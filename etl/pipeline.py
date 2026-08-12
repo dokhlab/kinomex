@@ -19,6 +19,7 @@ logger = logging.getLogger("kinomex.etl")
 
 STEPS = [
     ("uniprot", "UniProt kinase metadata"),
+    ("kinhub", "KinHub/Manning catalogue accounting"),
     ("pdb", "RCSB PDB structural data"),
     ("chembl", "ChEMBL bioactivity data"),
     ("pubchem", "PubChem compound enrichment & Ambit dataset"),
@@ -29,13 +30,14 @@ STEPS = [
 ]
 
 STEP_DEPENDENCIES: dict[str, list[str]] = {
-    "pdb": ["uniprot"],
-    "chembl": ["uniprot"],
-    "pubchem": ["uniprot", "chembl"],
-    "gtex": ["uniprot"],
-    "clinvar": ["uniprot"],
-    "diseases": ["uniprot"],
-    "pdis": ["uniprot", "pdb", "chembl", "gtex", "clinvar", "diseases"],
+    "kinhub": ["uniprot"],
+    "pdb": ["kinhub"],
+    "chembl": ["kinhub"],
+    "pubchem": ["kinhub", "chembl"],
+    "gtex": ["kinhub"],
+    "clinvar": ["kinhub"],
+    "diseases": ["kinhub"],
+    "pdis": ["kinhub", "pdb", "chembl", "gtex", "clinvar", "diseases"],
 }
 
 
@@ -72,6 +74,11 @@ async def _run_uniprot() -> int:
 async def _run_pdb() -> int:
     from .ingestors.pdb_ingestor import ingest_structures
     return await ingest_structures()
+
+
+async def _run_kinhub() -> int:
+    from .ingestors.kinhub_ingestor import ingest_kinhub_catalog
+    return await ingest_kinhub_catalog()
 
 
 async def _run_chembl() -> int:
@@ -112,6 +119,7 @@ async def _run_diseases() -> int:
 
 STEP_RUNNERS = {
     "uniprot": _run_uniprot,
+    "kinhub": _run_kinhub,
     "pdb": _run_pdb,
     "chembl": _run_chembl,
     "pubchem": _run_pubchem,

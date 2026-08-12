@@ -18,6 +18,8 @@ interface LigandAssay {
   value_nm: number;
   relation: string;
   target_conformation?: string;
+  source?: string;
+  pubchem_cid?: string | number;
   reference: LigandReference;
 }
 
@@ -205,6 +207,9 @@ export default function LigandTable({ ligands }: LigandTableProps) {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="border-t border-white/5 px-4 py-3 text-xs leading-relaxed text-slate-500">
+        Sources: <a href="https://www.ebi.ac.uk/chembl/" target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">ChEMBL</a> (CC BY-SA 3.0) and <a href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">PubChem</a> (record-specific contributor terms). Preserve source identifiers and attribution when reusing records.
       </div>
     </div>
   );

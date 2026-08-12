@@ -1,0 +1,5 @@
+import { NextRequest, NextResponse } from "next/server";
+import { clearSession, currentUser, ensureAuthIndexes, publicUser } from "@/lib/auth";
+export async function GET() { const user = await currentUser(); return NextResponse.json({ user: user ? publicUser(user) : null }); }
+export async function DELETE() { await clearSession(); return NextResponse.json({ ok: true }); }
+export async function PATCH(request: NextRequest) { const user = await currentUser(); if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 }); const body = await request.json().catch(() => null); const name = String(body?.name || "").trim().slice(0, 100); if (!name) return NextResponse.json({ error: "Name is required" }, { status: 400 }); const db = await ensureAuthIndexes(); await db.collection("users").updateOne({ _id: user._id }, { $set: { name, updatedAt: new Date() } }); const updated = await db.collection("users").findOne({ _id: user._id }); return NextResponse.json({ user: publicUser(updated as never) }); }

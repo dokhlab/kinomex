@@ -20,9 +20,21 @@ interface KinaseCardProps {
 
 export default function KinaseCard({ kinase }: KinaseCardProps) {
   const topOrgans = kinase.organ_systems_impacted?.slice(0, 3) ?? [];
+  const warmProfile = () => {
+    void fetch(`/api/kinases/${encodeURIComponent(kinase.gene_symbol)}`, {
+      method: "GET",
+      cache: "force-cache",
+    }).catch(() => undefined);
+  };
 
   return (
-    <Link href={`/kinases/${kinase.gene_symbol}`} className="block">
+    <Link
+      href={`/kinases/${kinase.gene_symbol}`}
+      className="block"
+      onMouseEnter={warmProfile}
+      onFocus={warmProfile}
+      onTouchStart={warmProfile}
+    >
       <GlassCard hoverable glowColor="cyan" className="h-full">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import KinomePhyloTree from "@/components/visualizations/KinomePhyloTree";
 
@@ -12,9 +13,9 @@ type TreeKinase = {
   full_name: string;
 };
 
-type GroupFilter = "All" | "AGC" | "CAMK" | "CK1" | "CMGC" | "STE" | "TK" | "TKL" | "Atypical";
+type GroupFilter = "All" | "AGC" | "CAMK" | "CK1" | "CMGC" | "STE" | "TK" | "TKL" | "Atypical" | "RGC" | "Other";
 
-const GROUPS: GroupFilter[] = ["All", "AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical"];
+const GROUPS: GroupFilter[] = ["All", "AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical", "RGC", "Other"];
 
 const GROUP_COLORS: Record<string, string> = {
   AGC: "#38bdf8",
@@ -25,6 +26,8 @@ const GROUP_COLORS: Record<string, string> = {
   TK: "#3b82f6",
   TKL: "#f97316",
   Atypical: "#94a3b8",
+  RGC: "#14b8a6",
+  Other: "#a1a1aa",
 };
 
 const groupPillStyles: Record<GroupFilter, string> = {
@@ -37,6 +40,8 @@ const groupPillStyles: Record<GroupFilter, string> = {
   TK: "border-blue-500/30 text-blue-400 bg-blue-500/10",
   TKL: "border-orange-500/30 text-orange-400 bg-orange-500/10",
   Atypical: "border-slate-500/30 text-slate-400 bg-slate-500/10",
+  RGC: "border-teal-500/30 text-teal-400 bg-teal-500/10",
+  Other: "border-zinc-500/30 text-zinc-400 bg-zinc-500/10",
 };
 
 const groupActiveStyles: Record<GroupFilter, string> = {
@@ -49,6 +54,8 @@ const groupActiveStyles: Record<GroupFilter, string> = {
   TK: "border-blue-500 text-white bg-blue-500/25 shadow-[0_0_20px_rgba(59,130,246,0.15)]",
   TKL: "border-orange-500 text-white bg-orange-500/25 shadow-[0_0_20px_rgba(249,115,22,0.15)]",
   Atypical: "border-slate-400 text-white bg-slate-400/25 shadow-[0_0_20px_rgba(148,163,184,0.15)]",
+  RGC: "border-teal-400 text-white bg-teal-400/25",
+  Other: "border-zinc-400 text-white bg-zinc-400/25",
 };
 
 function TreeSkeleton() {
@@ -82,13 +89,23 @@ export default function TreePage() {
   const [selectedKinaseData, setSelectedKinaseData] = useState<TreeKinase | null>(null);
 
   useEffect(() => {
-    fetch("/api/kinases?limit=600")
-      .then((r) => {
-        if (!r.ok) throw new Error("API unavailable");
-        return r.json();
-      })
-      .then((data) => {
-        const mapped: TreeKinase[] = (data.kinases || []).map((k: Record<string, unknown>) => ({
+    const loadAll = async () => {
+      const all: Record<string, unknown>[] = [];
+      let currentPage = 1;
+      let pageCount = 1;
+      do {
+        const response = await fetch(`/api/kinases?limit=100&page=${currentPage}`);
+        if (!response.ok) throw new Error("API unavailable");
+        const data = await response.json();
+        all.push(...(data.kinases || []));
+        pageCount = data.totalPages || 1;
+        currentPage += 1;
+      } while (currentPage <= pageCount);
+      return all;
+    };
+    loadAll()
+      .then((all) => {
+        const mapped: TreeKinase[] = all.map((k: Record<string, unknown>) => ({
           gene_symbol: (k.gene_symbol as string) || "",
           group: (k.group as string) || "",
           family: (k.subfamily as string) || "",
@@ -298,15 +315,16 @@ export default function TreePage() {
                 </div>
 
                 <div className="mt-8">
-                  <a
+                  <Link
                     href={`/kinases/${selectedKinaseData.gene_symbol}`}
+                    prefetch
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-kinome-cyan/20 hover:bg-kinome-cyan/30 border border-kinome-cyan/30 rounded-xl transition-colors w-full justify-center"
                   >
                     View Full Details
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </motion.div>

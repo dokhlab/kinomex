@@ -12,6 +12,8 @@ const config: Config = {
         "kinome-cyan": "#38bdf8",
         "kinome-violet": "#a855f7",
         "kinome-emerald": "#34d399",
+        "kinome-amber": "#f59e0b",
+        "kinome-rose": "#f43f5e",
         "kinome-dark": "#0b0f19",
         "kinome-card": "#0f1629",
       },

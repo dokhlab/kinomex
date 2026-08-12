@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import * as d3 from "d3";
 
 type KinaseNode = {
@@ -27,6 +28,8 @@ const GROUP_COLORS: Record<string, string> = {
   TK: "#3b82f6",
   TKL: "#f97316",
   Atypical: "#94a3b8",
+  RGC: "#14b8a6",
+  Other: "#a1a1aa",
 };
 
 type TreeNode = {
@@ -140,6 +143,7 @@ export default function KinomePhyloTree({
   selectedGroup,
   searchQuery,
 }: KinomePhyloTreeProps) {
+  const router = useRouter();
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<{
@@ -168,6 +172,32 @@ export default function KinomePhyloTree({
     [kinaseMap]
   );
 
+  const completeTree = useMemo(() => {
+    const root = enrichTree(KINOME_TREE);
+    const represented = new Set<string>();
+    const visit = (node: TreeNode) => {
+      if (!node.children?.length) represented.add(node.name);
+      node.children?.forEach(visit);
+    };
+    visit(root);
+    for (const kinase of kinases) {
+      if (represented.has(kinase.gene_symbol)) continue;
+      let groupNode = root.children?.find((node) => node.name === kinase.group);
+      if (!groupNode) {
+        groupNode = { name: kinase.group || "Other", group: kinase.group || "Other", children: [] };
+        root.children = [...(root.children || []), groupNode];
+      }
+      groupNode.children = [...(groupNode.children || []), {
+        name: kinase.gene_symbol,
+        group: kinase.group || "Other",
+        full_name: kinase.full_name,
+        pdis_score: kinase.pdis_score,
+      }];
+      represented.add(kinase.gene_symbol);
+    }
+    return root;
+  }, [enrichTree, kinases]);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -190,19 +220,123 @@ export default function KinomePhyloTree({
     const { width, height } = dimensions;
     const radius = Math.min(width, height) / 2 - 60;
 
-    const g = svg
+    const viewport = svg.append("g").attr("class", "zoom-viewport");
+    const g = viewport
       .append("g")
       .attr("transform", `translate(${width / 2},${height / 2})`);
 
-    const zoomBehavior = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.3, 5])
-      .on("zoom", (event) => {
-        g.attr("transform", event.transform.toString());
+    let nodeLabels: d3.Selection<SVGTextElement, d3.HierarchyNode<TreeNode>, SVGGElement, unknown> | null = null;
+    let nodeCircles: d3.Selection<SVGCircleElement, d3.HierarchyNode<TreeNode>, SVGGElement, unknown> | null = null;
+    let treeLinks: d3.Selection<SVGLineElement, d3.HierarchyLink<TreeNode>, SVGGElement, unknown> | null = null;
+    let currentZoomScale = 1;
+
+    const updateZoomStyles = (scale: number) => {
+      const safeScale = Math.max(scale, 0.3);
+      nodeLabels
+        ?.attr("font-size", `${10 / safeScale}px`)
+        .attr("x", (d) => ((d.x ?? 0) < Math.PI ? 10 / safeScale : -10 / safeScale))
+        .attr("dy", "0.31em")
+        .attr("stroke-width", 2.5 / safeScale);
+      nodeCircles
+        ?.attr("r", function () {
+          const baseRadius = Number(this.dataset.baseRadius || 3);
+          return baseRadius / safeScale;
+        })
+        .attr("stroke-width", 1.5 / safeScale);
+      treeLinks?.attr("stroke-width", 1 / safeScale);
+    };
+
+    const hideOverlappingLabels = () => {
+      if (!nodeLabels) return;
+      const labels = nodeLabels.nodes();
+      if (currentZoomScale >= 8) {
+        // At detail zoom every label is shown. Place nearby labels in radial
+        // lanes so dense kinase families remain readable instead of forming a
+        // single overlapping ring.
+        const accepted: DOMRect[] = [];
+        const safeScale = Math.max(currentZoomScale, 0.3);
+        const svgRect = svgRef.current?.getBoundingClientRect();
+        for (const label of labels) {
+          label.style.visibility = "visible";
+          const datum = d3.select(label).datum() as d3.HierarchyNode<TreeNode>;
+          const direction = (datum.x ?? 0) < Math.PI ? 1 : -1;
+          let placed = false;
+          const maxLabelLanes = 20;
+          const tangentOffsets = [0, -12, 12, -24, 24, -36, 36];
+          for (let lane = 0; lane < maxLabelLanes && !placed; lane += 1) {
+            for (const tangentOffset of tangentOffsets) {
+              label.setAttribute("x", String(direction * (10 + lane * 14) / safeScale));
+              label.setAttribute("dy", `${tangentOffset / safeScale}px`);
+              const rect = label.getBoundingClientRect();
+              const onScreen = !svgRect || !(
+                rect.right < svgRect.left || rect.left > svgRect.right ||
+                rect.bottom < svgRect.top || rect.top > svgRect.bottom
+              );
+              const overlaps = onScreen && accepted.some((other) => !(
+                rect.right + 2 < other.left || rect.left - 2 > other.right ||
+                rect.bottom + 2 < other.top || rect.top - 2 > other.bottom
+              ));
+              if (!overlaps) {
+                if (onScreen) accepted.push(rect);
+                placed = true;
+                break;
+              }
+            }
+          }
+          // The final lane is still preferable to hiding a kinase name. This
+          // fallback is only reachable in an exceptionally dense viewport.
+          if (!placed) {
+            label.setAttribute("x", String(direction * (10 + (maxLabelLanes - 1) * 14) / safeScale));
+            label.setAttribute("dy", `${tangentOffsets[tangentOffsets.length - 1] / safeScale}px`);
+          }
+        }
+        return;
+      }
+      const labelData = nodeLabels.data();
+      const dataByLabel = new Map(labels.map((label, index) => [label, labelData[index]]));
+      const query = (searchQuery ?? "").trim().toLowerCase();
+      const prioritized = [...labels].sort((a, b) => {
+        const aData = dataByLabel.get(a)!;
+        const bData = dataByLabel.get(b)!;
+        const priority = (data: d3.HierarchyNode<TreeNode>) => {
+          const name = data.data.name.toLowerCase();
+          if (query && name === query) return 0;
+          if (query && name.includes(query)) return 1;
+          if (selectedGroup && data.data.group === selectedGroup) return 2;
+          return 3;
+        };
+        return priority(aData) - priority(bData);
       });
+      const accepted: DOMRect[] = [];
+      for (const label of prioritized) {
+        label.style.visibility = "visible";
+        const rect = label.getBoundingClientRect();
+        const overlaps = accepted.some((placed) => !(
+          rect.right + 2 < placed.left ||
+          rect.left - 2 > placed.right ||
+          rect.bottom + 2 < placed.top ||
+          rect.top - 2 > placed.bottom
+        ));
+        if (overlaps) {
+          label.style.visibility = "hidden";
+        } else {
+          accepted.push(rect);
+        }
+      }
+    };
+
+    const zoomBehavior = d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.3, 12])
+      .on("zoom", (event) => {
+        currentZoomScale = event.transform.k;
+        viewport.attr("transform", event.transform.toString());
+        updateZoomStyles(event.transform.k);
+      })
+      .on("end", () => requestAnimationFrame(hideOverlappingLabels));
 
     svg.call(zoomBehavior);
 
-    const enrichedTree = enrichTree(KINOME_TREE);
+    const enrichedTree = completeTree;
     const root = d3.hierarchy(enrichedTree);
     const treeLayout = d3.tree<TreeNode>().size([2 * Math.PI, radius]);
     treeLayout(root);
@@ -212,7 +346,7 @@ export default function KinomePhyloTree({
       return GROUP_COLORS[group] || "#94a3b8";
     };
 
-    g.selectAll<SVGLineElement, d3.HierarchyPointNode<TreeNode>>(".link")
+    treeLinks = g.selectAll<SVGLineElement, d3.HierarchyLink<TreeNode>>(".link")
       .data(root.links())
       .enter()
       .append("line")
@@ -249,6 +383,11 @@ export default function KinomePhyloTree({
       .attr("target", "_self")
       .attr("cursor", "pointer")
       .on("mouseenter", (event, d) => {
+        const path = `/kinases/${encodeURIComponent(d.data.name)}`;
+        router.prefetch(path);
+        void fetch(`/api/kinases/${encodeURIComponent(d.data.name)}`, {
+          cache: "force-cache",
+        }).catch(() => undefined);
         const kinase = kinaseMap.get(d.data.name);
         if (kinase) {
           const rect = svgRef.current!.getBoundingClientRect();
@@ -259,15 +398,20 @@ export default function KinomePhyloTree({
           });
         }
       })
+      .on("click", (event, d) => {
+        event.preventDefault();
+        router.push(`/kinases/${encodeURIComponent(d.data.name)}`);
+      })
       .on("mouseleave", () => setTooltip(null))
       .each(function (d) {
         const link = d3.select(this);
+        const radius = d.data.pdis_score === null || d.data.pdis_score === undefined
+          ? 3
+          : 2 + (d.data.pdis_score / maxPdis) * 6;
         link
           .append("circle")
-          .attr("r", () => {
-            const score = d.data.pdis_score;
-            return score === null || score === undefined ? 3 : 2 + (score / maxPdis) * 6;
-          })
+          .attr("r", radius)
+          .attr("data-base-radius", radius)
           .attr("fill", () => getColor(d))
           .attr("stroke", () => getColor(d))
           .attr("stroke-width", 1.5)
@@ -280,8 +424,17 @@ export default function KinomePhyloTree({
           .attr("transform", () => ((d.x ?? 0) >= Math.PI ? "rotate(180)" : null))
           .text(d.data.name)
           .attr("font-size", "7px")
-          .attr("fill", "#94a3b8");
+          .attr("fill", "#cbd5e1")
+          .attr("stroke", "#0b0f19")
+          .attr("stroke-width", 2.5)
+          .attr("paint-order", "stroke")
+          .attr("stroke-linejoin", "round");
       });
+
+    nodeCircles = nodeGroup.select("a").select("circle");
+    nodeLabels = nodeGroup.select("a").select("text");
+    updateZoomStyles(1);
+    requestAnimationFrame(hideOverlappingLabels);
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -302,7 +455,10 @@ export default function KinomePhyloTree({
         const scale = 3;
         svg.transition().duration(750).call(
           zoomBehavior.transform as never,
-          d3.zoomIdentity.translate(width / 2, height / 2).scale(scale).translate(-px, -py)
+          d3.zoomIdentity
+            .translate(width / 2, height / 2)
+            .scale(scale)
+            .translate(-(width / 2 + px), -(height / 2 + py))
         );
       }
     }
@@ -322,7 +478,7 @@ export default function KinomePhyloTree({
           return g === selectedGroup ? 0.7 : 0.08;
         });
     }
-  }, [dimensions, kinases, selectedGroup, searchQuery, enrichTree, kinaseMap, onSelectKinase]);
+  }, [dimensions, kinases, selectedGroup, searchQuery, completeTree, kinaseMap, onSelectKinase, router]);
 
   return (
     <div
@@ -359,7 +515,11 @@ export default function KinomePhyloTree({
       {tooltip && (
         <div
           className="pointer-events-none absolute z-50 rounded-xl border border-white/15 bg-[#0b0f19]/90 backdrop-blur-md px-4 py-3 shadow-xl"
-          style={{ left: tooltip.x + 16, top: tooltip.y - 10 }}
+          style={{
+            left: Math.max(8, Math.min(tooltip.x + 16, dimensions.width - 240)),
+            top: Math.max(8, Math.min(tooltip.y - 10, dimensions.height - 130)),
+            width: 224,
+          }}
         >
           <p className="text-sm font-bold text-white">{tooltip.data.gene_symbol}</p>
           <p className="text-xs text-slate-300 mt-0.5">{tooltip.data.full_name}</p>

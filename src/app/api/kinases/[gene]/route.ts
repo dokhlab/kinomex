@@ -2,25 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { deriveGroup, parseMutationCode } from "@/lib/kinase-utils";
 
-const chemblIdCache = new Map<string, string>();
+const profileCache = new Map<string, { data: unknown; expiresAt: number }>();
+const PROFILE_CACHE_TTL = 60 * 1000;
 
-async function resolveChemblId(uniprotId: string): Promise<string | null> {
-  if (!uniprotId) return null;
-  const cached = chemblIdCache.get(uniprotId);
-  if (cached !== undefined) return cached;
-  try {
-    const url = `https://www.ebi.ac.uk/chembl/api/data/target?target_components__accession=${uniprotId}&format=json`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
-    const data = await res.json();
-    const target = data?.targets?.[0];
-    const chemblId = target?.target_chembl_id || null;
-    chemblIdCache.set(uniprotId, chemblId ?? "");
-    return chemblId;
-  } catch {
-    chemblIdCache.set(uniprotId, "");
-    return null;
-  }
-}
+const PROFILE_CACHE_HEADERS = {
+  "Cache-Control": "private, max-age=60, stale-while-revalidate=300",
+};
 
 export async function GET(
   _request: NextRequest,
@@ -36,58 +23,77 @@ export async function GET(
       );
     }
 
+    let normalizedGene: string;
+    try {
+      normalizedGene = decodeURIComponent(gene).trim().toUpperCase();
+    } catch {
+      return NextResponse.json({ error: "Invalid gene symbol" }, { status: 400 });
+    }
+    if (!/^[A-Z0-9][A-Z0-9_.-]{0,39}$/.test(normalizedGene)) {
+      return NextResponse.json({ error: "Invalid gene symbol" }, { status: 400 });
+    }
+
+    const cacheKey = normalizedGene;
+    const cached = profileCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return NextResponse.json(cached.data, { headers: PROFILE_CACHE_HEADERS });
+    }
+    profileCache.delete(cacheKey);
+
     const mongoose = await connectToDatabase();
     const db = mongoose.connection.db!;
 
-    const geneRegex = `^${gene.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`;
-
     // First fetch the kinase doc to get uniprot_id for ChEMBL lookup
-    const kinaseDoc = await db.collection("kinases").findOne({
-      gene_symbol: { $regex: geneRegex, $options: "i" },
-    });
+    const kinaseDoc = await db.collection("kinases").findOne(
+      { gene_symbol: normalizedGene },
+      { projection: { gene_symbol: 1, full_name: 1, kinhub_domains: 1, uniprot_id: 1, reviewed: 1, uniprot_section: 1, function_annotations: 1, catalytic_activities: 1, subunit_annotations: 1, source_url: 1, group: 1, subfamily: 1, keywords: 1, domain_boundaries: 1, protein_sequence: 1, seq_length: 1, ec_number: 1 } }
+    );
 
     if (!kinaseDoc) {
       return NextResponse.json(
-        { error: `Kinase "${gene}" not found` },
+        { error: `Kinase "${normalizedGene}" not found` },
         { status: 404 }
       );
     }
 
-    // Resolve ChEMBL target ID from UniProt
-    const chemblId = await resolveChemblId(kinaseDoc.uniprot_id);
-
-    // Fetch remaining data in parallel
+    // The dossier's initial response is assembled exclusively from imported
+    // local data. Live scientific services must never delay route navigation.
     const [pdisDoc, structures, bioactivities, expression, variants, diseasesDoc] = await Promise.all([
       db.collection("pdis").findOne({
-        gene_symbol: { $regex: geneRegex, $options: "i" },
+        gene_symbol: normalizedGene,
       }),
       db.collection("structures").find({
-        gene_symbols: { $regex: geneRegex, $options: "i" },
-      }).limit(20).toArray().catch(() => []),
+        gene_symbols: normalizedGene,
+      }, { projection: { pdb_id: 1, title: 1, resolution: 1, experimental_method: 1, bound_ligands: 1 } }).limit(20).toArray().catch(() => []),
       db.collection("bioactivities").find({
-        $or: [
-          { target_chembl_id: chemblId || "__NONE__" },
-          { target_gene_symbol: { $regex: geneRegex, $options: "i" } },
-        ],
-      }).sort({ source: -1, standard_value: 1 }).limit(200).toArray().catch(() => []),
+        target_gene_symbol: normalizedGene,
+      }, { projection: { source: 1, standard_value: 1, standard_units: 1, pubchem_cid: 1, compound_name: 1, compound_id: 1, binding_type: 1, assay_type: 1, standard_relation: 1, pubmed_ids: 1, pubmed_id: 1, doi: 1, document_journal: 1, document_year: 1 } }).sort({ source: -1, standard_value: 1 }).limit(200).toArray().catch(() => []),
       db.collection("expression").find({
-        gene_symbol: { $regex: geneRegex, $options: "i" },
-      }).toArray().catch(() => []),
+        gene_symbol: normalizedGene,
+      }, { projection: { tissue_site: 1, median_tpm: 1, organ_system: 1, tau: 1, source: 1 } }).toArray().catch(() => []),
       db.collection("variants").find({
-        gene_symbol: { $regex: geneRegex, $options: "i" },
-      }).toArray().catch(() => []),
+        gene_symbol: normalizedGene,
+      }, { projection: { mutation_code: 1, position: 1, pathogenicity: 1, drug_resistance_context: 1, is_gatekeeper: 1, wildtype_aa: 1, mutant_aa: 1, source_title: 1, pubmed_id: 1 } }).toArray().catch(() => []),
       db.collection("diseases").findOne({
-        gene_symbol: { $regex: geneRegex, $options: "i" },
+        gene_symbol: normalizedGene,
       }).catch(() => null),
     ]);
 
     // Build the unified kinase profile
     const kinase = {
       gene_symbol: kinaseDoc.gene_symbol,
-      name: kinaseDoc.full_name || "Unknown",
+      name: kinaseDoc.full_name || kinaseDoc.kinhub_domains?.[0]?.kinase_name || "Name unavailable",
       alias: "",
       organism: "Human",
       uniprot_id: kinaseDoc.uniprot_id,
+      swiss_prot_annotation: {
+        reviewed: kinaseDoc.reviewed === true,
+        section: kinaseDoc.uniprot_section || (kinaseDoc.reviewed ? "Swiss-Prot" : "Unavailable"),
+        functions: Array.isArray(kinaseDoc.function_annotations) ? kinaseDoc.function_annotations : [],
+        catalytic_activities: Array.isArray(kinaseDoc.catalytic_activities) ? kinaseDoc.catalytic_activities : [],
+        subunit_annotations: Array.isArray(kinaseDoc.subunit_annotations) ? kinaseDoc.subunit_annotations : [],
+        source_url: kinaseDoc.source_url || (kinaseDoc.uniprot_id ? `https://www.uniprot.org/uniprotkb/${kinaseDoc.uniprot_id}/entry` : null),
+      },
       pdb_id: structures.length > 0 ? structures[0].pdb_id : "",
       group: kinaseDoc.group || deriveGroup(kinaseDoc.keywords || []),
       subfamily: kinaseDoc.subfamily || "",
@@ -165,7 +171,7 @@ export async function GET(
           },
         };
       }),
-      key_references: await buildReferences(gene, variants, bioactivities, structures),
+      key_references: buildReferences(normalizedGene, variants, bioactivities, structures),
       organ_systems_impacted: Array.from(new Set(expression.map((e) => e.organ_system).filter(Boolean))),
       diseases_associated: (diseasesDoc?.diseases || []).map((d: { disease_id: string; description: string; omim_id: string }) => ({
         name: d.disease_id,
@@ -188,7 +194,11 @@ export async function GET(
       keywords: kinaseDoc.keywords || [],
     };
 
-    return NextResponse.json(kinase);
+    profileCache.set(cacheKey, {
+      data: kinase,
+      expiresAt: Date.now() + PROFILE_CACHE_TTL,
+    });
+    return NextResponse.json(kinase, { headers: PROFILE_CACHE_HEADERS });
   } catch (error) {
     console.error(`GET /api/kinases/${params.gene} error:`, error);
     return NextResponse.json(
@@ -203,7 +213,7 @@ function finiteOrNull(value: unknown): number | null {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function buildReferences(
+function buildReferences(
   gene: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   variants: any[],
@@ -211,7 +221,7 @@ async function buildReferences(
   bioactivities: any[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   structures: any[]
-): Promise<Array<{ pubmed_id: string; citation_text: string; doi?: string; relevance_tag: string }>> {
+): Array<{ pubmed_id: string; citation_text: string; doi?: string; relevance_tag: string }> {
   const refs: Array<{ pubmed_id: string; citation_text: string; doi?: string; relevance_tag: string }> = [];
   const seen = new Set<string>();
 
@@ -250,37 +260,6 @@ async function buildReferences(
         relevance_tag: "structure",
       });
     }
-  }
-
-  // 4. Fetch top PubMed results for this gene
-  try {
-    const searchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=10&sort=relevance&term=${encodeURIComponent(gene + " kinase")}&retmode=json`;
-    const searchResp = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
-    const searchData = await searchResp.json();
-    const ids: string[] = searchData?.esearchresult?.idlist || [];
-
-    if (ids.length > 0) {
-      const fetchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(",")}&retmode=json`;
-      const fetchResp = await fetch(fetchUrl, { signal: AbortSignal.timeout(5000) });
-      const fetchData = await fetchResp.json();
-
-      for (const id of ids) {
-        const doc = fetchData?.result?.[id];
-        if (doc && !seen.has(id)) {
-          seen.add(id);
-          const authors = doc.authors?.slice(0, 3).map((a: Record<string, string>) => a.name).join(", ") || "";
-          const year = doc.pubdate?.slice(0, 4) || "";
-          refs.push({
-            pubmed_id: id,
-            citation_text: `${authors}${authors ? " " : ""}(${year}) ${doc.title || ""}`.trim(),
-            doi: doc.articleids?.find((a: Record<string, string>) => a.idtype === "doi")?.value,
-            relevance_tag: "review",
-          });
-        }
-      }
-    }
-  } catch {
-    // PubMed query failed — continue with what we have
   }
 
   return refs;

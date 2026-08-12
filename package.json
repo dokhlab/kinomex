@@ -11,6 +11,8 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.2",
     "@types/d3": "^7.4.3",
     "d3": "^7.9.0",
     "framer-motion": "^12.42.2",

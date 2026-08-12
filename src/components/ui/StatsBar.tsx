@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
 interface StatsData {
-  totalKinases: number;
-  totalLigands: number;
-  totalVariants: number;
-  totalStructures: number;
-  totalDiseases: number;
+  totalKinases: number | null;
+  totalLigands: number | null;
+  totalVariants: number | null;
+  totalStructures: number | null;
+  totalDiseases: number | null;
 }
 
 interface StatsBarProps {
@@ -17,12 +17,12 @@ interface StatsBarProps {
 
 interface StatItem {
   label: string;
-  value: number;
+  value: number | null;
   icon: JSX.Element;
   color: string;
 }
 
-function AnimatedNumber({ value, duration = 1.2 }: { value: number; duration?: number }) {
+function AnimatedNumber({ value, duration = 1.2 }: { value: number | null; duration?: number }) {
   const [display, setDisplay] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
@@ -30,7 +30,7 @@ function AnimatedNumber({ value, duration = 1.2 }: { value: number; duration?: n
   const frameRef = useRef<number>(0);
 
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || value === null) return;
 
     const animate = (timestamp: number) => {
       if (startTime.current === null) startTime.current = timestamp;
@@ -48,7 +48,7 @@ function AnimatedNumber({ value, duration = 1.2 }: { value: number; duration?: n
     return () => cancelAnimationFrame(frameRef.current);
   }, [inView, value, duration]);
 
-  return <span ref={ref} className="tabular-nums">{display.toLocaleString()}</span>;
+  return <span ref={ref} className="tabular-nums">{value === null ? "—" : display.toLocaleString()}</span>;
 }
 
 function KinaseIcon() {
@@ -125,12 +125,15 @@ const colorMap: Record<string, { bg: string; text: string; border: string; iconB
 };
 
 export default function StatsBar({ stats }: StatsBarProps) {
+  const finiteCount = (value: unknown): number | null =>
+    typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
+
   const statItems: StatItem[] = [
-    { label: "Total Kinases", value: stats.totalKinases, icon: <KinaseIcon />, color: "kinome-cyan" },
-    { label: "Ligand Assays", value: stats.totalLigands, icon: <LigandIcon />, color: "kinome-violet" },
-    { label: "Known Variants", value: stats.totalVariants, icon: <VariantIcon />, color: "kinome-emerald" },
-    { label: "3D Structures", value: stats.totalStructures, icon: <StructureIcon />, color: "amber-400" },
-    { label: "Disease Annotations", value: stats.totalDiseases, icon: <DiseaseIcon />, color: "kinome-rose" },
+    { label: "Total Kinases", value: finiteCount(stats.totalKinases), icon: <KinaseIcon />, color: "kinome-cyan" },
+    { label: "Ligand Assays", value: finiteCount(stats.totalLigands), icon: <LigandIcon />, color: "kinome-violet" },
+    { label: "Known Variants", value: finiteCount(stats.totalVariants), icon: <VariantIcon />, color: "kinome-emerald" },
+    { label: "3D Structures", value: finiteCount(stats.totalStructures), icon: <StructureIcon />, color: "amber-400" },
+    { label: "Disease Annotations", value: finiteCount(stats.totalDiseases), icon: <DiseaseIcon />, color: "kinome-rose" },
   ];
 
   return (

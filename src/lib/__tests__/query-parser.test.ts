@@ -1,6 +1,11 @@
-import { parseQuery } from "@/lib/query-parser";
+import { isInteractionQuery, matchesScientificAnnotation, parseQuery, scientificAnnotationRelevance, scientificSearchPattern, shouldSearchExternalEvidence } from "@/lib/query-parser";
 
 describe("parseQuery", () => {
+  it("uses external evidence for broad functional questions despite a partial local match", () => {
+    expect(shouldSearchExternalEvidence("Which kinases phosphorylate GPCRs?")).toBe(true);
+    expect(shouldSearchExternalEvidence("Show TK kinases with PDIS above 0.5")).toBe(false);
+  });
+
   it("detects group keyword", () => {
     const result = parseQuery("TK kinases");
     expect(result.groups).toEqual(["TK"]);
@@ -84,6 +89,30 @@ describe("parseQuery", () => {
     expect(result.freeText).toContain("egfr");
   });
 
+  it("normalizes cytoskeletal vocabulary to the cytoskeleton annotation stem", () => {
+    expect(scientificSearchPattern("cytoskeletal")).toBe("cytoskelet");
+    expect(scientificSearchPattern("cytoskeleton")).toBe("cytoskelet");
+  });
+
+  it("matches cytoskeletal queries against Swiss-Prot cytoskeleton annotations", () => {
+    expect(matchesScientificAnnotation({
+      gene_symbol: "PTK2",
+      function_annotations: ["Regulates reorganization of the actin cytoskeleton."],
+    }, ["cytoskeletal"])).toBe(true);
+  });
+
+  it("prioritizes direct actin-cytoskeleton function annotations", () => {
+    const direct = scientificAnnotationRelevance({
+      function_annotations: ["Regulates focal adhesions and reorganization of the actin cytoskeleton."],
+    }, ["cytoskeletal"]);
+    const indirect = scientificAnnotationRelevance({ keywords: ["Cytoskeleton"] }, ["cytoskeletal"]);
+    expect(direct).toBeGreaterThan(indirect);
+  });
+
+  it("recognizes the exact cytoskeletal association question", () => {
+    expect(isInteractionQuery("what are the kinases associated with cytoskeletal proteins?")).toBe(true);
+  });
+
   it("filters stop words", () => {
     const result = parseQuery("show all kinases in the brain");
     expect(result.groups).toEqual([]);
@@ -106,6 +135,14 @@ describe("parseQuery", () => {
     expect(result.bindingTypes).toContain("covalent");
     expect(result.freeText).toContain("egfr");
     expect(result.diseases).toContain("brain cancer");
+  });
+
+  it("does not turn natural-language Type II family phrasing into name filters", () => {
+    const result = parseQuery("Find all TK family kinases expressed in the brain with Type II allosteric inhibitors");
+    expect(result.groups).toEqual(["TK"]);
+    expect(result.tissues).toEqual(["brain"]);
+    expect(result.bindingTypes).toEqual(expect.arrayContaining(["type_ii", "allosteric", "inhibitor"]));
+    expect(result.freeText).toEqual([]);
   });
 
   it("returns empty filters for empty query", () => {

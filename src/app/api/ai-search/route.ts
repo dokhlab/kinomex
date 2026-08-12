@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
-import { parseQuery } from "@/lib/query-parser";
+import { parseQuery, scientificSearchPattern } from "@/lib/query-parser";
+import { resolveStructuredGeneSet } from "@/lib/search-filters";
+import { searchPubMedEvidence } from "@/lib/pubmed";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +17,7 @@ export async function POST(request: NextRequest) {
     const db = mongoose.connection.db!;
 
     const filters = parseQuery(query);
+    const structuredGenes = await resolveStructuredGeneSet(db, filters);
 
     // Build match stage
     const matchStage: Record<string, unknown> = {};
@@ -23,16 +26,23 @@ export async function POST(request: NextRequest) {
     } else if (filters.groups.length > 1) {
       matchStage.group = { $in: filters.groups };
     }
+    if (structuredGenes !== null) {
+      matchStage.gene_symbol = { $in: structuredGenes };
+    }
 
     // Free-text search on gene_symbol and full_name
     const textMatch: Record<string, unknown> = {};
     if (filters.freeText.length > 0) {
       const tokenConditions = filters.freeText.map((tok) => {
-        const escaped = tok.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const escaped = scientificSearchPattern(tok).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         return {
           $or: [
             { gene_symbol: { $regex: escaped, $options: "i" } },
             { full_name: { $regex: escaped, $options: "i" } },
+            { function_annotations: { $regex: escaped, $options: "i" } },
+            { catalytic_activities: { $regex: escaped, $options: "i" } },
+            { subunit_annotations: { $regex: escaped, $options: "i" } },
+            { keywords: { $regex: escaped, $options: "i" } },
           ],
         };
       });
@@ -42,46 +52,12 @@ export async function POST(request: NextRequest) {
     const finalMatch = { ...matchStage, ...textMatch };
 
     // 1. Text-based kinase search
-    const kinasePromises: Promise<{ gene_symbol: string; full_name: string; group: string }[]>[] = [
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      db.collection("kinases").find(finalMatch).limit(200).toArray() as Promise<any[]>,
-    ];
-
-    // 2. Disease-based search — query disease collection and find matching kinases
-    if (filters.diseases.length > 0) {
-      const diseaseRegex = filters.diseases.map((d) => d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
-      kinasePromises.push(
-        db.collection("diseases")
-          .find({ "diseases.description": { $regex: diseaseRegex, $options: "i" } })
-          .project({ gene_symbol: 1 })
-          .limit(200)
-          .toArray()
-          .then((docs) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const genes = Array.from(new Set(docs.map((d: any) => d.gene_symbol).filter(Boolean))) as string[];
-            if (!genes.length) return [];
-            return db.collection("kinases")
-              .find({ gene_symbol: { $in: genes } })
-              .limit(200)
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              .toArray() as Promise<any[]>;
-          })
-          .catch(() => [])
-      );
-    }
-
+    // All structured filters are intersections. Previously disease results
+    // were unioned with the kinase query while tissue and binding filters were
+    // only displayed, not applied.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const kinaseResults: any[][] = await Promise.all(kinasePromises) as any[][];
-    const seen = new Set<string>();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const uniqueKinases: any[] = [];
-    for (const k of kinaseResults.flat()) {
-      const g = k.gene_symbol;
-      if (g && !seen.has(g)) {
-        seen.add(g);
-        uniqueKinases.push(k);
-      }
-    }
+    const uniqueKinases: any[] = await db.collection("kinases")
+      .find(finalMatch).limit(200).toArray();
 
     // Get PDIS scores
     const geneSymbols = uniqueKinases.map((k) => k.gene_symbol).filter(Boolean);
@@ -165,11 +141,15 @@ export async function POST(request: NextRequest) {
     });
 
     enriched = enriched.slice(0, 50);
+    const externalEvidence = enriched.length === 0
+      ? await searchPubMedEvidence(query).catch(() => [])
+      : [];
 
     return NextResponse.json({
       results: enriched,
       parsedFilters: filters,
       totalMatches: enriched.length,
+      externalEvidence,
     });
   } catch (error) {
     console.error("POST /api/ai-search error:", error);

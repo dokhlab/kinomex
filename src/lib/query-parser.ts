@@ -1,4 +1,4 @@
-export const GROUPS = ["AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical"];
+export const GROUPS = ["AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical", "RGC", "Other"];
 
 export const STOP_WORDS = new Set([
   "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for",
@@ -15,6 +15,7 @@ export const STOP_WORDS = new Set([
   "mutated", "mutation", "mutations", "cancer", "tumor", "tumors",
   "associated", "linked", "related", "syndrome", "disease", "diseases",
   "involved", "expressed", "target", "targets", "targeted",
+  "family", "families", "ii", "iii", "iv",
 ]);
 
 export const TISSUE_KEYWORDS: Record<string, string> = {
@@ -29,6 +30,8 @@ export const TISSUE_KEYWORDS: Record<string, string> = {
 };
 
 export const BINDING_KEYWORDS: Record<string, string> = {
+  "type ii": "type_ii", "type-ii": "type_ii", "dfg-out": "type_ii",
+  "type iii": "allosteric", "type-iii": "allosteric",
   inhibitor: "inhibitor", agonist: "agonist", antagonist: "antagonist",
   "covalent inhibitor": "covalent", covalent: "covalent", reversible: "reversible",
   "atp-competitive": "atp_competitive", allosteric: "allosteric", bivalent: "bivalent",
@@ -67,6 +70,67 @@ export interface ParsedFilters {
   minPdis: number | null;
   maxPdis: number | null;
   freeText: string[];
+}
+
+const SCIENTIFIC_SEARCH_STEMS: Record<string, string> = {
+  cytoskeletal: "cytoskelet",
+  cytoskeleton: "cytoskelet",
+};
+
+export function scientificSearchPattern(term: string): string {
+  return SCIENTIFIC_SEARCH_STEMS[term.toLowerCase()] ?? term;
+}
+
+export function isInteractionQuery(query: string): boolean {
+  return /\b(interact\w*|associat\w*|network|partners?|binds?|binding)\b/i.test(query);
+}
+
+/** Broad biological questions need literature evidence even if one local annotation matches. */
+export function shouldSearchExternalEvidence(query: string): boolean {
+  const filters = parseQuery(query);
+  return filters.freeText.length > 0 &&
+    filters.groups.length === 0 &&
+    filters.tissues.length === 0 &&
+    filters.diseases.length === 0 &&
+    filters.bindingTypes.length === 0 &&
+    filters.minPdis === null &&
+    filters.maxPdis === null;
+}
+
+export function matchesScientificAnnotation(
+  record: Record<string, unknown>,
+  terms: string[],
+): boolean {
+  const searchable = [
+    record.gene_symbol,
+    record.full_name,
+    ...(Array.isArray(record.function_annotations) ? record.function_annotations : []),
+    ...(Array.isArray(record.catalytic_activities) ? record.catalytic_activities : []),
+    ...(Array.isArray(record.subunit_annotations) ? record.subunit_annotations : []),
+    ...(Array.isArray(record.keywords) ? record.keywords : []),
+  ].filter((value): value is string => typeof value === "string").join(" ").toLowerCase();
+  return terms.every((term) => searchable.includes(scientificSearchPattern(term).toLowerCase()));
+}
+
+export function scientificAnnotationRelevance(
+  record: Record<string, unknown>,
+  terms: string[],
+): number {
+  const functions = Array.isArray(record.function_annotations)
+    ? record.function_annotations.filter((value): value is string => typeof value === "string").join(" ").toLowerCase()
+    : "";
+  const allAnnotations = [
+    functions,
+    ...(Array.isArray(record.subunit_annotations) ? record.subunit_annotations : []),
+    ...(Array.isArray(record.keywords) ? record.keywords : []),
+  ].filter((value): value is string => typeof value === "string").join(" ").toLowerCase();
+  let score = terms.reduce((total, term) => {
+    const pattern = scientificSearchPattern(term).toLowerCase();
+    return total + (functions.includes(pattern) ? 10 : allAnnotations.includes(pattern) ? 2 : 0);
+  }, 0);
+  if (functions.includes("actin cytoskeleton")) score += 5;
+  if (functions.includes("focal adhesion")) score += 3;
+  return score;
 }
 
 export function parseQuery(query: string): ParsedFilters {

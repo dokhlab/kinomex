@@ -76,7 +76,12 @@ export async function GET(request: NextRequest) {
         .toArray();
       const scoreMap = new Map<string, number>();
       for (const p of pdisDocs) {
-        if (p.gene_symbol && typeof p.pdis_total === "number") {
+        if (
+          p.gene_symbol &&
+          Number.isFinite(p.pdis_total) &&
+          p.pdis_total >= 0 &&
+          p.pdis_total <= 100
+        ) {
           scoreMap.set(p.gene_symbol, p.pdis_total);
         }
       }

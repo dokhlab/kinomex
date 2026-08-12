@@ -49,7 +49,8 @@ def _extract_kinase(record: dict[str, Any]) -> dict[str, Any]:
 
     seq_info = record.get("sequence", {})
     protein_sequence = seq_info.get("value", "")
-    seq_length = seq_info.get("length", 0)
+    reported_length = seq_info.get("length")
+    seq_length = reported_length if isinstance(reported_length, int) and reported_length > 0 else (len(protein_sequence) or None)
 
     domains: list[dict[str, Any]] = []
     for feat in record.get("features", []):
@@ -57,7 +58,8 @@ def _extract_kinase(record: dict[str, Any]) -> dict[str, Any]:
             loc = feat.get("location", {})
             start = loc.get("start", {}).get("value", 0)
             end = loc.get("end", {}).get("value", 0)
-            domains.append({"name": feat.get("description", "unknown"), "start": start, "end": end})
+            if isinstance(start, int) and isinstance(end, int) and start > 0 and end >= start:
+                domains.append({"name": feat.get("description", "unknown"), "start": start, "end": end})
 
     keywords: list[str] = []
     for kw in record.get("keywords", []):
@@ -66,6 +68,22 @@ def _extract_kinase(record: dict[str, Any]) -> dict[str, Any]:
     # Determine reviewed status (Swiss-Prot vs TrEMBL)
     entry_type = record.get("entryType", "") or ""
     reviewed = "swiss-prot" in entry_type.lower()
+
+    function_annotations: list[str] = []
+    catalytic_activities: list[str] = []
+    subunit_annotations: list[str] = []
+    for comment in record.get("comments", []):
+        comment_type = comment.get("commentType", "")
+        texts = [text.get("value", "").strip() for text in comment.get("texts", []) if text.get("value")]
+        if comment_type == "FUNCTION":
+            function_annotations.extend(texts)
+        elif comment_type == "SUBUNIT":
+            subunit_annotations.extend(texts)
+        elif comment_type == "CATALYTIC ACTIVITY":
+            reaction = comment.get("reaction", {})
+            reaction_name = reaction.get("name", "").strip()
+            if reaction_name:
+                catalytic_activities.append(reaction_name)
 
     # Derive kinase group from curated mapping, fallback to keyword heuristic
     group = KINASE_GROUPS.get(gene_symbol, _derive_group(keywords, full_name))
@@ -82,7 +100,15 @@ def _extract_kinase(record: dict[str, Any]) -> dict[str, Any]:
         "keywords": keywords,
         "group": group,
         "reviewed": reviewed,
+        "uniprot_section": "Swiss-Prot" if reviewed else "TrEMBL",
+        "function_annotations": function_annotations,
+        "catalytic_activities": catalytic_activities,
+        "subunit_annotations": subunit_annotations,
+        "annotation_source": "UniProtKB/Swiss-Prot" if reviewed else "UniProtKB/TrEMBL",
+        "uniprot_record_status": "inactive" if record.get("entryType") == "Inactive" else "active",
+        "uniprot_inactive_reason": record.get("inactiveReason") or None,
         "source": "uniprot",
+        "uniprot_keyword_membership": True,
         "source_url": "https://rest.uniprot.org/uniprotkb/" + uniprot_id,
         "retrieved_at": datetime.now(timezone.utc),
     }
@@ -270,6 +296,7 @@ async def ingest_kinases() -> int:
         await db[COLLECTIONS["kinases"]].delete_many({
             "source": "uniprot",
             "uniprot_id": {"$nin": valid_ids},
+            "catalog_membership": {"$ne": "kinhub_core"},
         })
     logger.info("UniProt ingestion complete – %d kinase records stored", len(all_records))
     return len(all_records)

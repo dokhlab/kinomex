@@ -3,6 +3,22 @@ set -u
 
 KINOMEX_DIR="$(cd "$(dirname "$0")" && pwd)"
 ACTION="start"
+MONGO_START_TIMEOUT=20
+
+# Generate a persistent local encryption/session secret on first run. Existing
+# deployments can provide AUTH_SECRET in .env.local or the environment.
+if [ -z "${AUTH_SECRET:-}" ]; then
+  if [ -f "$KINOMEX_DIR/.env.local" ]; then
+    AUTH_SECRET="$(sed -n 's/^AUTH_SECRET=//p' "$KINOMEX_DIR/.env.local" | tail -n 1)"
+  fi
+  if [ -z "${AUTH_SECRET:-}" ]; then
+    umask 077
+    AUTH_SECRET="$(openssl rand -hex 32)"
+    printf '\nAUTH_SECRET=%s\n' "$AUTH_SECRET" >> "$KINOMEX_DIR/.env.local"
+    echo "Generated AUTH_SECRET in .env.local for encrypted user credentials."
+  fi
+  export AUTH_SECRET
+fi
 
 if [ "${1:-}" = "-s" ]; then
   ACTION="stop"
@@ -43,8 +59,50 @@ if [ "$ACTION" = "stop" ]; then
   exit 0
 fi
 
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "python3 is required to populate the KinomeX database." >&2
+check_existing_listener() {
+  local pid
+  local process_cwd
+  local kinomex_found=0
+
+  while IFS= read -r pid; do
+    [ -n "$pid" ] || continue
+    process_cwd="$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')"
+    if [ "$process_cwd" != "$KINOMEX_DIR" ]; then
+      echo "Port $PORT is already used by PID $pid outside this KinomeX repository." >&2
+      echo "Choose another port with ./run <port>, or stop that process first." >&2
+      return 1
+    fi
+    kinomex_found=1
+  done < <(lsof -tiTCP:"$PORT" -sTCP:LISTEN 2>/dev/null | sort -u)
+
+  if [ "$kinomex_found" -eq 1 ]; then
+    echo "KinomeX is already running at http://localhost:$PORT."
+    echo "Use ./run -s $PORT to stop it before restarting."
+    return 2
+  fi
+  return 0
+}
+
+check_existing_listener
+listener_status=$?
+if [ "$listener_status" -eq 2 ]; then
+  exit 0
+elif [ "$listener_status" -ne 0 ]; then
+  exit 1
+fi
+
+if [ -x "$KINOMEX_DIR/.venv/bin/python" ]; then
+  KINOMEX_PYTHON="$KINOMEX_DIR/.venv/bin/python"
+elif command -v python3 >/dev/null 2>&1; then
+  KINOMEX_PYTHON="$(command -v python3)"
+else
+  echo "Python is required to populate the KinomeX database." >&2
+  exit 1
+fi
+
+if ! "$KINOMEX_PYTHON" -c 'import motor, pymongo' >/dev/null 2>&1; then
+  echo "KinomeX ETL dependencies are missing for $KINOMEX_PYTHON." >&2
+  echo "Create .venv and install them with: .venv/bin/pip install -r etl/requirements.txt" >&2
   exit 1
 fi
 
@@ -54,18 +112,107 @@ if ! command -v npm >/dev/null 2>&1; then
 fi
 
 cd "$KINOMEX_DIR" || exit 1
+
+# Next.js reads .env.local itself. Read only MONGODB_URI here so the launcher
+# checks the same database without sourcing credentials or executable shell.
+if [ -z "${MONGODB_URI:-}" ] && [ -f "$KINOMEX_DIR/.env.local" ]; then
+  while IFS='=' read -r key value; do
+    if [ "$key" = "MONGODB_URI" ]; then
+      MONGODB_URI="${value%$'\r'}"
+      MONGODB_URI="${MONGODB_URI#\"}"
+      MONGODB_URI="${MONGODB_URI%\"}"
+      export MONGODB_URI
+      break
+    fi
+  done < "$KINOMEX_DIR/.env.local"
+fi
+MONGODB_URI="${MONGODB_URI:-mongodb://localhost:27017/kinomex}"
+export MONGODB_URI
+
+mongo_is_ready() {
+  "$KINOMEX_PYTHON" - <<'PY' >/dev/null 2>&1
+import os
+from pymongo import MongoClient
+
+client = MongoClient(os.environ["MONGODB_URI"], serverSelectionTimeoutMS=1000)
+try:
+    client.admin.command("ping")
+finally:
+    client.close()
+PY
+}
+
+start_local_mongodb() {
+  local mongo_formula
+  local mongo_bin
+  local mongo_conf
+
+  if ! command -v brew >/dev/null 2>&1; then
+    return 1
+  fi
+
+  mongo_formula="$(brew list --formula 2>/dev/null | awk '/^mongodb-community(@.*)?$/ { print }' | sort -V | tail -n 1)"
+  if [ -z "$mongo_formula" ]; then
+    return 1
+  fi
+
+  echo "MongoDB is not running; starting Homebrew service $mongo_formula..."
+  if brew services start "$mongo_formula"; then
+    return 0
+  fi
+
+  # Some Homebrew/MongoDB combinations generate an empty LaunchAgent. Fall
+  # back to MongoDB's supported daemon mode rather than starting the website
+  # without a database.
+  mongo_bin="$(brew --prefix "$mongo_formula")/bin/mongod"
+  mongo_conf="$(brew --prefix)/etc/mongod.conf"
+  if [ ! -x "$mongo_bin" ] || [ ! -f "$mongo_conf" ]; then
+    return 1
+  fi
+  echo "Homebrew service startup failed; starting mongod directly..."
+  "$mongo_bin" --config "$mongo_conf" --fork
+}
+
+if ! mongo_is_ready; then
+  case "$MONGODB_URI" in
+    mongodb://localhost:*|mongodb://127.0.0.1:*|mongodb://localhost/*|mongodb://127.0.0.1/*)
+      if ! start_local_mongodb; then
+        echo "MongoDB is unavailable at $MONGODB_URI." >&2
+        echo "Install a MongoDB 7-compatible server or set MONGODB_URI to a reachable server." >&2
+        echo "Homebrew example: brew tap mongodb/brew && brew install mongodb-community@7.0" >&2
+        exit 1
+      fi
+      ;;
+    *)
+      echo "MongoDB is unavailable at the configured remote URI." >&2
+      echo "Check MONGODB_URI, network access, and server status before starting KinomeX." >&2
+      exit 1
+      ;;
+  esac
+
+  echo "Waiting for MongoDB to accept connections..."
+  mongo_waited=0
+  until mongo_is_ready; do
+    if [ "$mongo_waited" -ge "$MONGO_START_TIMEOUT" ]; then
+      echo "MongoDB did not become ready within ${MONGO_START_TIMEOUT} seconds." >&2
+      exit 1
+    fi
+    sleep 1
+    mongo_waited=$((mongo_waited + 1))
+  done
+fi
+echo "MongoDB is ready."
+
 ETL_LOG="$KINOMEX_DIR/etl/auto_populate.log"
 
-python3 -m etl.auto_populate >"$ETL_LOG" 2>&1 &
-ETL_PID=$!
-echo "Database population check started (PID $ETL_PID; log: $ETL_LOG)."
-
-cleanup() {
-  if kill -0 "$ETL_PID" 2>/dev/null; then
-    kill -TERM "$ETL_PID" 2>/dev/null || true
-  fi
-}
-trap cleanup EXIT INT TERM
+echo "Checking database schema and required catalogue imports..."
+if ! "$KINOMEX_PYTHON" -m etl.auto_populate >"$ETL_LOG" 2>&1; then
+  echo "KinomeX database preparation failed. The website was not started." >&2
+  echo "Recent output from $ETL_LOG:" >&2
+  tail -n 40 "$ETL_LOG" >&2
+  exit 1
+fi
+echo "Database is current (log: $ETL_LOG)."
 
 npm run dev -- -p "$PORT"
 APP_STATUS=$?

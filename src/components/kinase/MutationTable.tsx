@@ -227,6 +227,9 @@ export default function MutationTable({ mutations }: MutationTableProps) {
           </span>
         ))}
       </div>
+      <p className="px-1 text-xs leading-relaxed text-slate-500">
+        Source: <a href="https://www.ncbi.nlm.nih.gov/clinvar/" target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">NCBI ClinVar</a>. Submitted assertions are not independently verified and are not intended for direct diagnosis or medical decision-making without review by a genetics professional.
+      </p>
     </>
   );
 }

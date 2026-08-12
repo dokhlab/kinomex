@@ -47,7 +47,12 @@ KinomeX currently provides:
   and Atypical kinases;
 - paginated filtering by gene/name, group, organ system, and PDIS interval;
 - a dynamic 20-bin PDIS histogram with draggable minimum and maximum bounds;
-- a radial D3 kinome tree with group coloring and PDIS-scaled nodes;
+- a radial D3 kinome tree with group coloring, PDIS-scaled nodes, progressive
+  label disclosure, and collision-aware deep zoom;
+- curated functional and catalytic-activity annotations imported specifically
+  from reviewed UniProtKB/Swiss-Prot records;
+- an interactive STRING kinase-association network with functional/physical
+  modes, confidence filtering, zoom/pan, and profile-linked nodes;
 - per-kinase profiles combining sequence, structures, ligand assays,
   expression, variants, diseases, references, and PDIS components;
 - interactive NGL and Mol* structure visualization;
@@ -56,7 +61,7 @@ KinomeX currently provides:
 - rule-based natural-language search over groups, diseases, tissues, and PDIS;
 - optional database-grounded conversational AI through an OpenAI-compatible
   chat-completions endpoint;
-- an eight-step, dependency-aware ETL pipeline;
+- a nine-step, dependency-aware ETL pipeline;
 - a concurrency-safe scheduled updater with MongoDB run history.
 
 Displayed counts are computed from the connected MongoDB database. They may
@@ -83,7 +88,7 @@ MongoDB
        │ Motor / PyMongo idempotent upserts
        │
 Python asynchronous ETL
-  UniProt → PDB → ChEMBL → PubChem → GTEx → ClinVar → diseases → PDIS
+  UniProt → KinHub reconciliation → PDB → ChEMBL → PubChem → GTEx → ClinVar → diseases → PDIS
        │
        ▼
 Authoritative public data services
@@ -114,9 +119,9 @@ restart clears those caches.
 | --- | --- | --- |
 | `/` | Dashboard | Live summary, search, group filters, and paginated kinase cards |
 | `/explorer` | Explorer | Gene/group/organ filtering and interactive PDIS histogram |
-| `/tree` | Kinome Tree | Radial D3 overview of kinase groups and PDIS values |
-| `/search` | AI Search | Rule-based natural-language query parsing and comparison workflow |
-| `/kinases/[gene]` | Kinase profile | Structure, distribution, ligands, mutations, diseases, and references |
+| `/tree` | Kinome Tree | Radial D3 overview with searchable kinases, PDIS-scaled nodes, and readable deep-zoom labels |
+| `/search` | AI Assistant | Source-aware conversation across KinomeX, UniProt, STRING, connected databases, and verified PubMed literature |
+| `/kinases/[gene]` | Kinase profile | Summary grounded in Swiss-Prot function and the high-confidence STRING interactome, followed by curated function and Structure, Distribution, Ligands, Mutations, Network, Diseases, and References tabs |
 | `/docs` | Documentation | In-product biological, technical, and reference documentation |
 
 The fixed navigation includes quick search, responsive mobile navigation, and
@@ -126,9 +131,13 @@ and a `prefers-reduced-motion` fallback.
 
 ## Data sources and provenance
 
+Licensing, attribution, and reuse obligations are recorded in [NOTICE.md](NOTICE.md) and in the **Attributions** tab of the in-application Docs page. Record-level terms remain controlling; ChEMBL-derived records retain CC BY-SA 3.0 ShareAlike obligations, while PubMed abstract copyright is publication-specific.
+
 | Source | Imported or queried information | Primary collection/use |
 | --- | --- | --- |
-| UniProt | accession, gene symbol, name, sequence, domains, EC number, keywords, reviewed status, disease comments | `kinases`, `diseases` |
+| UniProtKB/Swiss-Prot | reviewed accession, gene symbol, name, sequence, domains, EC number, curated function, catalytic activity, subunit annotations, disease comments | `kinases`, `diseases` |
+| KinHub/Manning | core roster, kinase-domain rows, group, family, and subfamily | `kinases`, `catalog_metadata` |
+| STRING | human functional or physical protein associations and component confidence scores | live `/api/interactions` network view |
 | RCSB PDB | structure identifiers, experimental method, resolution, titles, bound ligands | `structures` |
 | ChEMBL | human kinase targets, compounds, assays, standardized activity values, documents | `bioactivities` |
 | PubChem | compound enrichment and additional assay/compound records | `bioactivities` |
@@ -270,21 +279,25 @@ Response shape:
   "kinases": [],
   "total": 0,
   "page": 1,
-  "totalPages": 0
+  "totalPages": 0,
+  "groupBreakdown": {}
 }
 ```
 
 Each returned kinase includes its gene symbol, name, group, subfamily,
 UniProt ID, normalized PDIS, organ systems, disease identifiers, and mutation
-count. Successful non-empty results are cached in the server process for five
-minutes.
+count. `groupBreakdown` is aggregated from the complete filtered population
+before pagination; its values therefore sum to `total` and are never limited
+to the current page. Successful non-empty results are cached in the server
+process for five minutes.
 
 ### `GET /api/kinases/distribution`
 
 Returns 20 PDIS buckets over the stored 0–100 range for the current
 `search`, `group`, and `organ_system` filters. It deliberately ignores the
 selected PDIS interval so the Explorer histogram remains stable while its
-handles move. Kinases without a score are placed in the first bucket.
+handles move. Kinases without a score are reported separately as `unscored`
+and are not placed into a scored bucket.
 
 ### `GET /api/kinases/stats`
 
@@ -302,6 +315,19 @@ live lookups use five-second timeouts and degrade to locally available data.
 Status codes include `400` for a missing gene, `404` when no kinase is found,
 and `500` for an unexpected profile failure.
 
+### `GET /api/interactions`
+
+Retrieves human STRING associations for up to 50 validated protein symbols.
+`network_type` accepts `functional` or `physical`, `score` sets the required
+confidence from 0–1000, and `add_nodes` requests up to 50 neighboring proteins.
+The kinase dossier uses one focal gene plus 20 neighbors and presents both an
+interactive graph and a ranked evidence-score table. STRING associations can
+represent functional or physical evidence and do not by themselves establish
+direct binding. The Network tab follows Mutations. Clicking its focal kinase
+returns to the KinomeX dossier; neighboring proteins open STRING using its
+species-qualified canonical form,
+`https://string-db.org/network/homo_sapiens/[gene]`.
+
 ### `POST /api/ai-search`
 
 Accepts:
@@ -311,9 +337,12 @@ Accepts:
 ```
 
 `parseQuery()` extracts group, tissue, disease, binding, and PDIS concepts,
-then searches local collections. Candidate sets are capped during retrieval,
-deduplicated by gene, enriched, ranked, and sliced to at most 50 results. This
-route is rule-based; it does not call an LLM.
+then searches local collections. Tissue, disease, and binding evidence is
+resolved to gene sets and intersected with the requested kinase group and
+free-text constraints. Results are enriched, ranked, and sliced to at most 50
+records. When the local intersection is empty, the route retrieves relevant
+PubMed articles that contain a PMID, DOI, title, and abstract and returns them
+as external evidence. This route is rule-based; it does not call an LLM.
 
 ### `POST /api/chat`
 
@@ -360,6 +389,7 @@ Create `.env.local` in the repository root:
 
 ```dotenv
 MONGODB_URI=mongodb://localhost:27017/kinomex
+AUTH_SECRET=replace-with-at-least-32-random-characters
 
 # Optional conversational AI
 LLM_API_KEY=your_key
@@ -387,7 +417,7 @@ patterns are excluded by `.gitignore`.
 
 ## Running KinomeX
 
-The repository-local launcher starts the database population guard and Next.js:
+The repository-local launcher prepares the database and then starts Next.js:
 
 ```bash
 ./run              # start on port 3007
@@ -399,12 +429,15 @@ The repository-local launcher starts the database population guard and Next.js:
 The launcher:
 
 1. validates the requested TCP port;
-2. verifies that `python3` and `npm` are available;
-3. starts `python3 -m etl.auto_populate` in the background;
-4. writes population output to `etl/auto_populate.log`;
-5. starts `npm run dev -- -p <port>`;
-6. terminates its background population process when the app exits;
-7. refuses to stop a listener whose working directory is not this repository.
+2. exits successfully when KinomeX is already listening on that port, or
+   refuses to overwrite an unrelated listener;
+3. verifies that `python3` and `npm` are available;
+4. ensures MongoDB is reachable, starting a local Homebrew service when needed;
+5. runs `python3 -m etl.auto_populate` and waits for all required catalogue
+   migrations to finish;
+6. writes preparation output to `etl/auto_populate.log` and stops on failure;
+7. starts `npm run dev -- -p <port>` only after the database is current;
+8. refuses to stop a listener whose working directory is not this repository.
 
 Run Next.js without automatic population:
 
@@ -423,9 +456,17 @@ npm run start -- -p 3007
 
 ### Startup population guard
 
-`python3 -m etl.auto_populate` is intended for local startup. If the kinase
-collection is empty, it imports reviewed UniProt metadata. It then:
+`python3 -m etl.auto_populate` is a version-aware local startup guard. If the
+kinase collection is empty, it imports and reconciles UniProt and KinHub
+metadata. For an existing database, it checks the recorded startup schema and
+the required fields themselves. The current migration refreshes the reconciled
+catalogue when Swiss-Prot function, catalytic activity, subunit, section, or
+annotation-source fields are absent. It then:
 
+- records completed migrations in `catalog_metadata` under
+  `_id: startup-migrations`;
+- exits with an error if a required update fails or remains incomplete, so the
+  website cannot start against a partially migrated catalogue;
 - reports which scientific evidence collections are absent;
 - never invents or seeds structures, bioactivities, variants, diseases,
   expression values, or PDIS scores;
@@ -512,20 +553,45 @@ The application reads MongoDB at request time, so a successful refresh does
 not require a rebuild. Existing in-memory API entries can remain visible for
 up to five minutes.
 
-## AI features
+## AI assistant
 
-KinomeX separates two AI-like experiences:
-
-- **AI Search** is deterministic parsing and MongoDB filtering. It requires no
-  external model or API key.
-- **Chat** calls an OpenAI-compatible chat-completions service after retrieving
-  a compact kinase context from MongoDB.
+KinomeX provides one AI-powered research conversation. Each question first
+runs deterministic parsing and MongoDB retrieval. Functional free text also
+searches reviewed Swiss-Prot function, catalytic-activity, and subunit
+annotations. Interaction questions additionally retrieve high-confidence
+STRING associations for matched kinases. The assistant then uses an
+OpenAI-compatible chat-completions service to explain only that supplied
+evidence.
 
 The chat model is instructed to prefer retrieved records, preserve uppercase
 gene symbols, include groups/PDIS in lists, and acknowledge unavailable data.
-This retrieval is lightweight keyword matching, not vector search or a formal
-retrieval-evaluation system. Model responses can still be incomplete or
-incorrect and should be checked against primary sources.
+Structured tissue, disease, binding, group, and PDIS requests use the same
+evidence intersections. When the local intersection is empty, the assistant
+queries PubMed and receives only retrieved abstracts. It must place one factual statement per line,
+with a PMID and DOI on every line. The server buffers the answer, rejects
+citations outside the retrieved evidence, and confirms through NCBI E-utilities
+that every DOI belongs to its stated PubMed record before releasing text.
+Source rules are evidence-specific: STRING claims cite a direct STRING
+association link, Swiss-Prot annotations cite the UniProt entry, and connected
+provider records cite their originating webserver. Only literature-derived
+claims require a verified PMID and matching DOI. Missing, mismatched,
+unreachable, or invented citations fail closed instead of
+producing an unverified answer. A failed citation-format pass is rewritten once;
+if it still fails, the assistant returns the verified PubMed article list rather
+than a dead-end error. When KinomeX context is available, the assistant remains
+restricted to that context.
+
+Questions that ask which kinases satisfy a condition use a consistent table
+with `Kinase`, `Evidence`, and `References` columns. Gene symbols are matched
+back to the KinomeX catalog and link to `/kinases/[gene]`. Every externally
+sourced row includes clickable PubMed and DOI links plus the literal PMID/DOI
+pair used by server-side citation validation.
+
+The research conversation is stored in browser `sessionStorage`. It survives
+client-side navigation to other KinomeX pages and is restored when the user
+returns to `/search`. Storage is scoped to the current browser tab/session,
+retains at most the 40 messages accepted by the API, and is cleared explicitly
+by **New Chat** or automatically when the browser session ends.
 
 ## Security and validation
 
@@ -597,7 +663,8 @@ production rendering and bundling.
 
 ### Empty or partial database
 
-- Inspect `etl/auto_populate.log` after launcher startup.
+- Inspect `etl/auto_populate.log` if the launcher stops during database
+  preparation.
 - Run `python3 -m etl.pipeline --list-steps` to verify the environment.
 - Use the full pipeline for production; development seeding is intentionally
   incomplete compared with upstream ingestion.
@@ -679,12 +746,13 @@ The initial audit found 10,263 demonstrably synthetic documents: all 3,885
 bioactivities, 508 diseases, 3,265 expression measurements, 508 PDIS scores,
 575 structures, and 1,522 variants. Every targeted document was exported as
 MongoDB Extended JSON in a timestamped gzip backup before deletion. The final
-audit contains 59,735 documents, zero records matching a synthetic signature,
+audit contains 59,789 documents, zero records matching a synthetic signature,
 and zero non-finite numbers:
 
 | Collection | Final records | Provenance |
 | --- | ---: | --- |
-| `kinases` | 625 | reviewed UniProt Protein kinase entries |
+| `kinases` | 678 | 522 KinHub core + 156 reviewed UniProt extensions |
+| `catalog_metadata` | 1 | reproducible definition and partition counts |
 | `expression` | 33,588 | GTEx v10 median gene expression |
 | `variants` | 25,285 | NCBI ClinVar |
 | `diseases` | 237 | UniProt disease comments |
@@ -696,7 +764,30 @@ Run a non-mutating audit with:
 
 ```bash
 node scripts/audit_database.mjs --output=data-audit/audit-current.json
+node scripts/audit_kinase_catalog.mjs --output=data-audit/kinase-catalog-accounting.json
 ```
+
+### Kinase-count accounting
+
+“Human kinome” counts differ because papers and databases count genes,
+proteins, or kinase domains. KinomeX therefore does not force these into one
+unlabeled number. The current reconciled catalogue contains:
+
+- 536 KinHub kinase-domain rows;
+- 522 UniProt entries represented by those KinHub rows;
+- 625 reviewed human UniProt entries carrying the controlled `Protein kinase`
+  keyword, of which 469 overlap the KinHub roster;
+- 53 additional KinHub accessions resolved from UniProt outside that keyword
+  query; and
+- 678 entries in the union: 522 KinHub core plus 156 reviewed-UniProt
+  extensions.
+
+One KinHub accession, PRKY/O43930, is retained and explicitly labeled as an
+inactive historical UniProt record; it has no invented sequence length.
+`data-audit/kinase-catalog-accounting.json` proves that both catalogue
+partitions sum to the total, all 536 domain rows are represented, required
+identifiers are present, and related scientific collections contain no orphan
+gene symbols.
 
 Preview the known synthetic signatures, then back up and remove matches:
 

@@ -70,6 +70,18 @@ async def fetch_diseases(db: AsyncIOMotorDatabase) -> None:
     await diseases_col.delete_many({"source": {"$in": ["uniprot", None]}})
     if collected_docs:
         await diseases_col.insert_many(collected_docs, ordered=False)
+    covered_genes = sorted(doc["gene_symbol"] for doc in collected_docs if doc.get("gene_symbol"))
+    await db["source_coverage"].replace_one(
+        {"_id": "uniprot_diseases"},
+        {
+            "_id": "uniprot_diseases", "source": "uniprot",
+            "catalog_entries_queried": len(kinases), "successful_requests": completed,
+            "genes_with_annotations": covered_genes,
+            "entries_without_disease_annotations": len(kinases) - len(collected_docs),
+            "complete": True, "retrieved_at": datetime.now(timezone.utc),
+        },
+        upsert=True,
+    )
     final_count = await diseases_col.count_documents({})
     logger.info("Diseases complete: %d kinases with disease annotations", final_count)
 

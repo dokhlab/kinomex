@@ -1,0 +1,3 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createSession, ensureAuthIndexes, normalizeUsername, publicUser, verifyPassword } from "@/lib/auth";
+export async function POST(request: NextRequest) { const body = await request.json().catch(() => null); const db = await ensureAuthIndexes(); const user = await db.collection("users").findOne({ usernameNormalized: normalizeUsername(String(body?.username || "")) }); if (!user || !await verifyPassword(String(body?.password || ""), user.passwordHash, user.passwordSalt)) return NextResponse.json({ error: "Invalid username or password." }, { status: 401 }); await createSession(user._id); return NextResponse.json({ user: publicUser(user as never) }); }

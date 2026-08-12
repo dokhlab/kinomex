@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import UserSettings from "@/components/ui/UserSettings";
 
 const navLinks = [
   { href: "/", label: "Dashboard" },
   { href: "/tree", label: "Kinome Tree" },
   { href: "/explorer", label: "Explorer" },
-  { href: "/search", label: "AI Search" },
+  { href: "/search", label: "AI Assistant" },
   { href: "/docs", label: "Docs" },
 ];
 
@@ -108,6 +109,7 @@ export default function Navigation() {
                 className="w-56 pl-9 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl outline-none focus:border-kinome-cyan/40 focus:ring-1 focus:ring-kinome-cyan/20 transition-all duration-200"
               />
             </div>
+            <UserSettings />
           </div>
 
           {/* Mobile hamburger */}
@@ -187,6 +189,7 @@ export default function Navigation() {
                     className="w-full pl-9 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 bg-slate-800/50 backdrop-blur-sm border border-white/10 rounded-xl outline-none focus:border-kinome-cyan/40 focus:ring-1 focus:ring-kinome-cyan/20 transition-all duration-200"
                   />
                 </div>
+                <div className="mt-2 flex justify-end"><UserSettings /></div>
               </div>
             </div>
           </motion.div>

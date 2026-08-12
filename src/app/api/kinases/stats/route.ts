@@ -1,13 +1,25 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 
+type CatalogMetadata = {
+  _id: string;
+  kinhub_domain_rows: number;
+  kinhub_resolved_entries: number;
+  uniprot_extended_entries: number;
+  inactive_historical_entries: number;
+  unresolved_kinhub_accessions: string[];
+  retrieved_at: Date;
+};
+
 export async function GET() {
   try {
     const mongoose = await connectToDatabase();
     const db = mongoose.connection.db!;
 
-    const [totalKinases, groupDist, pdisAgg, totalVariants, totalStructures, totalDiseases, totalBioactivities, topMutated, topDruggable] = await Promise.all([
+    const [totalKinases, catalogMetadata, groupDist, pdisAgg, totalVariants, totalStructures, totalDiseases, totalBioactivities, topMutated, topDruggable] = await Promise.all([
       db.collection("kinases").countDocuments(),
+      db.collection<CatalogMetadata>("catalog_metadata")
+        .findOne({ _id: "human-kinase-catalog" }),
       db.collection("kinases").aggregate([
         { $group: { _id: "$group", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
@@ -16,9 +28,13 @@ export async function GET() {
         { $group: { _id: null, avg: { $avg: "$pdis_total" } } },
       ]).toArray().catch(() => []),
       db.collection("variants").countDocuments().catch(() => 0),
-      db.collection("structures").countDocuments().catch(() => 0),
+      db.collection("structures").countDocuments({
+        "gene_symbols.0": { $exists: true },
+      }).catch(() => 0),
       db.collection("diseases").countDocuments().catch(() => 0),
-      db.collection("bioactivities").countDocuments().catch(() => 0),
+      db.collection("bioactivities").countDocuments({
+        target_gene_symbol: { $nin: [null, ""] },
+      }).catch(() => 0),
       db.collection("variants").aggregate([
         { $group: { _id: "$gene_symbol", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
@@ -28,7 +44,8 @@ export async function GET() {
     ]);
 
     const groupDistribution: Record<string, number> = {
-      AGC: 0, CAMK: 0, CK1: 0, CMGC: 0, STE: 0, TK: 0, TKL: 0, Atypical: 0,
+      AGC: 0, CAMK: 0, CK1: 0, CMGC: 0, STE: 0, TK: 0, TKL: 0,
+      Atypical: 0, RGC: 0, Other: 0,
     };
     for (const g of groupDist) {
       if (g._id && groupDistribution.hasOwnProperty(g._id)) {
@@ -45,6 +62,17 @@ export async function GET() {
 
     const response = {
       totalKinases,
+      catalogAccounting: catalogMetadata ? {
+        totalEntries: totalKinases,
+        kinhubDomainRows: catalogMetadata.kinhub_domain_rows,
+        kinhubCoreEntries: catalogMetadata.kinhub_resolved_entries,
+        uniprotExtendedEntries: catalogMetadata.uniprot_extended_entries,
+        inactiveHistoricalEntries: catalogMetadata.inactive_historical_entries,
+        unresolvedKinHubAccessions: catalogMetadata.unresolved_kinhub_accessions,
+        reconciled: totalKinases ===
+          catalogMetadata.kinhub_resolved_entries + catalogMetadata.uniprot_extended_entries,
+        retrievedAt: catalogMetadata.retrieved_at,
+      } : null,
       groupDistribution,
       averagePDIS: averagePDIS === null ? null : Math.round(averagePDIS * 1000) / 1000,
       totalLigands: totalBioactivities,

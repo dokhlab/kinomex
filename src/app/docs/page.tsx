@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
-const tabs = ["About", "Technical", "Encyclopedia"] as const;
+const tabs = ["About", "Technical", "Encyclopedia", "Attributions"] as const;
 type Tab = (typeof tabs)[number];
 
 function TabButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
@@ -53,6 +54,26 @@ function Math({ children }: { children: string }) {
 }
 
 function AboutTab() {
+  const [catalog, setCatalog] = useState<{
+    totalEntries: number;
+    kinhubDomainRows: number;
+    kinhubCoreEntries: number;
+    uniprotExtendedEntries: number;
+  } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/kinases/stats")
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((data) => {
+        if (active && data.catalogAccounting) setCatalog(data.catalogAccounting);
+      })
+      .catch(() => {
+        if (active) setCatalog(null);
+      });
+    return () => { active = false; };
+  }, []);
+
   return (
     <div className="space-y-12">
       {/* Hero */}
@@ -63,7 +84,7 @@ function AboutTab() {
         </div>
         <h1 className="text-4xl font-bold text-gradient-cyan-violet mb-4">KinomeX Documentation</h1>
         <p className="text-slate-400 text-lg leading-relaxed">
-          A full-stack computational biophysics platform covering the entire human kinome — 500+ protein kinases
+          A full-stack computational biophysics platform built around a reconciled human kinase catalog,
           with structural biology, tissue expression, evolutionary phylogeny, and chemical genomics data.
         </p>
       </div>
@@ -85,16 +106,21 @@ function AboutTab() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           {[
-            { n: "500+", label: "Human Kinases", color: "text-kinome-cyan", bg: "bg-kinome-cyan/10" },
-            { n: "518+", label: "Canonical Kinome", color: "text-kinome-violet", bg: "bg-kinome-violet/10" },
-            { n: "~70", label: "Approved Kinase Drugs", color: "text-kinome-emerald", bg: "bg-kinome-emerald/10" },
+            { n: catalog?.totalEntries, label: "Catalogued Protein Entries", color: "text-kinome-cyan", bg: "bg-kinome-cyan/10" },
+            { n: catalog?.kinhubCoreEntries, label: "KinHub Core Entries", color: "text-kinome-violet", bg: "bg-kinome-violet/10" },
+            { n: catalog?.uniprotExtendedEntries, label: "Reviewed UniProt Extensions", color: "text-kinome-emerald", bg: "bg-kinome-emerald/10" },
           ].map((s) => (
             <div key={s.label} className={`${s.bg} border border-white/10 rounded-2xl p-5 text-center`}>
-              <div className={`text-3xl font-bold ${s.color}`}>{s.n}</div>
+              <div className={`text-3xl font-bold ${s.color}`}>{s.n ?? "—"}</div>
               <div className="text-slate-400 text-sm mt-1">{s.label}</div>
             </div>
           ))}
         </div>
+        <p className="mt-3 text-center text-xs text-slate-500">
+          {catalog
+            ? `Live MongoDB accounting. ${catalog.kinhubCoreEntries} core protein entries represent ${catalog.kinhubDomainRows} KinHub kinase-domain rows; extensions are reviewed UniProt Protein kinase entries outside that core.`
+            : "Live catalog accounting is unavailable; no estimated values are shown."}
+        </p>
       </Section>
 
       {/* Architecture */}
@@ -108,11 +134,11 @@ function AboutTab() {
               </div>
               <div>
                 <h4 className="text-kinome-violet font-semibold text-sm uppercase tracking-wide">Backend</h4>
-                <p className="text-slate-400 text-sm mt-1">Next.js API Routes → raw MongoDB queries via <code className="bg-slate-800 px-1.5 py-0.5 rounded text-xs text-kinome-cyan">motor</code> async driver</p>
+                <p className="text-slate-400 text-sm mt-1">Next.js API Routes → MongoDB queries through the shared Mongoose connection</p>
               </div>
               <div>
                 <h4 className="text-kinome-emerald font-semibold text-sm uppercase tracking-wide">Database</h4>
-                <p className="text-slate-400 text-sm mt-1">MongoDB 7 (Docker), 7 collections: kinases, structures, bioactivities, expression, variants, pdis, diseases</p>
+                <p className="text-slate-400 text-sm mt-1">MongoDB with scientific evidence collections plus catalog metadata used for reproducible accounting</p>
               </div>
             </div>
             <div className="space-y-4">
@@ -122,7 +148,7 @@ function AboutTab() {
               </div>
               <div>
                 <h4 className="text-kinome-rose font-semibold text-sm uppercase tracking-wide">Data Sources</h4>
-                <p className="text-slate-400 text-sm mt-1">UniProt, RCSB PDB, ChEMBL, ClinicalTrials.gov, PubMed, ClinVar, UniProt DISEASE</p>
+                <p className="text-slate-400 text-sm mt-1">UniProtKB/Swiss-Prot, KinHub, STRING, RCSB PDB, ChEMBL, PubChem, GTEx, ClinicalTrials.gov, PubMed, ClinVar</p>
               </div>
               <div>
                 <h4 className="text-slate-300 font-semibold text-sm uppercase tracking-wide">Deployment</h4>
@@ -138,10 +164,10 @@ function AboutTab() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             { name: "Dashboard", path: "/", desc: "Aggregate statistics, top druggable and mutated kinases, PDIS distribution chart." },
-            { name: "Kinome Tree", path: "/tree", desc: "Interactive phylogenetic tree with clickable nodes linking to each kinase's detail page." },
-            { name: "Explorer", path: "/explorer", desc: "Filterable table of all 500+ kinases by group, PDIS score range, organ system, and search." },
-            { name: "AI Search", path: "/search", desc: "Semantic search across kinases, PDIS profiles, structures, and bioactivities." },
-            { name: "Kinase Detail", path: "/kinases/[gene]", desc: "Deep-dive page with structure viewer (RCSB PDB live + AlphaFold), tissue expression, mutations, and ligands." },
+            { name: "Kinome Tree", path: "/tree", desc: "Interactive phylogenetic tree with searchable, clickable nodes and collision-aware labels that progressively appear during zoom." },
+            { name: "Explorer", path: "/explorer", desc: "Filterable reconciled catalog with full-result group counts, PDIS score range, organ system, and search." },
+            { name: "AI Assistant", path: "/search", desc: "A session-persistent, evidence-grounded conversation; kinase tables link KinomeX profiles with verified PubMed and DOI references." },
+            { name: "Kinase Detail", path: "/kinases/[gene]", desc: "Dossier with a Summary grounded in reviewed Swiss-Prot function and high-confidence STRING neighbors, followed by curated function and the Structure, Distribution, Ligands, Mutations, Network, Diseases, and References tabs." },
             { name: "Documentation", path: "/docs", desc: "This page — platform description, technical reference, and kinase encyclopedia." },
           ].map((p) => (
             <Card key={p.name}>
@@ -223,13 +249,15 @@ function TechnicalTab() {
         <Card title="Pipeline Steps">
           <div className="space-y-3">
             {[
-              { step: 1, name: "uniprot", desc: "Cursor-based paginated fetch of human kinase entries", api: "rest.uniprot.org/uniprotkb/search", records: "~500" },
-              { step: 2, name: "pdb", desc: "RCSB PDB search by UniProt accession + resolution filter", api: "search.rcsb.org/rcsbsearch/v2/query", records: "~70,910" },
-              { step: 3, name: "chembl", desc: "Bulk paginated fetch of bioactivity records for human targets", api: "www.ebi.ac.uk/chembl/api/data/activity.json", records: "~50,000" },
-              { step: 4, name: "gtex", desc: "Curated tissue expression patterns (basal + curated datasets)", api: "gtexportal.org/api/v2", records: "~34,589" },
-              { step: 5, name: "clinvar", desc: "Curated known mutations + NCBI batch queries", api: "eutils.ncbi.nlm.nih.gov/entrez/eutils", records: "~87" },
-              { step: 6, name: "diseases", desc: "UniProt DISEASE comment annotations per kinase entry", api: "rest.uniprot.org/uniprotkb/{uid}.json", records: "~1,000+" },
-              { step: 7, name: "pdis", desc: "Composite score calculation from all upstream data", api: "PubMed, ClinicalTrials.gov", records: "~1,872" },
+              { step: 1, name: "uniprot", desc: "Cursor-based paginated fetch of reviewed human Protein kinase entries", api: "rest.uniprot.org/uniprotkb/search", records: "Run-dependent" },
+              { step: 2, name: "kinhub", desc: "KinHub/Manning roster reconciliation and catalog accounting", api: "KinHub + UniProt", records: "Run-dependent" },
+              { step: 3, name: "pdb", desc: "RCSB PDB search by reconciled UniProt accession", api: "search.rcsb.org/rcsbsearch/v2/query", records: "Run-dependent" },
+              { step: 4, name: "chembl", desc: "Paginated bioactivity retrieval for reconciled human targets", api: "www.ebi.ac.uk/chembl/api/data/activity.json", records: "Run-dependent" },
+              { step: 5, name: "pubchem", desc: "Compound enrichment and Ambit kinase bioactivity import", api: "pubchem.ncbi.nlm.nih.gov", records: "Run-dependent" },
+              { step: 6, name: "gtex", desc: "GTEx tissue-expression import", api: "gtexportal.org/api/v2", records: "Run-dependent" },
+              { step: 7, name: "clinvar", desc: "NCBI ClinVar pathogenic variant retrieval", api: "eutils.ncbi.nlm.nih.gov/entrez/eutils", records: "Run-dependent" },
+              { step: 8, name: "diseases", desc: "UniProt disease-comment annotations per kinase entry", api: "rest.uniprot.org/uniprotkb/{uid}.json", records: "Run-dependent" },
+              { step: 9, name: "pdis", desc: "Composite score calculation from verified upstream evidence", api: "PubMed, ClinicalTrials.gov", records: "Run-dependent" },
             ].map((s) => (
               <div key={s.step} className="flex items-start gap-4 bg-slate-900/50 border border-white/10 rounded-xl p-4">
                 <div className="w-10 h-10 rounded-xl bg-kinome-violet/15 text-kinome-violet font-bold text-sm flex items-center justify-center flex-shrink-0">
@@ -283,7 +311,7 @@ function TechnicalTab() {
 
       {/* Database Schema */}
       <Section title="Database Schema" icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>}>
-        <Card title="7 Collections in `kinomex` Database">
+        <Card title="Core Collections in `kinomex` Database">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -295,13 +323,14 @@ function TechnicalTab() {
               </thead>
               <tbody className="text-slate-300">
                 {[
-                  { col: "kinases", n: "500+", fields: "gene_symbol, uniprot_id, group, full_name, keywords" },
-                  { col: "structures", n: "70,910", fields: "rcsb_id, uniprot_accession, resolution, gene_symbols, title" },
-                  { col: "bioactivities", n: "50,000", fields: "target_chembl_id, standard_type, standard_value, standard_units, value_nm" },
-                  { col: "expression", n: "34,589", fields: "gene_symbol, tissue_site, median_tpm, organ_system, data_source" },
-                  { col: "variants", n: "87", fields: "gene_symbol, position, ref_aa, alt_aa, clinical_significance, associated_diseases" },
-                  { col: "pdis", n: "1,872", fields: "gene_symbol, citation_score, clinical_score, structure_score, patent_score, fda_score, pdis_total" },
-                  { col: "diseases", n: "~1,000+", fields: "gene_symbol, uniprot_id, diseases[].disease_id, diseases[].description, diseases[].omim_id" },
+                  { col: "kinases", n: "Live", fields: "gene_symbol, uniprot_id, group, full_name, catalog_membership" },
+                  { col: "catalog_metadata", n: "Live", fields: "kinhub_domain_rows, kinhub_resolved_entries, uniprot_extended_entries, retrieved_at" },
+                  { col: "structures", n: "Live", fields: "rcsb_id, uniprot_accession, resolution, gene_symbols, title" },
+                  { col: "bioactivities", n: "Live", fields: "target_gene_symbol, compound_id, standard_type, standard_value, binding_type" },
+                  { col: "expression", n: "Live", fields: "gene_symbol, tissue_site, median_tpm, organ_system, data_source" },
+                  { col: "variants", n: "Live", fields: "gene_symbol, position, ref_aa, alt_aa, clinical_significance, associated_diseases" },
+                  { col: "pdis", n: "Live", fields: "gene_symbol, citation_score, clinical_score, structure_score, patent_score, fda_score, pdis_total" },
+                  { col: "diseases", n: "Live", fields: "gene_symbol, uniprot_id, diseases[].disease_id, diseases[].description, diseases[].omim_id" },
                 ].map((r) => (
                   <tr key={r.col} className="border-b border-white/5">
                     <td className="py-2.5 px-3"><code className="text-kinome-cyan">{r.col}</code></td>
@@ -322,6 +351,13 @@ function TechnicalTab() {
             The kinome tree is a radial phylogenetic layout with 9 groups arranged at fixed angular positions.
             Each group occupies a wedge, with kinases distributed along rays within their wedge.
           </p>
+          <p className="text-slate-300 text-sm leading-relaxed mt-3">
+            Zoom ranges from 0.3× to 12×. At overview scales, overlapping names are suppressed while exact search
+            matches and the selected group receive priority. At 8× and above, every kinase name is displayed;
+            dense names are placed into collision-aware radial and tangential lanes. Label text, node markers,
+            outlines, and branch strokes retain stable screen-space sizing so they remain legible at deep zoom.
+            Drag to pan, use the mouse wheel or trackpad to zoom, and select a kinase node to open its profile.
+          </p>
           <Math>
             {"angle(group_i) = (i / N_groups) × 2π + offset\nradius(kinase_j) = base + j × spacing\nx = radius × cos(angle)\ny = radius × sin(angle)"}
           </Math>
@@ -335,15 +371,26 @@ function TechnicalTab() {
         </Card>
       </Section>
 
+      <Section title="Reviewed Annotations and Interaction Evidence" icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card title="UniProtKB/Swiss-Prot">
+            <p className="text-sm leading-relaxed text-slate-300">The UniProt ETL query is restricted to reviewed human Protein kinase records (<code className="text-kinome-cyan">reviewed:true</code>). KinomeX imports curated FUNCTION, CATALYTIC ACTIVITY, and SUBUNIT comments and displays their UniProt source link on each kinase profile. Missing annotations remain explicitly unavailable.</p>
+          </Card>
+          <Card title="STRING Network">
+            <p className="text-sm leading-relaxed text-slate-300">The Network tab in each kinase dossier calls STRING for human proteins (<code className="text-kinome-cyan">species=9606</code>). It follows Mutations, supports functional or physical associations and confidence filtering, requests up to 20 neighbors for the focal protein, and shows a ranked table of combined, experimental, database, and text-mining scores. The AI Assistant also retrieves STRING for interaction questions and cites a direct association link in each applicable answer row. Neighbor clicks use STRING&apos;s species-qualified <code className="text-kinome-cyan">/network/homo_sapiens/[gene]</code> link; the focal kinase remains linked to its KinomeX dossier. STRING associations do not necessarily establish direct physical binding.</p>
+          </Card>
+        </div>
+      </Section>
+
       {/* Data Flow */}
       <Section title="Request Lifecycle" icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}>
         <Card>
           <Math>
-            {"Browser → Next.js 14 Server Component\n  → API Route (/api/kinases)\n    → MongoDB raw query (motor async)\n    → 7 collections joined in application layer\n  ← JSON response\n← React + Tailwind + Recharts render"}
+            {"Browser → Next.js App Router\n  → API Route (/api/kinases)\n    → shared Mongoose connection\n    → relevant MongoDB collections joined in application code\n  ← JSON response\n← React + Tailwind render"}
           </Math>
           <p className="text-slate-300 text-sm mt-3 leading-relaxed">
-            All data is served from MongoDB via raw <code className="bg-slate-800 px-1.5 py-0.5 rounded text-xs text-kinome-cyan">db.collection.find()</code> queries —
-            no Mongoose models. The API routes join data from multiple collections in application code and return flattened
+            Application data is served from MongoDB through a reused Mongoose connection and native collection operations.
+            The API routes join data from multiple collections in application code and return flattened
             response objects that match the frontend component interfaces.
           </p>
         </Card>
@@ -359,9 +406,9 @@ function EncyclopediaTab() {
       <Section title="What Are Protein Kinases?" icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>}>
         <Card>
           <p className="text-slate-300 leading-relaxed">
-            Protein kinases are enzymes (~2% of the human genome) that regulate virtually every cellular process by
-            covalently adding phosphate groups to proteins. The human kinome consists of <strong className="text-white">518 canonical</strong> protein kinases
-            and over <strong className="text-white">3,800 kinase-related</strong> genes (pseudokinases, kinase-like domains).
+            Protein kinases regulate cellular processes by covalently adding phosphate groups to proteins.
+            Published kinome totals vary because sources count genes, protein entries, or kinase domains. KinomeX therefore
+            reports its live reconciled catalog accounting explicitly instead of presenting those definitions as one number.
           </p>
           <p className="text-slate-300 leading-relaxed mt-3">
             The catalytic reaction: <strong className="text-kinome-cyan">ATP + Protein → ADP + Phosphoprotein</strong>.
@@ -386,7 +433,6 @@ function EncyclopediaTab() {
             {
               group: "AGC",
               full: "cAMP-dependent, cGMP-dependent, and protein kinase C",
-              kinases: "~285",
               color: "bg-kinome-cyan",
               examples: "AKT1, PKA, PKC, PKG, PKN, PDK1, SGK, GRK",
               desc: "Regulated by lipids (PIP₃) and second messengers (cAMP, cGMP, Ca²⁺). Central to growth factor signaling (PI3K/AKT), neuronal function, and cardiac regulation. AKT1 is one of the most frequently activated kinases in cancer.",
@@ -395,7 +441,6 @@ function EncyclopediaTab() {
             {
               group: "CAMK",
               full: "Calcium/calmodulin-dependent protein kinases",
-              kinases: "~243",
               color: "bg-kinome-violet",
               examples: "CaMKII, AMPK, MARK, BRSK, LKB1, DAPK, MLCK",
               desc: "Activated by intracellular calcium/calmodulin complexes. AMPK is the cellular energy sensor — activated when ATP is low. LKB1 is a tumor suppressor that phosphorylates AMPK. DAPK family controls apoptosis.",
@@ -404,7 +449,6 @@ function EncyclopediaTab() {
             {
               group: "CK1",
               full: "Casein kinase 1",
-              kinases: "~82",
               color: "bg-kinome-amber",
               examples: "CSNK1A1, CSNK1D, CSNK1E, VRK1, VRK2",
               desc: "Constitutively active serine/threonine kinases. CK1ε/δ regulate circadian rhythm (phosphorylates PER proteins), Wnt signaling, and DNA repair. VRK kinases control nuclear envelope dynamics.",
@@ -413,7 +457,6 @@ function EncyclopediaTab() {
             {
               group: "CMGC",
               full: "CDK, MAPK, GSK3, CLK",
-              kinases: "~1,015",
               color: "bg-kinome-rose",
               examples: "CDK1/2/4/6, ERK1/2, JNK, p38, GSK3β, CLK1, DYRK",
               desc: "The largest group. CDKs control cell cycle progression (CDK4/6 → G1/S). MAPK cascades (RAS→RAF→MEK→ERK) transduce mitogenic signals. GSK3β regulates metabolism and development. DYRK kinases are implicated in Down syndrome.",
@@ -422,7 +465,6 @@ function EncyclopediaTab() {
             {
               group: "STE",
               full: "Homologs of yeast sterile kinases",
-              kinases: "~161",
               color: "bg-kinome-emerald",
               examples: "MEK1/2, MKK3/4/6/7, MLK1-3, MAP3K1-14, TAO",
               desc: "The MAPK kinase kinases (MAP3Ks) and MAPK kinases (MAP2Ks). They form the core signaling cascades: MAP3K → MAP2K → MAPK. MEK1/2 activate ERK1/2; MKK4/7 activate JNK; MKK3/6 activate p38.",
@@ -431,7 +473,6 @@ function EncyclopediaTab() {
             {
               group: "TK",
               full: "Tyrosine kinases",
-              kinases: "~567",
               color: "bg-sky-400",
               examples: "EGFR, HER2, VEGFR, PDGFR, FGFR, MET, RON, SRC, ABL, JAK1-3",
               desc: "Phosphorylate tyrosine residues. Receptor tyrosine kinases (RTKs) are single-pass transmembrane receptors activated by ligand binding. Non-receptor tyrosine kinases (SRC, ABL, JAK) are cytoplasmic. RTKs drive angiogenesis (VEGFR), cell proliferation (EGFR), and immune signaling (JAK/STAT).",
@@ -440,7 +481,6 @@ function EncyclopediaTab() {
             {
               group: "TKL",
               full: "Tyrosine kinase-like",
-              kinases: "~209",
               color: "bg-indigo-400",
               examples: "RAF1, BRAF, ARAF, MLK1-3, MLK2, LCK, BTK, TEC",
               desc: "Structurally similar to tyrosine kinases but often phosphorylate serine/threonine. RAF kinases (BRAF) are key nodes in the RAS-MAPK pathway — BRAF V600E is the most common oncogenic kinase mutation in melanoma. BTK is essential for B-cell signaling.",
@@ -449,7 +489,6 @@ function EncyclopediaTab() {
             {
               group: "Atypical",
               full: "Atypical protein kinases",
-              kinases: "~1,265",
               color: "bg-amber-400",
               examples: "PIKK family (ATM, ATR, mTOR, DNA-PK, SMG1, TRRAP), Alpha-kinases, TRIB1-3, NIMA",
               desc: "Do not share the canonical bilobal kinase fold. PIKKs (PI3K-related kinases) are massive (~300 kDa) and regulate DNA damage response (ATM/ATR), mRNA surveillance (SMG1), and cell growth (mTOR). Alpha-kinases have a unique fold despite catalyzing the same reaction.",
@@ -464,7 +503,6 @@ function EncyclopediaTab() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="text-white font-bold">{g.full}</h3>
-                    <code className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded">{g.kinases} kinases</code>
                   </div>
                   <p className="text-slate-300 text-sm leading-relaxed mt-2">{g.desc}</p>
                   <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -493,7 +531,14 @@ function EncyclopediaTab() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-slate-900/80 border border-white/10 rounded-xl p-4 flex items-center justify-center">
-              <svg viewBox="0 0 440 320" className="w-full max-w-md" xmlns="http://www.w3.org/2000/svg">
+              <Image
+                src="/images/canonical-kinase-fold.png"
+                alt="Annotated canonical protein kinase fold showing the N-lobe, alpha-C helix, hinge region, catalytic cleft, substrate peptide, C-lobe, HRD motif, activation loop, and ATP"
+                width={633}
+                height={558}
+                className="h-auto w-full max-w-xl rounded-lg object-contain"
+              />
+              <svg viewBox="0 0 440 320" className="hidden" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <defs>
                   <linearGradient id="nLobeGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#38bdf8" stopOpacity="0.18"/><stop offset="100%" stopColor="#38bdf8" stopOpacity="0.04"/></linearGradient>
                   <linearGradient id="cLobeGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a855f7" stopOpacity="0.18"/><stop offset="100%" stopColor="#a855f7" stopOpacity="0.04"/></linearGradient>
@@ -582,7 +627,7 @@ function EncyclopediaTab() {
                 <p className="text-slate-400 text-xs mt-1">Connects the two lobes. The linker flexibility allows domain closure upon ATP binding. The hinge region is also the binding site for most Type I ATP-competitive kinase inhibitors.</p>
               </div>
               <div className="bg-slate-900/60 border border-white/10 rounded-lg p-3">
-                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-kinome-rose opacity-60" /><span className="text-xs font-semibold text-white">Activation loop (T-loop)</span></div>
+                <div className="flex items-center gap-2"><span className="h-3 w-3 shrink-0 rounded-sm bg-kinome-rose opacity-60" /><span className="text-xs font-semibold text-white">Activation loop (T-loop)</span></div>
                 <p className="text-slate-400 text-xs mt-1">Contains the DFG motif at its N-terminus. Must be phosphorylated (at a conserved Ser/Thr/Tyr) for full activity in most kinases. The T-loop conformation determines DFG-in (active) vs DFG-out (inactive) states.</p>
               </div>
             </div>
@@ -594,7 +639,16 @@ function EncyclopediaTab() {
             Kinases toggle between <strong className="text-kinome-cyan">active</strong> and <strong className="text-kinome-rose">inactive</strong> conformations
             governed by the DFG motif and the αC-helix position. The DFG motif refers to a conserved Asp-Phe-Gly sequence.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="overflow-hidden rounded-xl border border-white/10 bg-slate-950/80">
+            <Image
+              src="/images/kinase-active-inactive-conformations.png"
+              alt="Comparison of the DFG-in active and DFG-out inactive kinase conformations, including ATP and substrate binding in the active state and the Type II inhibitor pocket in the inactive state"
+              width={1874}
+              height={839}
+              className="h-auto w-full object-contain"
+            />
+          </div>
+          <div className="hidden" aria-hidden="true">
             <div className="bg-slate-900/80 border border-kinome-cyan/20 rounded-xl p-4">
               <h4 className="text-kinome-cyan text-sm font-semibold mb-3 text-center">DFG-in (Active state)</h4>
               <svg viewBox="0 0 320 200" className="w-full" xmlns="http://www.w3.org/2000/svg">
@@ -687,7 +741,14 @@ function EncyclopediaTab() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-slate-900/80 border border-white/10 rounded-xl p-4 flex items-center justify-center">
-              <svg viewBox="0 0 220 320" className="w-full max-w-[180px]" xmlns="http://www.w3.org/2000/svg">
+              <Image
+                src="/images/receptor-tyrosine-kinase-architecture.png"
+                alt="Receptor tyrosine kinase dimer architecture showing ligand-bound extracellular domains, transmembrane helices across the lipid bilayer, intracellular kinase domains, and trans-autophosphorylation"
+                width={429}
+                height={533}
+                className="h-auto w-full max-w-sm rounded-lg object-contain"
+              />
+              <svg viewBox="0 0 220 320" className="hidden" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <defs>
                   <linearGradient id="ecdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#38bdf8" stopOpacity="0.10"/><stop offset="100%" stopColor="#38bdf8" stopOpacity="0.02"/></linearGradient>
                   <linearGradient id="mbGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#f59e0b" stopOpacity="0.15"/><stop offset="50%" stopColor="#f59e0b" stopOpacity="0.08"/><stop offset="100%" stopColor="#f59e0b" stopOpacity="0.15"/></linearGradient>
@@ -750,7 +811,7 @@ function EncyclopediaTab() {
                 <p className="text-slate-400 text-xs mt-1">Single ~25-residue α-helix spanning the lipid bilayer. The TM domain mediates receptor dimerization via helix-helix packing in the membrane. Some RTKs (e.g., EGFR) exist as pre-formed dimers; others (e.g., VEGFR) dimerize only upon ligand binding. A juxtamembrane region connects TM to the kinase domain.</p>
               </div>
               <div className="bg-slate-900/60 border border-white/10 rounded-lg p-3">
-                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-kinome-amber opacity-60" /><span className="text-xs font-semibold text-white">Intracellular kinase domain (KD)</span></div>
+                <div className="flex items-center gap-2"><span className="h-3 w-3 shrink-0 rounded-sm bg-kinome-amber opacity-60" /><span className="text-xs font-semibold text-white">Intracellular kinase domain (KD)</span></div>
                 <p className="text-slate-400 text-xs mt-1">The canonical bilobal catalytic domain. Ligand-induced dimerization brings two kinase domains into close proximity, triggering <strong className="text-white">trans-autophosphorylation</strong> on conserved tyrosine residues within the activation loop. Phosphorylation stabilizes the active conformation and creates SH2-domain docking sites for downstream signaling proteins.</p>
               </div>
             </div>
@@ -765,7 +826,14 @@ function EncyclopediaTab() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-slate-900/80 border border-white/10 rounded-xl p-4 flex items-center justify-center">
-              <svg viewBox="0 0 360 260" className="w-full max-w-md" xmlns="http://www.w3.org/2000/svg">
+              <Image
+                src="/images/atypical-kinase-pikk-fold.png"
+                alt="PIKK fold architecture showing the HEAT-repeat solenoid, FAT and FATC domains, central PIK domain, FRB region, and mLST8"
+                width={806}
+                height={671}
+                className="h-auto w-full max-w-lg rounded-lg object-contain"
+              />
+              <svg viewBox="0 0 360 260" className="hidden" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <defs>
                   <linearGradient id="fatGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#38bdf8" stopOpacity="0.08"/><stop offset="100%" stopColor="#38bdf8" stopOpacity="0.02"/></linearGradient>
                   <linearGradient id="pikGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#f59e0b" stopOpacity="0.10"/><stop offset="100%" stopColor="#f59e0b" stopOpacity="0.02"/></linearGradient>
@@ -837,7 +905,7 @@ function EncyclopediaTab() {
             </div>
             <div className="space-y-3">
               <div className="bg-slate-900/60 border border-white/10 rounded-lg p-3">
-                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-kinome-amber opacity-60" /><span className="text-xs font-semibold text-white">PIK domain</span></div>
+                <div className="flex items-center gap-2"><span className="h-3 w-3 shrink-0 rounded-sm bg-kinome-amber opacity-60" /><span className="text-xs font-semibold text-white">PIK domain</span></div>
                 <p className="text-slate-400 text-xs mt-1">The phosphoinositide 3-kinase-related domain. Despite the name, PIKKs are serine/threonine protein kinases. The PIK domain (~200 residues) is inserted into the FAT domain and uses a distinct α-helical fold built from HEAT repeats — completely different from the bilobal architecture of typical kinases.</p>
               </div>
               <div className="bg-slate-900/60 border border-white/10 rounded-lg p-3">
@@ -903,8 +971,9 @@ function EncyclopediaTab() {
 
         <Card title="Druggable Kinome">
           <p className="text-slate-300 text-sm leading-relaxed">
-            ~65 of the 518 kinases are currently &quot;druggable&quot; by small molecules. The ATP-binding site is highly conserved,
-            making selectivity the central challenge in kinase drug design. Most approved inhibitors are:
+            Kinase drug-target and approval totals change over time and depend on whether drugs, targets, indications, or
+            regulatory jurisdictions are counted. KinomeX does not currently maintain a validated approved-drug total.
+            The ATP-binding site is highly conserved, making selectivity a central challenge in kinase drug design. Common inhibitor classes include:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
             <div className="bg-slate-900/60 border border-white/10 rounded-lg p-3">
@@ -1008,6 +1077,137 @@ function EncyclopediaTab() {
   );
 }
 
+const attributionSources = [
+  {
+    name: "UniProtKB/Swiss-Prot",
+    use: "Reviewed protein identity, sequence, domains, function, catalytic activity, subunit and disease annotations.",
+    rights: "Copyrightable database content is CC BY 4.0. KinomeX identifies UniProt as the source, links each entry, and labels normalized or combined fields as KinomeX processing.",
+    href: "https://www.uniprot.org/help/license",
+    license: "CC BY 4.0",
+  },
+  {
+    name: "STRING",
+    use: "Human functional and physical protein associations and evidence-channel confidence scores.",
+    rights: "STRING data and downloads are CC BY 4.0. KinomeX uses the documented API for limited queries, credits STRING, links associations, and does not scrape STRING pages. Scores are described as associations, not proof of direct binding.",
+    href: "https://string-db.org/cgi/access?footer_active_subpage=licensing",
+    license: "CC BY 4.0",
+  },
+  {
+    name: "RCSB Protein Data Bank / wwPDB",
+    use: "PDB identifiers, experimental structures, methods, resolution and bound-ligand metadata.",
+    rights: "PDB archive and programmatic API data are CC0 1.0. KinomeX nevertheless credits RCSB PDB and preserves PDB identifiers and links; original structure authors should be cited when a structure is used in research.",
+    href: "https://www.rcsb.org/pages/usage-policy",
+    license: "CC0 1.0",
+  },
+  {
+    name: "AlphaFold Protein Structure Database",
+    use: "Fallback predicted structures when no experimental PDB structure is available.",
+    rights: "Predictions are available under CC BY 4.0 for academic and commercial use. KinomeX labels them as predictions, links the source entry, and does not present them as experimentally validated or clinically approved.",
+    href: "https://alphafold.ebi.ac.uk/faq",
+    license: "CC BY 4.0",
+  },
+  {
+    name: "ChEMBL",
+    use: "Kinase targets, compounds, assays, standardized activity values and document identifiers.",
+    rights: "ChEMBL data are CC BY-SA 3.0. ChEMBL-derived records and adaptations exposed by KinomeX remain under CC BY-SA 3.0; attribution and the same license must accompany any redistribution or derivative export.",
+    href: "https://www.ebi.ac.uk/chembl/",
+    license: "CC BY-SA 3.0",
+  },
+  {
+    name: "PubChem",
+    use: "PubChem identifiers, compound properties and the deposited Ambit kinase-profiling assay (AID 1433).",
+    rights: "PubChem is an open NLM archive, but contributor-specific rights can apply. KinomeX retains PubChem identifiers and provenance, does not bulk republish PubChem, and requires users of exported records to inspect the source record's current contributor license.",
+    href: "https://pubchem.ncbi.nlm.nih.gov/docs/downloads",
+    license: "Record-specific",
+  },
+  {
+    name: "GTEx Portal",
+    use: "Public aggregate median tissue-expression values from the documented GTEx release.",
+    rights: "KinomeX uses only public aggregate Portal data, not controlled individual-level dbGaP data. Publications and presentations must acknowledge GTEx, identify the Portal/release, and include the access date requested by GTEx.",
+    href: "https://gtexportal.org/home/documentationPage",
+    license: "Public aggregate data; citation required",
+  },
+  {
+    name: "NCBI ClinVar",
+    use: "Submitted variant identifiers and clinical-significance assertions.",
+    rights: "NCBI requests attribution when ClinVar data are copied or distributed. KinomeX links source records and states that submissions are not independently verified and are not for direct diagnosis or medical decisions without genetics-professional review.",
+    href: "https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/",
+    license: "NCBI data-use policy",
+  },
+  {
+    name: "PubMed / NCBI E-utilities",
+    use: "Citation metadata, PMID/DOI verification, publication counts and transient abstracts used to ground answers.",
+    rights: "Citation metadata may be reused with NLM acknowledgment, but abstracts may be copyrighted by authors or publishers. KinomeX does not store or republish article full text, instructs the AI to paraphrase retrieved evidence, and links users to PubMed and the DOI.",
+    href: "https://www.ncbi.nlm.nih.gov/home/about/policies/",
+    license: "Metadata/public-domain portions; abstracts record-specific",
+  },
+  {
+    name: "ClinicalTrials.gov",
+    use: "Aggregate active/completed study counts used as one PDIS component.",
+    rights: "KinomeX attributes ClinicalTrials.gov, uses study records without altering their meaning, does not imply NIH/NLM endorsement, and does not redistribute uploaded study documents, which may carry third-party copyright.",
+    href: "https://clinicaltrials.gov/about-site/terms-conditions",
+    license: "U.S. public-domain data; additional international/third-party rights may apply",
+  },
+  {
+    name: "KinHub and Manning classification",
+    use: "Core human-kinome roster reconciliation and factual kinase group/domain classification.",
+    rights: "KinomeX cites the Manning et al. classification and KinHub/KinMap, copies no KinHub artwork or explanatory prose, and does not offer the KinHub source roster as a standalone download. Because no explicit current KinHub data license is published, broader or commercial redistribution should obtain permission from the source maintainers.",
+    href: "http://www.kinhub.org/",
+    license: "No explicit source-data license located",
+  },
+  {
+    name: "OMIM",
+    use: "Outbound identifiers and links supplied through UniProt disease cross-references.",
+    rights: "OMIM content is copyrighted. KinomeX does not ingest or reproduce OMIM narrative text; it displays identifiers and links only. Any direct OMIM content use requires compliance with OMIM's terms.",
+    href: "https://omim.org/help/copyright",
+    license: "Copyrighted; links/identifiers only",
+  },
+];
+
+function AttributionsTab() {
+  return (
+    <div className="space-y-10">
+      <div className="max-w-3xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-kinome-cyan">Data provenance</p>
+        <h1 className="mt-2 text-4xl font-bold text-white">Attributions &amp; reuse rights</h1>
+        <p className="mt-4 text-base leading-relaxed text-slate-400">
+          KinomeX is an integration and visualization layer, not the owner of upstream scientific data. Rights remain with the named providers and contributors. The notices below describe the project&apos;s current, deliberately conservative use of each source; source terms control if they change.
+        </p>
+        <p className="mt-2 text-xs text-slate-500">Terms reviewed against official provider pages on August 11, 2026. This inventory is operational guidance, not legal advice.</p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        {attributionSources.map((source) => (
+          <article key={source.name} className="glass rounded-2xl border border-white/10 p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-white">{source.name}</h2>
+                <p className="mt-1 text-sm leading-relaxed text-slate-400">{source.use}</p>
+              </div>
+              <span className="rounded-full border border-kinome-cyan/20 bg-kinome-cyan/[0.07] px-3 py-1 text-[11px] font-medium text-kinome-cyan">{source.license}</span>
+            </div>
+            <p className="mt-3 border-t border-white/[0.06] pt-3 text-sm leading-relaxed text-slate-300">{source.rights}</p>
+            <a href={source.href} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-kinome-cyan hover:underline">
+              Official terms or source policy <span aria-hidden="true">↗</span>
+            </a>
+          </article>
+        ))}
+      </div>
+
+      <Card title="Compliance boundaries">
+        <ul className="space-y-2 text-sm leading-relaxed text-slate-300">
+          <li>• Source names identify provenance and do not imply endorsement, partnership, or ownership.</li>
+          <li>• Third-party logos, screenshots, and prose are not incorporated; KinomeX uses its own interface and graphics.</li>
+          <li>• ChEMBL-derived records retain CC BY-SA 3.0 attribution and ShareAlike obligations.</li>
+          <li>• PubMed abstracts and linked articles are not redistributed as a corpus; answers use short paraphrases with verified PMID and DOI links.</li>
+          <li>• ClinVar and AlphaFold information is research-oriented and must not be treated as clinical advice or validated diagnosis.</li>
+          <li>• API clients must preserve record-level source identifiers and these notices when redistributing data.</li>
+        </ul>
+      </Card>
+    </div>
+  );
+}
+
 export default function DocsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("About");
 
@@ -1015,7 +1215,7 @@ export default function DocsPage() {
     <div className="min-h-screen bg-kinome-deep pt-24 pb-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Tabs */}
-        <div className="flex items-center gap-2 mb-10 border-b border-white/10 pb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-10 border-b border-white/10 pb-4">
           {tabs.map((tab) => (
             <TabButton key={tab} label={tab} active={activeTab === tab} onClick={() => setActiveTab(tab)} />
           ))}
@@ -1033,6 +1233,7 @@ export default function DocsPage() {
             {activeTab === "About" && <AboutTab />}
             {activeTab === "Technical" && <TechnicalTab />}
             {activeTab === "Encyclopedia" && <EncyclopediaTab />}
+            {activeTab === "Attributions" && <AttributionsTab />}
           </motion.div>
         </AnimatePresence>
       </div>

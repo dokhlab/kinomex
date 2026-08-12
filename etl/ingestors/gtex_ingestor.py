@@ -155,6 +155,18 @@ async def ingest_expression() -> int:
         key_fields=["gene_symbol", "tissue_site_id", "dataset_id"],
         batch_size=1000,
     )
+    covered = sorted(by_gene)
+    await db["source_coverage"].replace_one(
+        {"_id": "gtex_v10"},
+        {
+            "_id": "gtex_v10", "source": "gtex", "dataset_id": DATASET_ID,
+            "catalog_entries_queried": len(genes), "covered_gene_count": len(covered),
+            "covered_genes": covered, "unmapped_genes": missing,
+            "mapped_without_expression": sorted(set(gencode_by_gene) - set(by_gene)),
+            "complete": True, "retrieved_at": retrieved_at,
+        },
+        upsert=True,
+    )
     logger.info(
         "Stored %d verified GTEx measurements for %d/%d kinase symbols",
         len(records), len(by_gene), len(genes),

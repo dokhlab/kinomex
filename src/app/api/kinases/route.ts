@@ -31,14 +31,17 @@ export async function GET(request: NextRequest) {
     const search = (searchParams.get("search") || "").trim();
     const group = (searchParams.get("group") || "").trim();
     const organ_system = (searchParams.get("organ_system") || "").trim();
+    const catalog = (searchParams.get("catalog") || "all").trim();
     const minPDIS = parseFiniteNumber(searchParams.get("minPDIS"), 0);
     const maxPDIS = parseFiniteNumber(searchParams.get("maxPDIS"), 1);
     const parsedPage = parseFiniteNumber(searchParams.get("page"), 1);
     const parsedLimit = parseFiniteNumber(searchParams.get("limit"), 20);
     const sort = searchParams.get("sort") || "gene_symbol";
+    const hasPdisFilter = searchParams.has("minPDIS") || searchParams.has("maxPDIS");
 
     if (
       search.length > 100 || organ_system.length > 50 || !isKinaseGroup(group) ||
+      !["all", "core", "extended"].includes(catalog) ||
       minPDIS === null || maxPDIS === null || minPDIS < 0 || maxPDIS > 1 || minPDIS > maxPDIS ||
       parsedPage === null || parsedLimit === null || !Number.isInteger(parsedPage) ||
       !Number.isInteger(parsedLimit) || parsedPage < 1 || parsedLimit < 1 || !isSafeSort(sort)
@@ -51,7 +54,7 @@ export async function GET(request: NextRequest) {
     const sortDir = sort.startsWith("-") ? -1 : 1;
     const sortField = sort.replace(/^-/, "");
 
-    const cacheKey = JSON.stringify({ search, group, organ_system, minPDIS, maxPDIS, page, limit, sort });
+    const cacheKey = JSON.stringify({ search, group, organ_system, catalog, minPDIS, maxPDIS, hasPdisFilter, page, limit, sort });
     const cached = getCached(cacheKey);
     if (cached) {
       return NextResponse.json(cached);
@@ -73,6 +76,8 @@ export async function GET(request: NextRequest) {
     if (group) {
       matchStage.group = group;
     }
+    if (catalog === "core") matchStage.catalog_membership = "kinhub_core";
+    if (catalog === "extended") matchStage.catalog_membership = "uniprot_extended";
 
     // Gene-level filters (organ system, PDIS range) are resolved to gene
     // lists up-front so the total count and pagination only cover matches.
@@ -82,23 +87,22 @@ export async function GET(request: NextRequest) {
       const organGenes = await resolveOrganGenes(db, organ_system);
       if (organGenes.length === 0) {
         // No kinases match this organ system — return empty
-        return NextResponse.json({ kinases: [], total: 0, page, totalPages: 0 });
+        return NextResponse.json({ kinases: [], total: 0, page, totalPages: 0, groupBreakdown: {} });
       }
       geneConditions.push({ gene_symbol: { $in: organGenes } });
     }
 
-    const hasPdisFilter = searchParams.has("minPDIS") || searchParams.has("maxPDIS");
     if (hasPdisFilter) {
       // pdis collection stores scores on a 0-100 scale; resolve matching genes
       // BEFORE pagination so totals and pages reflect only in-range kinases.
-      const minTotal = Math.round(minPDIS * 100);
-      const maxTotal = Math.round(maxPDIS * 100);
+      const minTotal = minPDIS * 100;
+      const maxTotal = maxPDIS * 100;
       const pdisDocs = await db.collection("pdis")
         .find({ pdis_total: { $gte: minTotal, $lte: maxTotal } })
         .toArray();
       const pdisGenes = new Set((pdisDocs.map((p) => p.gene_symbol)).filter(Boolean) as string[]);
       if (pdisGenes.size === 0) {
-        return NextResponse.json({ kinases: [], total: 0, page, totalPages: 0 });
+        return NextResponse.json({ kinases: [], total: 0, page, totalPages: 0, groupBreakdown: {} });
       }
       geneConditions.push({ gene_symbol: { $in: Array.from(pdisGenes) } });
     }
@@ -107,8 +111,20 @@ export async function GET(request: NextRequest) {
       matchStage.$and = geneConditions;
     }
 
-    // First get total count from kinases collection
-    const total = await db.collection("kinases").countDocuments(matchStage);
+    // Count the complete filtered population before pagination. The breakdown
+    // must use this same match stage; deriving it from the returned page makes
+    // every group appear capped by the page size.
+    const [total, groupRows] = await Promise.all([
+      db.collection("kinases").countDocuments(matchStage),
+      db.collection("kinases").aggregate([
+        { $match: matchStage },
+        { $group: { _id: { $ifNull: ["$group", "Atypical"] }, count: { $sum: 1 } } },
+        { $sort: { count: -1, _id: 1 } },
+      ]).toArray(),
+    ]);
+    const groupBreakdown = Object.fromEntries(
+      groupRows.map((row) => [String(row._id), Number(row.count)]),
+    );
 
     // Get kinases with pagination
     const sortDoc: Record<string, 1 | -1> = { [sortField]: sortDir as 1 | -1 };
@@ -149,11 +165,14 @@ export async function GET(request: NextRequest) {
       const gene = k.gene_symbol;
       return {
         gene_symbol: gene,
-        name: k.full_name || "Unknown",
+        name: k.full_name || k.kinhub_domains?.[0]?.kinase_name || "Name unavailable",
+        uniprot_record_status: k.uniprot_record_status || "active",
         group: k.group || deriveGroup(k.keywords || []),
         subfamily: k.subfamily || "",
         organism: "Human",
         uniprot_id: k.uniprot_id,
+        catalog_membership: k.catalog_membership,
+        kinase_domain_count: Array.isArray(k.kinhub_domains) ? k.kinhub_domains.length : 0,
         pdis_score: pdisMap.get(gene) ?? null,
         organ_systems_impacted: (expMap.get(gene) || []),
         diseases_associated: diseaseMap.get(gene) || [],
@@ -163,7 +182,7 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.ceil(total / limit);
 
-    const response = { kinases: enriched, total, page, totalPages };
+    const response = { kinases: enriched, total, page, totalPages, groupBreakdown };
     if (total > 0) {
       setCache(cacheKey, response);
     }

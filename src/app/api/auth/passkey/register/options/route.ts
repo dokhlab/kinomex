@@ -1,0 +1,4 @@
+import { NextRequest, NextResponse } from "next/server";
+import { generateRegistrationOptions } from "@simplewebauthn/server";
+import { currentUser, ensureAuthIndexes } from "@/lib/auth";
+export async function POST(request: NextRequest) { const user = await currentUser(); if (!user) return NextResponse.json({ error:"Authentication required" },{status:401}); const rpID=request.nextUrl.hostname; const options=await generateRegistrationOptions({rpName:"KinomeX",rpID,userName:user.username,userDisplayName:user.name,userID:new Uint8Array(user._id.id),attestationType:"none",excludeCredentials:(user.passkeys||[]).map(p=>({id:p.id as never})),authenticatorSelection:{residentKey:"preferred",userVerification:"required"}}); const db=await ensureAuthIndexes(); await db.collection("auth_challenges").updateOne({userId:user._id,type:"register"},{$set:{challenge:options.challenge,expiresAt:new Date(Date.now()+300000)}},{upsert:true}); return NextResponse.json(options); }

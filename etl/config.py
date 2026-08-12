@@ -10,6 +10,14 @@ _env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(_env_path)
 
 
+def _optional_secret(name: str) -> str:
+    """Return an optional secret only when it is not a template placeholder."""
+    value = os.getenv(name, "").strip()
+    if value.lower() in {"your_api_key_here", "replace_me", "changeme"}:
+        return ""
+    return value
+
+
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
@@ -32,7 +40,7 @@ class APIConfig:
     rcsb_url: str = field(default_factory=lambda: os.getenv("RCSB_API_URL", "https://search.rcsb.org/rcsbsearch/v2/query"))
     gtex_url: str = field(default_factory=lambda: os.getenv("GTEX_API_URL", "https://gtexportal.org/api/v2"))
     ncbi_eutils_url: str = field(default_factory=lambda: os.getenv("NCBI_EUTILS_URL", "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"))
-    pubmed_api_key: str = field(default_factory=lambda: os.getenv("PUBMED_API_KEY", ""))
+    pubmed_api_key: str = field(default_factory=lambda: _optional_secret("PUBMED_API_KEY"))
     pubchem_url: str = field(default_factory=lambda: os.getenv("PUBCHEM_API_URL", "https://pubchem.ncbi.nlm.nih.gov/rest/pug"))
 
 

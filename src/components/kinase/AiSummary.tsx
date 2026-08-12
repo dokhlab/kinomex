@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { StringInteraction } from "@/lib/string-network";
 
 interface TissueExpression {
   tissue_name: string;
@@ -49,6 +50,11 @@ interface SummaryData {
   diseases_associated: Disease[];
   key_references: { pubmed_id: string; relevance_tag: string }[];
   organ_systems_impacted: string[];
+  swiss_prot_annotation?: {
+    functions: string[];
+    section: string;
+    source_url: string | null;
+  };
 }
 
 
@@ -72,6 +78,8 @@ function Para({ children }: { children: React.ReactNode }) {
 
 export default function AiSummary({ data }: { data: SummaryData }) {
   const [expanded, setExpanded] = useState(false);
+  const [interactions, setInteractions] = useState<StringInteraction[]>([]);
+  const [interactomeStatus, setInteractomeStatus] = useState<"idle" | "loading" | "ready" | "unavailable">("idle");
   const g = data.gene_symbol;
   const name = data.name;
   const group = data.classification?.group || "";
@@ -88,6 +96,42 @@ export default function AiSummary({ data }: { data: SummaryData }) {
   const nRefs = data.key_references.length;
   const nDomains = data.domains?.length || 0;
   const pdis = data.pdis_score?.overall_score;
+  const curatedFunctions = data.swiss_prot_annotation?.functions ?? [];
+
+  useEffect(() => {
+    if (!expanded) return;
+    const controller = new AbortController();
+    const params = new URLSearchParams({
+      genes: g,
+      score: "700",
+      network_type: "functional",
+      add_nodes: "10",
+    });
+    setInteractions([]);
+    setInteractomeStatus("loading");
+    fetch(`/api/interactions?${params}`, { signal: controller.signal })
+      .then(async (response) => {
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error || "STRING unavailable");
+        return (body.interactions ?? []) as StringInteraction[];
+      })
+      .then((records) => {
+        setInteractions(records);
+        setInteractomeStatus("ready");
+      })
+      .catch((reason) => {
+        if (reason instanceof DOMException && reason.name === "AbortError") return;
+        setInteractomeStatus("unavailable");
+    });
+    return () => controller.abort();
+  }, [expanded, g]);
+
+  const directInteractions = interactions
+    .filter((edge) => edge.source.toUpperCase() === g.toUpperCase() || edge.target.toUpperCase() === g.toUpperCase())
+    .sort((a, b) => b.score - a.score);
+  const topPartners = directInteractions.slice(0, 5).map((edge) =>
+    edge.source.toUpperCase() === g.toUpperCase() ? edge.target : edge.source
+  );
 
   const pathCounts: Record<string, number> = {};
   for (const m of data.mutations) {
@@ -119,7 +163,7 @@ export default function AiSummary({ data }: { data: SummaryData }) {
           </div>
           <div className="text-left">
             <h2 className="text-sm font-semibold text-white group-hover:text-kinome-cyan transition-colors">
-              AI Summary
+              Summary
             </h2>
             <p className="text-[11px] text-slate-500">
               {expanded ? "Hide" : "Show"} narrative summary of {g}
@@ -164,6 +208,24 @@ export default function AiSummary({ data }: { data: SummaryData }) {
                         : " suggesting limited pharmaceutical characterization to date."}
                     </>
                   )}
+                </Para>
+
+                <Para>
+                  {curatedFunctions.length > 0
+                    ? <>According to the reviewed UniProtKB/{data.swiss_prot_annotation?.section || "Swiss-Prot"} record, {curatedFunctions[0]}</>
+                    : `No reviewed Swiss-Prot functional description is present for ${g} in the current import.`}
+                </Para>
+
+                <Para>
+                  {interactomeStatus === "loading"
+                    ? `Loading the high-confidence ${g} interactome from STRING…`
+                    : interactomeStatus === "unavailable"
+                    ? `The STRING interactome is temporarily unavailable; no interaction claims are inferred.`
+                    : directInteractions.length > 0
+                    ? <>At a STRING combined-confidence threshold of 0.70, {g} is directly connected in the retrieved functional-association network to {directInteractions.length} protein{directInteractions.length === 1 ? "" : "s"}. The strongest displayed neighbors are {topPartners.join(", ")}. These STRING links integrate functional evidence and do not necessarily represent direct physical binding; detailed component scores are available in the Network tab.</>
+                    : interactomeStatus === "ready"
+                    ? `STRING returned no direct functional associations for ${g} at the 0.70 confidence threshold.`
+                    : `The high-confidence STRING interactome will load when this summary is opened.`}
                 </Para>
 
                 <Para>

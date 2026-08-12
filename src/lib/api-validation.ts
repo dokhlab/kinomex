@@ -1,5 +1,5 @@
 const KINASE_GROUPS = new Set([
-  "AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical",
+  "AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical", "RGC", "Other",
 ]);
 
 export const KINASE_SORT_FIELDS = new Set([

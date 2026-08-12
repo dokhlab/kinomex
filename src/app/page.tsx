@@ -7,7 +7,7 @@ import KinaseCard from "@/components/ui/KinaseCard";
 import SearchBar from "@/components/ui/SearchBar";
 import StatsBar from "@/components/ui/StatsBar";
 
-const GROUPS = ["All", "AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical"] as const;
+const GROUPS = ["All", "AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical", "RGC", "Other"] as const;
 
 type GroupFilter = (typeof GROUPS)[number];
 
@@ -21,6 +21,8 @@ const groupColors: Record<GroupFilter, string> = {
   TK: "border-blue-500/30 text-blue-400 bg-blue-500/10",
   TKL: "border-orange-500/30 text-orange-400 bg-orange-500/10",
   Atypical: "border-slate-500/30 text-slate-400 bg-slate-500/10",
+  RGC: "border-teal-500/30 text-teal-400 bg-teal-500/10",
+  Other: "border-zinc-500/30 text-zinc-400 bg-zinc-500/10",
 };
 
 const groupActiveColors: Record<GroupFilter, string> = {
@@ -33,14 +35,25 @@ const groupActiveColors: Record<GroupFilter, string> = {
   TK: "border-blue-500 text-white bg-blue-500/25 shadow-[0_0_20px_rgba(59,130,246,0.15)]",
   TKL: "border-orange-500 text-white bg-orange-500/25 shadow-[0_0_20px_rgba(249,115,22,0.15)]",
   Atypical: "border-slate-400 text-white bg-slate-400/25 shadow-[0_0_20px_rgba(148,163,184,0.15)]",
+  RGC: "border-teal-400 text-white bg-teal-400/25",
+  Other: "border-zinc-400 text-white bg-zinc-400/25",
 };
 
 interface StatsData {
-  totalKinases: number;
-  totalLigands: number;
-  totalVariants: number;
-  totalStructures: number;
-  totalDiseases: number;
+  totalKinases: number | null;
+  totalLigands: number | null;
+  totalVariants: number | null;
+  totalStructures: number | null;
+  totalDiseases: number | null;
+  catalogAccounting: {
+    totalEntries: number;
+    kinhubDomainRows: number;
+    kinhubCoreEntries: number;
+    uniprotExtendedEntries: number;
+    inactiveHistoricalEntries: number;
+    unresolvedKinHubAccessions: string[];
+    reconciled: boolean;
+  } | null;
 }
 
 interface KinaseListItem {
@@ -115,9 +128,30 @@ function HomePageContent() {
 
   useEffect(() => {
     fetch("/api/kinases/stats")
-      .then((r) => r.json())
-      .then((data) => setStats(data))
-      .catch(console.error);
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Statistics API unavailable");
+        const data: unknown = await response.json();
+        if (
+          !data ||
+          typeof data !== "object" ||
+          !Number.isFinite((data as StatsData).totalKinases)
+        ) {
+          throw new Error("Statistics API returned an invalid response");
+        }
+        return data as StatsData;
+      })
+      .then(setStats)
+      .catch((error) => {
+        console.error(error);
+        setStats({
+          totalKinases: null,
+          totalLigands: null,
+          totalVariants: null,
+          totalStructures: null,
+          totalDiseases: null,
+          catalogAccounting: null,
+        });
+      });
   }, []);
 
   // Sync URL search param into state (e.g. from nav quick search)
@@ -197,7 +231,7 @@ function HomePageContent() {
             </h1>
             <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
               Human Kinome Explorer{" "}
-              <span className="text-kinome-cyan font-medium">{stats?.totalKinases ?? "..."}</span> Protein Kinases
+              <span className="text-kinome-cyan font-medium">{stats?.totalKinases ?? "..."}</span> Catalogued Protein Entries
             </p>
           </motion.div>
         </div>
@@ -220,16 +254,23 @@ function HomePageContent() {
             <div className="space-y-3">
               <h2 className="text-base font-semibold text-white">Welcome to KinomeX</h2>
               <p className="text-sm text-slate-300 leading-relaxed max-w-5xl">
-                KinomeX is an integrated research server for exploring the human protein kinase landscape. It brings together curated evidence from <span className="text-white">UniProt, RCSB PDB, ChEMBL, PubChem, GTEx, ClinVar, PubMed, and ClinicalTrials.gov</span>, connecting kinase identity and classification with molecular structures, ligand bioactivity, tissue expression, pathogenic variants, and disease associations.
+                KinomeX is an integrated research server for exploring the human protein kinase landscape. Its catalogue reconciles <span className="text-white">KinHub/Manning and UniProt</span>; verified evidence currently available from GTEx, ClinVar, and UniProt connects kinase identity with tissue expression, pathogenic variants, and disease associations. Structure, ligand, and PDIS fields remain explicitly unavailable until their kinase-scoped imports pass validation.
               </p>
               <p className="text-sm text-slate-400 leading-relaxed max-w-5xl">
-                Browse <span className="text-kinome-cyan font-medium">{stats?.totalKinases ?? "500+"} human kinases</span>, compare kinase groups, inspect interactive structures and expression profiles, or search for genes, tissues, diseases, and therapeutic evidence. Each kinase is accompanied by a <span className="text-kinome-violet font-medium">Pharmaceutical Development Interest Score (PDIS)</span> that summarizes publication activity, clinical investigation, structural coverage, compound diversity, and approved-drug evidence. PDIS is intended as an exploration and prioritization aid—not a measure of biological importance or clinical recommendation.
+                Browse <span className="text-kinome-cyan font-medium">{stats?.totalKinases ?? "500+"} accounted catalogue entries</span>, compare kinase groups, inspect expression profiles, or search for genes, tissues, diseases, and therapeutic evidence. When all required evidence sources are verified, the <span className="text-kinome-violet font-medium">Pharmaceutical Development Interest Score (PDIS)</span> summarizes development activity; otherwise it is shown as unavailable rather than estimated.
               </p>
-              <div className="flex flex-wrap gap-2 pt-1 text-[11px] font-medium text-slate-300">
-                <span className="rounded-full border border-cyan-400/15 bg-cyan-400/5 px-3 py-1">Integrated public data</span>
-                <span className="rounded-full border border-violet-400/15 bg-violet-400/5 px-3 py-1">Interactive molecular profiles</span>
-                <span className="rounded-full border border-emerald-400/15 bg-emerald-400/5 px-3 py-1">Evidence-based prioritization</span>
-              </div>
+              {stats?.catalogAccounting && (
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  <span className="text-white font-medium">Fully reconciled catalogue:</span>{" "}
+                  {stats.catalogAccounting.kinhubCoreEntries} KinHub-indexed core entries representing{" "}
+                  {stats.catalogAccounting.kinhubDomainRows} kinase domains, plus{" "}
+                  {stats.catalogAccounting.uniprotExtendedEntries} additional reviewed UniProt Protein kinase entries.
+                  {stats.catalogAccounting.inactiveHistoricalEntries > 0 &&
+                    ` ${stats.catalogAccounting.inactiveHistoricalEntries} KinHub entry is retained as a labeled historical/inactive UniProt record.`}
+                  {stats.catalogAccounting.unresolvedKinHubAccessions.length > 0 &&
+                    ` ${stats.catalogAccounting.unresolvedKinHubAccessions.length} historical KinHub accessions are unresolved.`}
+                </p>
+              )}
             </div>
           </div>
         </motion.div>

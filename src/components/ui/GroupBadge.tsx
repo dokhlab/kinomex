@@ -8,7 +8,9 @@ type KinaseGroup =
   | "STE"
   | "TK"
   | "TKL"
-  | "Atypical";
+  | "Atypical"
+  | "RGC"
+  | "Other";
 
 interface GroupBadgeProps {
   group: KinaseGroup;
@@ -24,6 +26,8 @@ const groupStyles: Record<KinaseGroup, string> = {
   TK: "bg-blue-500/15 text-blue-400 border border-blue-500/20",
   TKL: "bg-orange-500/15 text-orange-400 border border-orange-500/20",
   Atypical: "bg-slate-500/15 text-slate-400 border border-slate-500/20",
+  RGC: "bg-teal-500/15 text-teal-400 border border-teal-500/20",
+  Other: "bg-zinc-500/15 text-zinc-400 border border-zinc-500/20",
 };
 
 export default function GroupBadge({ group, className }: GroupBadgeProps) {

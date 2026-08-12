@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import KinaseCard from "@/components/ui/KinaseCard";
 import PDISHistogram, { type PDISBucket } from "@/components/visualizations/PDISHistogram";
 
-type GroupFilter = "All" | "AGC" | "CAMK" | "CK1" | "CMGC" | "STE" | "TK" | "TKL" | "Atypical";
+type GroupFilter = "All" | "AGC" | "CAMK" | "CK1" | "CMGC" | "STE" | "TK" | "TKL" | "Atypical" | "RGC" | "Other";
 
-const GROUPS: GroupFilter[] = ["All", "AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical"];
+const GROUPS: GroupFilter[] = ["All", "AGC", "CAMK", "CK1", "CMGC", "STE", "TK", "TKL", "Atypical", "RGC", "Other"];
 
 const ORGAN_SYSTEMS = [
   "All",
@@ -35,6 +35,8 @@ const groupPillStyles: Record<GroupFilter, string> = {
   TK: "border-blue-500/30 text-blue-400 bg-blue-500/10",
   TKL: "border-orange-500/30 text-orange-400 bg-orange-500/10",
   Atypical: "border-slate-500/30 text-slate-400 bg-slate-500/10",
+  RGC: "border-teal-500/30 text-teal-400 bg-teal-500/10",
+  Other: "border-zinc-500/30 text-zinc-400 bg-zinc-500/10",
 };
 
 const groupActiveStyles: Record<GroupFilter, string> = {
@@ -47,6 +49,8 @@ const groupActiveStyles: Record<GroupFilter, string> = {
   TK: "border-blue-500 text-white bg-blue-500/25 shadow-[0_0_20px_rgba(59,130,246,0.15)]",
   TKL: "border-orange-500 text-white bg-orange-500/25 shadow-[0_0_20px_rgba(249,115,22,0.15)]",
   Atypical: "border-slate-400 text-white bg-slate-400/25 shadow-[0_0_20px_rgba(148,163,184,0.15)]",
+  RGC: "border-teal-400 text-white bg-teal-400/25",
+  Other: "border-zinc-400 text-white bg-zinc-400/25",
 };
 
 interface KinaseListItem {
@@ -64,6 +68,7 @@ interface KinasesResponse {
   total: number;
   page: number;
   totalPages: number;
+  groupBreakdown: Record<string, number>;
 }
 
 function CardSkeleton() {
@@ -101,6 +106,7 @@ export default function ExplorerPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [groupBreakdown, setGroupBreakdown] = useState<Record<string, number>>({});
 
   const fetchKinases = useCallback(
     async (pageNum: number) => {
@@ -110,8 +116,10 @@ export default function ExplorerPage() {
       if (search) params.set("search", search);
       if (activeGroup !== "All") params.set("group", activeGroup);
       if (activeOrgan !== "All") params.set("organ_system", activeOrgan);
-      params.set("minPDIS", String(minPdis));
-      params.set("maxPDIS", String(maxPdis));
+      if (minPdis > 0 || maxPdis < 1) {
+        params.set("minPDIS", String(minPdis));
+        params.set("maxPDIS", String(maxPdis));
+      }
       params.set("page", String(pageNum));
       params.set("limit", "24");
 
@@ -122,10 +130,12 @@ export default function ExplorerPage() {
         setKinases(data.kinases || []);
         setTotalPages(data.totalPages || 1);
         setTotal(data.total || 0);
+        setGroupBreakdown(data.groupBreakdown || {});
       } catch {
         setKinases([]);
         setTotal(0);
         setTotalPages(1);
+        setGroupBreakdown({});
       } finally {
         setLoading(false);
       }
@@ -160,14 +170,6 @@ export default function ExplorerPage() {
     fetchDistribution();
   }, [fetchDistribution]);
 
-  const groupBreakdown = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const k of kinases) {
-      counts[k.group] = (counts[k.group] || 0) + 1;
-    }
-    return counts;
-  }, [kinases]);
-
   return (
     <div className="min-h-screen pb-20 pt-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -181,7 +183,7 @@ export default function ExplorerPage() {
             Kinase Explorer
           </h1>
           <p className="text-sm text-slate-400">
-            Browse, search, and filter the human kinome
+            Browse the reconciled catalog: KinHub core entries plus reviewed UniProt extensions
           </p>
         </motion.div>
 
@@ -258,7 +260,7 @@ export default function ExplorerPage() {
             </motion.div>
 
             <div className="mb-4 text-sm text-slate-500">
-              {loading ? "Searching..." : `${total} kinase${total !== 1 ? "s" : ""} found`}
+              {loading ? "Searching..." : `${total} catalog entr${total === 1 ? "y" : "ies"} found`}
             </div>
 
             {loading ? (
@@ -340,7 +342,7 @@ export default function ExplorerPage() {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400">Total Results</span>
+                  <span className="text-xs text-slate-400">Catalog Entries</span>
                   <span className="text-sm font-bold text-kinome-cyan tabular-nums">{total}</span>
                 </div>
 
@@ -356,6 +358,9 @@ export default function ExplorerPage() {
                         </div>
                       ))}
                   </div>
+                  <p className="mt-2 text-[10px] leading-relaxed text-slate-600">
+                    Counts cover all matching entries, not only this page.
+                  </p>
                 </div>
 
                 <div className="border-t border-white/5 pt-3">

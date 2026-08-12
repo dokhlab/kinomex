@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-31T21:43:11.424Z",
+  "generatedAt": "2026-07-31T22:33:33.614Z",
   "database": "kinomex",
   "policy": "Numeric ranges are descriptive; only provenance/pattern evidence marks records synthetic.",
   "collections": {
@@ -10,74 +10,150 @@
       "numericFields": {},
       "nonFiniteNumbers": 0
     },
+    "catalog_metadata": {
+      "documents": 1,
+      "syntheticDocuments": 0,
+      "sources": [
+        {
+          "source": "kinhub_uniprot_reconciliation",
+          "count": 1
+        }
+      ],
+      "numericFields": {
+        "kinhub_domain_rows": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 536,
+          "max": 536
+        },
+        "kinhub_roster_accessions": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 522,
+          "max": 522
+        },
+        "kinhub_resolved_entries": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 522,
+          "max": 522
+        },
+        "kinhub_named_hgnc_symbols": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 517,
+          "max": 517
+        },
+        "reviewed_uniprot_keyword_entries": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 625,
+          "max": 625
+        },
+        "kinhub_keyword_overlap_entries": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 469,
+          "max": 469
+        },
+        "kinhub_supplemental_entries": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 53,
+          "max": 53
+        },
+        "uniprot_extended_entries": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 156,
+          "max": 156
+        },
+        "inactive_historical_entries": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 1,
+          "max": 1
+        }
+      },
+      "nonFiniteNumbers": 0
+    },
     "diseases": {
-      "documents": 237,
+      "documents": 256,
       "syntheticDocuments": 0,
       "sources": [
         {
           "source": "uniprot",
-          "count": 237
+          "count": 256
         }
       ],
       "numericFields": {},
       "nonFiniteNumbers": 0
     },
     "expression": {
-      "documents": 33588,
+      "documents": 36396,
       "syntheticDocuments": 0,
       "sources": [
         {
           "source": "gtex",
-          "count": 33588
+          "count": 36396
         }
       ],
       "numericFields": {
         "median_tpm": {
-          "count": 33588,
-          "finite": 33588,
+          "count": 36396,
+          "finite": 36396,
           "nonFinite": 0,
           "min": 0,
           "max": 28328.8
         },
         "tau": {
-          "count": 33588,
-          "finite": 33588,
+          "count": 36396,
+          "finite": 36396,
           "nonFinite": 0,
-          "min": 0.377243,
+          "min": 0.36569,
           "max": 1
         }
       },
       "nonFiniteNumbers": 0
     },
     "kinases": {
-      "documents": 625,
+      "documents": 678,
       "syntheticDocuments": 0,
       "sources": [
         {
           "source": "uniprot",
-          "count": 625
+          "count": 678
         }
       ],
       "numericFields": {
         "domain_boundaries[].start": {
-          "count": 1479,
-          "finite": 1479,
+          "count": 1576,
+          "finite": 1576,
           "nonFinite": 0,
           "min": 1,
           "max": 34256
         },
         "domain_boundaries[].end": {
-          "count": 1479,
-          "finite": 1479,
+          "count": 1576,
+          "finite": 1576,
           "nonFinite": 0,
           "min": 24,
           "max": 34344
         },
         "seq_length": {
-          "count": 625,
-          "finite": 625,
+          "count": 677,
+          "finite": 677,
           "nonFinite": 0,
-          "min": 152,
+          "min": 30,
           "max": 34350
         }
       },
@@ -90,6 +166,69 @@
       "numericFields": {},
       "nonFiniteNumbers": 0
     },
+    "source_coverage": {
+      "documents": 3,
+      "syntheticDocuments": 0,
+      "sources": [
+        {
+          "source": "gtex",
+          "count": 1
+        },
+        {
+          "source": "uniprot",
+          "count": 1
+        },
+        {
+          "source": "clinvar",
+          "count": 1
+        }
+      ],
+      "numericFields": {
+        "catalog_entries_queried": {
+          "count": 2,
+          "finite": 2,
+          "nonFinite": 0,
+          "min": 678,
+          "max": 678
+        },
+        "covered_gene_count": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 674,
+          "max": 674
+        },
+        "successful_requests": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 678,
+          "max": 678
+        },
+        "entries_without_disease_annotations": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 422,
+          "max": 422
+        },
+        "catalog_genes_queried": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 678,
+          "max": 678
+        },
+        "records": {
+          "count": 1,
+          "finite": 1,
+          "nonFinite": 0,
+          "min": 63638,
+          "max": 63638
+        }
+      },
+      "nonFiniteNumbers": 0
+    },
     "structures": {
       "documents": 0,
       "syntheticDocuments": 0,
@@ -98,28 +237,28 @@
       "nonFiniteNumbers": 0
     },
     "variants": {
-      "documents": 25285,
+      "documents": 63638,
       "syntheticDocuments": 0,
       "sources": [
         {
           "source": "clinvar",
-          "count": 25285
+          "count": 63638
         }
       ],
       "numericFields": {
         "position": {
-          "count": 25285,
-          "finite": 25285,
+          "count": 63638,
+          "finite": 63638,
           "nonFinite": 0,
           "min": 1,
-          "max": 35894
+          "max": 35986
         }
       },
       "nonFiniteNumbers": 0
     }
   },
   "totals": {
-    "documents": 59735,
+    "documents": 100972,
     "syntheticDocuments": 0,
     "nonFiniteNumbers": 0
   }
