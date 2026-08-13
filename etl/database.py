@@ -82,6 +82,7 @@ async def ensure_indexes() -> None:
 
     await db[COLLECTIONS["bioactivities"]].create_indexes([
         IndexModel([("compound_id", ASCENDING), ("target_chembl_id", ASCENDING)]),
+        IndexModel([("source", ASCENDING), ("activity_id", ASCENDING)]),
         IndexModel([("target_gene_symbol", ASCENDING)]),
         IndexModel([("pubchem_cid", ASCENDING)]),
         IndexModel([("assay_type", ASCENDING)]),

@@ -496,6 +496,35 @@ python3 -m etl.pipeline chembl pubchem
 python3 -m etl.pipeline pdis
 ```
 
+Ligand records are source-bounded rather than inferred. The ChEMBL step maps
+every catalogue accession to human ChEMBL targets, preserves each quantitative
+source activity by its ChEMBL activity ID, and the dossier presents one row per
+distinct source compound (with its most potent measurement and supporting
+record count). Investigational development candidates are displayed separately
+from quantitative binding assays and require a trial-registry or primary-source
+link. After a ligand refresh, generate the per-kinase integrity report with:
+
+```bash
+pnpm audit:ligands
+```
+
+The report is written to `reports/ligand-coverage.json`. A kinase with no row
+means that the connected sources returned no mapped record; it must not be
+interpreted as evidence that no ligand exists. Nonzero
+`records_missing_gene_symbol` or `invalid_chembl_records` indicates an
+incomplete legacy import that should not be presented as audited coverage.
+
+The 13 August 2026 audited snapshot contains 1,019,354 ChEMBL activity records
+and 2,085 PubChem records mapped to 566 catalogue genes. The remaining 112
+catalogue genes had no mapped record in those connected source snapshots; this
+is a source-coverage statement, not evidence that ligands do not exist. The
+audit found no missing gene symbols, invalid live ChEMBL records, orphan gene
+mappings, or duplicate ChEMBL activity identifiers. The dossier Ligands view
+keeps curated development candidates separate from quantitative binding
+assays. Binding assays can be searched and filtered by value range, activity
+type, and assay; columns are resizable and results paginate at 100 compounds
+per page.
+
 Dependencies are included automatically and run in topological order. For
 example, requesting `pdis` schedules `uniprot`, `pdb`, `chembl`, `gtex`,
 `clinvar`, `diseases`, and finally `pdis`.

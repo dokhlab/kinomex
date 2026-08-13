@@ -1,0 +1,5614 @@
+{
+  "generated_at": "2026-08-13T20:35:16.778Z",
+  "database": "mongodb://localhost:27017/kinomex",
+  "catalogue_total": 678,
+  "genes_with_any_ligand": 566,
+  "genes_without_ligands": [
+    "AATK",
+    "ABR",
+    "ADCK2",
+    "ADPGK",
+    "AK3",
+    "AK5",
+    "AK6",
+    "AK7",
+    "AK8",
+    "AK9",
+    "ALPK1",
+    "ALPK2",
+    "ALPK3",
+    "AMHR2",
+    "BLVRA",
+    "CAMKV",
+    "CIITA",
+    "CKB",
+    "CKMT2",
+    "CLP1",
+    "CMPK2",
+    "DGKD",
+    "DGKE",
+    "DGKH",
+    "DGKQ",
+    "DOLK",
+    "EPHA10",
+    "ETNK1",
+    "ETNK2",
+    "FAM20B",
+    "FCSK",
+    "FGGY",
+    "GALK2",
+    "GK2",
+    "GK3",
+    "GK5",
+    "GLYCTK",
+    "GTF2F1",
+    "GUCY2C",
+    "GUCY2D",
+    "GUCY2F",
+    "HK3",
+    "HYKK",
+    "IDNK",
+    "IPPK",
+    "ITPK1",
+    "ITPKA",
+    "ITPKC",
+    "KALRN",
+    "LRGUK",
+    "LRRK1",
+    "MAST2",
+    "MOS",
+    "MVK",
+    "NADK2",
+    "NAGK",
+    "NME3",
+    "NME6",
+    "NME7",
+    "NMRK1",
+    "NMRK2",
+    "NOL9",
+    "NPR2",
+    "NRBP1",
+    "NRBP2",
+    "NRK",
+    "OBSCN",
+    "PDIK1L",
+    "PDPK2P",
+    "PGK2",
+    "PI4KAP2",
+    "PKDCC",
+    "PMS2P1",
+    "PMS2P11",
+    "PMVK",
+    "POMK",
+    "PPIP5K1",
+    "PRAG1",
+    "PRKY",
+    "PRPS1L1",
+    "PRPS2",
+    "PSKH2",
+    "PSTK",
+    "PTK7",
+    "PXK",
+    "RBKS",
+    "RFK",
+    "RPS6KC1",
+    "RPS6KL1",
+    "RSKR",
+    "RYK",
+    "SBK2",
+    "SCYL1",
+    "SCYL2",
+    "SCYL3",
+    "SEPHS1",
+    "SEPHS2",
+    "SHPK",
+    "SPEG",
+    "STK40",
+    "STKLD1",
+    "STYK1",
+    "TBCK",
+    "TEX14",
+    "TPK1",
+    "TRIB3",
+    "TRIM66",
+    "UCKL1",
+    "UHMK1",
+    "ULK4",
+    "VRK3",
+    "XYLB"
+  ],
+  "source_summary": [
+    {
+      "records": 2085,
+      "source": "pubchem",
+      "genes": 274,
+      "compounds": 38
+    },
+    {
+      "records": 1019354,
+      "source": "chembl",
+      "genes": 566,
+      "compounds": 346657
+    }
+  ],
+  "integrity": {
+    "records_missing_gene_symbol": 0,
+    "invalid_chembl_records": 0
+  },
+  "kinases": [
+    {
+      "gene_symbol": "AAK1",
+      "records": 2766,
+      "compounds": 1244,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "AATK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ABL1",
+      "records": 9141,
+      "compounds": 4713,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ABL2",
+      "records": 658,
+      "compounds": 512,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ABR",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ACVR1",
+      "records": 3060,
+      "compounds": 2059,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ACVR1B",
+      "records": 700,
+      "compounds": 462,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ACVR1C",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ACVR2A",
+      "records": 160,
+      "compounds": 120,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ACVR2B",
+      "records": 380,
+      "compounds": 284,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ACVRL1",
+      "records": 810,
+      "compounds": 535,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ADCK1",
+      "records": 247,
+      "compounds": 245,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ADCK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ADCK5",
+      "records": 144,
+      "compounds": 143,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ADK",
+      "records": 1082,
+      "compounds": 838,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ADPGK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "AGK",
+      "records": 4,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "AK1",
+      "records": 6,
+      "compounds": 5,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "AK2",
+      "records": 251,
+      "compounds": 250,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "AK3",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "AK4",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "AK5",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "AK6",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "AK7",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "AK8",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "AK9",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "AKT1",
+      "records": 8046,
+      "compounds": 5032,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "AKT2",
+      "records": 2938,
+      "compounds": 2157,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "AKT3",
+      "records": 1856,
+      "compounds": 1531,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ALDH18A1",
+      "records": 4,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ALK",
+      "records": 6225,
+      "compounds": 3482,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ALPK1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ALPK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ALPK3",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "AMHR2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ANKK1",
+      "records": 132,
+      "compounds": 92,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ARAF",
+      "records": 347,
+      "compounds": 333,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ATM",
+      "records": 5092,
+      "compounds": 4100,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ATR",
+      "records": 6761,
+      "compounds": 3157,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "AURKA",
+      "records": 6068,
+      "compounds": 5031,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "AURKB",
+      "records": 5132,
+      "compounds": 3978,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "AURKC",
+      "records": 308,
+      "compounds": 211,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "AXL",
+      "records": 5219,
+      "compounds": 4179,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "BAZ1A",
+      "records": 20,
+      "compounds": 18,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BAZ1B",
+      "records": 2,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BCKDK",
+      "records": 75,
+      "compounds": 55,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BCR",
+      "records": 1787,
+      "compounds": 1183,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BLK",
+      "records": 1192,
+      "compounds": 1014,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "BLVRA",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "BMP2K",
+      "records": 467,
+      "compounds": 333,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "BMPR1A",
+      "records": 962,
+      "compounds": 630,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BMPR1B",
+      "records": 826,
+      "compounds": 570,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BMPR2",
+      "records": 439,
+      "compounds": 327,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "BMX",
+      "records": 737,
+      "compounds": 468,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "BRAF",
+      "records": 12568,
+      "compounds": 7328,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "BRD2",
+      "records": 1786,
+      "compounds": 1090,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BRD3",
+      "records": 1615,
+      "compounds": 1062,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BRD4",
+      "records": 24326,
+      "compounds": 12796,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BRDT",
+      "records": 572,
+      "compounds": 297,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BRSK1",
+      "records": 768,
+      "compounds": 697,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "BRSK2",
+      "records": 165,
+      "compounds": 119,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "BTK",
+      "records": 23991,
+      "compounds": 13554,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "BUB1",
+      "records": 1501,
+      "compounds": 1424,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "BUB1B",
+      "records": 5,
+      "compounds": 5,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CAMK1",
+      "records": 871,
+      "compounds": 787,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMK1D",
+      "records": 665,
+      "compounds": 557,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMK1G",
+      "records": 164,
+      "compounds": 117,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMK2A",
+      "records": 700,
+      "compounds": 560,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMK2B",
+      "records": 769,
+      "compounds": 689,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMK2D",
+      "records": 1207,
+      "compounds": 1048,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMK2G",
+      "records": 1001,
+      "compounds": 853,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMK4",
+      "records": 420,
+      "compounds": 323,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMKK1",
+      "records": 175,
+      "compounds": 126,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMKK2",
+      "records": 617,
+      "compounds": 433,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CAMKV",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "CASK",
+      "records": 112,
+      "compounds": 93,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDC42BPA",
+      "records": 1274,
+      "compounds": 1124,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDC42BPB",
+      "records": 612,
+      "compounds": 506,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDC42BPG",
+      "records": 354,
+      "compounds": 257,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDC7",
+      "records": 1721,
+      "compounds": 1450,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK1",
+      "records": 5228,
+      "compounds": 4272,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK10",
+      "records": 70,
+      "compounds": 70,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK11A",
+      "records": 184,
+      "compounds": 118,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK11B",
+      "records": 139,
+      "compounds": 98,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK12",
+      "records": 1743,
+      "compounds": 1288,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK13",
+      "records": 577,
+      "compounds": 415,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK14",
+      "records": 254,
+      "compounds": 192,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK15",
+      "records": 85,
+      "compounds": 77,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK16",
+      "records": 416,
+      "compounds": 304,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK17",
+      "records": 363,
+      "compounds": 264,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK18",
+      "records": 170,
+      "compounds": 117,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK19",
+      "records": 623,
+      "compounds": 505,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK2",
+      "records": 13995,
+      "compounds": 10853,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK20",
+      "records": 2,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK3",
+      "records": 558,
+      "compounds": 437,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK4",
+      "records": 5587,
+      "compounds": 4410,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK5",
+      "records": 4643,
+      "compounds": 4063,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK6",
+      "records": 3367,
+      "compounds": 2305,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDK7",
+      "records": 3114,
+      "compounds": 2386,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK8",
+      "records": 1855,
+      "compounds": 1419,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDK9",
+      "records": 7015,
+      "compounds": 5419,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CDKL1",
+      "records": 79,
+      "compounds": 78,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDKL2",
+      "records": 103,
+      "compounds": 89,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDKL3",
+      "records": 94,
+      "compounds": 83,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDKL4",
+      "records": 5,
+      "compounds": 5,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CDKL5",
+      "records": 242,
+      "compounds": 201,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CERK",
+      "records": 5,
+      "compounds": 5,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CERT1",
+      "records": 4,
+      "compounds": 4,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CHEK1",
+      "records": 4969,
+      "compounds": 4098,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CHEK2",
+      "records": 1623,
+      "compounds": 1430,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CHKA",
+      "records": 268,
+      "compounds": 238,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CHKB",
+      "records": 44,
+      "compounds": 44,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CHUK",
+      "records": 1073,
+      "compounds": 940,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CIITA",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "CILK1",
+      "records": 317,
+      "compounds": 260,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CIT",
+      "records": 477,
+      "compounds": 367,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CKB",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "CKM",
+      "records": 4,
+      "compounds": 4,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CKMT1A",
+      "records": 2,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CKMT2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "CLK1",
+      "records": 1716,
+      "compounds": 1363,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CLK2",
+      "records": 2613,
+      "compounds": 2343,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CLK3",
+      "records": 1412,
+      "compounds": 1269,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CLK4",
+      "records": 3945,
+      "compounds": 2569,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CLP1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "CMPK1",
+      "records": 136,
+      "compounds": 134,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CMPK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "COASY",
+      "records": 4,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "COQ8A",
+      "records": 393,
+      "compounds": 292,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "COQ8B",
+      "records": 126,
+      "compounds": 86,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSF1R",
+      "records": 5173,
+      "compounds": 3819,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSK",
+      "records": 583,
+      "compounds": 446,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK1A1",
+      "records": 1567,
+      "compounds": 1394,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK1A1L",
+      "records": 128,
+      "compounds": 90,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK1D",
+      "records": 2778,
+      "compounds": 2537,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK1E",
+      "records": 2240,
+      "compounds": 2048,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK1G1",
+      "records": 1020,
+      "compounds": 878,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK1G2",
+      "records": 991,
+      "compounds": 852,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK1G3",
+      "records": 934,
+      "compounds": 805,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK2A1",
+      "records": 4743,
+      "compounds": 3437,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK2A2",
+      "records": 1347,
+      "compounds": 808,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "CSNK2A3",
+      "records": 248,
+      "compounds": 209,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DAPK1",
+      "records": 245,
+      "compounds": 184,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DAPK2",
+      "records": 159,
+      "compounds": 112,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DAPK3",
+      "records": 1215,
+      "compounds": 1059,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DCAF1",
+      "records": 45,
+      "compounds": 35,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DCK",
+      "records": 474,
+      "compounds": 368,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DCLK1",
+      "records": 800,
+      "compounds": 725,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DCLK2",
+      "records": 141,
+      "compounds": 97,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DCLK3",
+      "records": 143,
+      "compounds": 100,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DDR1",
+      "records": 2144,
+      "compounds": 1886,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DDR2",
+      "records": 901,
+      "compounds": 620,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DGKA",
+      "records": 230,
+      "compounds": 137,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DGKB",
+      "records": 5,
+      "compounds": 5,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DGKD",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "DGKE",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "DGKG",
+      "records": 5,
+      "compounds": 5,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DGKH",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "DGKI",
+      "records": 6,
+      "compounds": 6,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DGKK",
+      "records": 2,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DGKQ",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "DGKZ",
+      "records": 453,
+      "compounds": 240,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DGUOK",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DMPK",
+      "records": 162,
+      "compounds": 118,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DOLK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "DSTYK",
+      "records": 83,
+      "compounds": 78,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DTYMK",
+      "records": 60,
+      "compounds": 56,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DYRK1A",
+      "records": 8452,
+      "compounds": 5480,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DYRK1B",
+      "records": 1677,
+      "compounds": 1401,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "DYRK2",
+      "records": 881,
+      "compounds": 789,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DYRK3",
+      "records": 1020,
+      "compounds": 979,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "DYRK4",
+      "records": 871,
+      "compounds": 844,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "EEF2K",
+      "records": 599,
+      "compounds": 578,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "EGFR",
+      "records": 29180,
+      "compounds": 14911,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EIF2AK1",
+      "records": 361,
+      "compounds": 308,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "EIF2AK2",
+      "records": 280,
+      "compounds": 216,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EIF2AK3",
+      "records": 605,
+      "compounds": 360,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "EIF2AK4",
+      "records": 814,
+      "compounds": 693,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHA1",
+      "records": 386,
+      "compounds": 287,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHA10",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "EPHA2",
+      "records": 2105,
+      "compounds": 1723,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHA3",
+      "records": 210,
+      "compounds": 153,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHA4",
+      "records": 524,
+      "compounds": 400,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHA5",
+      "records": 410,
+      "compounds": 291,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHA6",
+      "records": 167,
+      "compounds": 111,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHA7",
+      "records": 374,
+      "compounds": 273,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHA8",
+      "records": 175,
+      "compounds": 120,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHB1",
+      "records": 177,
+      "compounds": 118,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHB2",
+      "records": 513,
+      "compounds": 380,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHB3",
+      "records": 442,
+      "compounds": 331,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHB4",
+      "records": 1855,
+      "compounds": 1378,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "EPHB6",
+      "records": 346,
+      "compounds": 273,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ERBB2",
+      "records": 5194,
+      "compounds": 4094,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ERBB3",
+      "records": 166,
+      "compounds": 153,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ERBB4",
+      "records": 1266,
+      "compounds": 1125,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ERN1",
+      "records": 2783,
+      "compounds": 1186,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ERN2",
+      "records": 247,
+      "compounds": 243,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ETNK1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ETNK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "FAM20B",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "FAM20C",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "FASTK",
+      "records": 3,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "FCSK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "FER",
+      "records": 941,
+      "compounds": 790,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FES",
+      "records": 825,
+      "compounds": 690,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FGFR1",
+      "records": 11074,
+      "compounds": 6588,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FGFR2",
+      "records": 4969,
+      "compounds": 3071,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FGFR3",
+      "records": 7523,
+      "compounds": 4079,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FGFR4",
+      "records": 4937,
+      "compounds": 2826,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FGGY",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "FGR",
+      "records": 355,
+      "compounds": 258,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FLT1",
+      "records": 3032,
+      "compounds": 2561,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FLT3",
+      "records": 10329,
+      "compounds": 6617,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FLT4",
+      "records": 1581,
+      "compounds": 1314,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FN3K",
+      "records": 4,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "FN3KRP",
+      "records": 5,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "FRK",
+      "records": 993,
+      "compounds": 824,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "FYN",
+      "records": 3586,
+      "compounds": 2252,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "GAK",
+      "records": 779,
+      "compounds": 530,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "GALK1",
+      "records": 787,
+      "compounds": 514,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GALK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "GCK",
+      "records": 1585,
+      "compounds": 1210,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GK",
+      "records": 5,
+      "compounds": 5,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "GK3",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "GK5",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "GLYCTK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "GNE",
+      "records": 2,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GRK1",
+      "records": 223,
+      "compounds": 172,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GRK2",
+      "records": 845,
+      "compounds": 732,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GRK3",
+      "records": 62,
+      "compounds": 56,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GRK4",
+      "records": 102,
+      "compounds": 91,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GRK5",
+      "records": 707,
+      "compounds": 618,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GRK6",
+      "records": 461,
+      "compounds": 398,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GRK7",
+      "records": 104,
+      "compounds": 92,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "GSK3A",
+      "records": 3437,
+      "compounds": 2705,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "GSK3B",
+      "records": 10331,
+      "compounds": 7218,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "GTF2F1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "GUCY2C",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "GUCY2D",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "GUCY2F",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "GUK1",
+      "records": 5,
+      "compounds": 5,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HASPIN",
+      "records": 337,
+      "compounds": 301,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HCK",
+      "records": 1090,
+      "compounds": 871,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "HIPK1",
+      "records": 195,
+      "compounds": 178,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HIPK2",
+      "records": 885,
+      "compounds": 836,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HIPK3",
+      "records": 137,
+      "compounds": 118,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HIPK4",
+      "records": 749,
+      "compounds": 704,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HK1",
+      "records": 264,
+      "compounds": 258,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HK2",
+      "records": 67,
+      "compounds": 53,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HK3",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "HKDC1",
+      "records": 678,
+      "compounds": 438,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HUNK",
+      "records": 85,
+      "compounds": 77,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "HYKK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "IDNK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "IGF1R",
+      "records": 5948,
+      "compounds": 4178,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "IKBKB",
+      "records": 2673,
+      "compounds": 2205,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "IKBKE",
+      "records": 1550,
+      "compounds": 1349,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ILK",
+      "records": 556,
+      "compounds": 408,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "INSR",
+      "records": 3015,
+      "compounds": 2428,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "INSRR",
+      "records": 153,
+      "compounds": 104,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "IP6K1",
+      "records": 196,
+      "compounds": 191,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "IP6K2",
+      "records": 69,
+      "compounds": 66,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "IP6K3",
+      "records": 51,
+      "compounds": 49,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "IPMK",
+      "records": 17,
+      "compounds": 17,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "IPPK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "IRAK1",
+      "records": 1634,
+      "compounds": 1473,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "IRAK2",
+      "records": 2,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "IRAK3",
+      "records": 423,
+      "compounds": 316,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "IRAK4",
+      "records": 13428,
+      "compounds": 10302,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ITK",
+      "records": 3447,
+      "compounds": 2522,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ITPK1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ITPKA",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ITPKB",
+      "records": 43,
+      "compounds": 43,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ITPKC",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "JAK1",
+      "records": 19934,
+      "compounds": 12985,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "JAK2",
+      "records": 24618,
+      "compounds": 15839,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "JAK3",
+      "records": 15331,
+      "compounds": 10304,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "KALRN",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "KDR",
+      "records": 19706,
+      "compounds": 14324,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "KHK",
+      "records": 1090,
+      "compounds": 447,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "KIT",
+      "records": 9224,
+      "compounds": 5033,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "KSR1",
+      "records": 3,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "KSR2",
+      "records": 3,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "LATS1",
+      "records": 971,
+      "compounds": 584,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "LATS2",
+      "records": 686,
+      "compounds": 362,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "LCK",
+      "records": 5114,
+      "compounds": 4035,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "LIMK1",
+      "records": 1772,
+      "compounds": 1408,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "LIMK2",
+      "records": 806,
+      "compounds": 597,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "LMTK2",
+      "records": 2,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "LMTK3",
+      "records": 13,
+      "compounds": 12,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "LRGUK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "LRRK1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "LRRK2",
+      "records": 8276,
+      "compounds": 4734,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "LTK",
+      "records": 539,
+      "compounds": 453,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "LYN",
+      "records": 2186,
+      "compounds": 1669,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAK",
+      "records": 87,
+      "compounds": 76,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP2K1",
+      "records": 2653,
+      "compounds": 1844,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP2K2",
+      "records": 812,
+      "compounds": 611,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP2K3",
+      "records": 400,
+      "compounds": 296,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP2K4",
+      "records": 531,
+      "compounds": 340,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP2K5",
+      "records": 380,
+      "compounds": 306,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP2K6",
+      "records": 421,
+      "compounds": 316,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP2K7",
+      "records": 340,
+      "compounds": 324,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K1",
+      "records": 358,
+      "compounds": 292,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K10",
+      "records": 207,
+      "compounds": 140,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K11",
+      "records": 881,
+      "compounds": 594,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K12",
+      "records": 1308,
+      "compounds": 1100,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K13",
+      "records": 112,
+      "compounds": 104,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K14",
+      "records": 1899,
+      "compounds": 1478,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K15",
+      "records": 82,
+      "compounds": 74,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K19",
+      "records": 121,
+      "compounds": 107,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K2",
+      "records": 356,
+      "compounds": 288,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K20",
+      "records": 1119,
+      "compounds": 977,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K21",
+      "records": 4,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K3",
+      "records": 346,
+      "compounds": 276,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K4",
+      "records": 380,
+      "compounds": 278,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K5",
+      "records": 3068,
+      "compounds": 2131,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K6",
+      "records": 351,
+      "compounds": 285,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K7",
+      "records": 640,
+      "compounds": 481,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K8",
+      "records": 360,
+      "compounds": 316,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP3K9",
+      "records": 263,
+      "compounds": 204,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP4K1",
+      "records": 10826,
+      "compounds": 6405,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP4K2",
+      "records": 1368,
+      "compounds": 1241,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAP4K3",
+      "records": 564,
+      "compounds": 443,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP4K4",
+      "records": 2395,
+      "compounds": 1867,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAP4K5",
+      "records": 1124,
+      "compounds": 965,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK1",
+      "records": 23518,
+      "compounds": 20447,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK10",
+      "records": 3144,
+      "compounds": 2600,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK11",
+      "records": 762,
+      "compounds": 588,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK12",
+      "records": 2321,
+      "compounds": 1717,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK13",
+      "records": 1080,
+      "compounds": 1006,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK14",
+      "records": 8693,
+      "compounds": 6382,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK15",
+      "records": 425,
+      "compounds": 312,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK3",
+      "records": 1115,
+      "compounds": 921,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK4",
+      "records": 128,
+      "compounds": 88,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK6",
+      "records": 429,
+      "compounds": 301,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK7",
+      "records": 669,
+      "compounds": 432,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK8",
+      "records": 3706,
+      "compounds": 3125,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAPK9",
+      "records": 3000,
+      "compounds": 2587,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPKAPK2",
+      "records": 2928,
+      "compounds": 2363,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAPKAPK3",
+      "records": 899,
+      "compounds": 861,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAPKAPK5",
+      "records": 1071,
+      "compounds": 876,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MARK1",
+      "records": 165,
+      "compounds": 121,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MARK2",
+      "records": 1094,
+      "compounds": 947,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MARK3",
+      "records": 1314,
+      "compounds": 1149,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MARK4",
+      "records": 484,
+      "compounds": 366,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MAST1",
+      "records": 85,
+      "compounds": 77,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAST2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "MAST3",
+      "records": 10,
+      "compounds": 10,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MAST4",
+      "records": 3,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MASTL",
+      "records": 43,
+      "compounds": 25,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MATK",
+      "records": 553,
+      "compounds": 526,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MELK",
+      "records": 1956,
+      "compounds": 1695,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MERTK",
+      "records": 5136,
+      "compounds": 3490,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MET",
+      "records": 10453,
+      "compounds": 6632,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MINK1",
+      "records": 938,
+      "compounds": 854,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MKNK1",
+      "records": 2206,
+      "compounds": 1795,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MKNK2",
+      "records": 3135,
+      "compounds": 2500,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MLKL",
+      "records": 44,
+      "compounds": 34,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MOK",
+      "records": 45,
+      "compounds": 45,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MOS",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "MST1R",
+      "records": 900,
+      "compounds": 731,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MTOR",
+      "records": 13872,
+      "compounds": 9292,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "MUSK",
+      "records": 161,
+      "compounds": 115,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MVK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "MYLK",
+      "records": 565,
+      "compounds": 394,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MYLK2",
+      "records": 160,
+      "compounds": 111,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MYLK3",
+      "records": 321,
+      "compounds": 268,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MYLK4",
+      "records": 177,
+      "compounds": 129,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MYO3A",
+      "records": 126,
+      "compounds": 83,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "MYO3B",
+      "records": 136,
+      "compounds": 92,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NADK",
+      "records": 46,
+      "compounds": 39,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NADK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NAGK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NEK1",
+      "records": 672,
+      "compounds": 550,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NEK10",
+      "records": 4,
+      "compounds": 4,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NEK11",
+      "records": 87,
+      "compounds": 80,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NEK2",
+      "records": 1668,
+      "compounds": 1432,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NEK3",
+      "records": 342,
+      "compounds": 278,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NEK4",
+      "records": 703,
+      "compounds": 665,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NEK5",
+      "records": 138,
+      "compounds": 90,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NEK6",
+      "records": 204,
+      "compounds": 152,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NEK7",
+      "records": 327,
+      "compounds": 245,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NEK8",
+      "records": 6,
+      "compounds": 4,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NEK9",
+      "records": 394,
+      "compounds": 282,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NIM1K",
+      "records": 106,
+      "compounds": 93,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NLK",
+      "records": 435,
+      "compounds": 324,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NME1",
+      "records": 4,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NME2",
+      "records": 96,
+      "compounds": 60,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NME3",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NME4",
+      "records": 3,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NME6",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NME7",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NMRK1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NMRK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NOL9",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NPR1",
+      "records": 162,
+      "compounds": 162,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "NPR2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NRBP1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NRBP2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NRK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "NTRK1",
+      "records": 12058,
+      "compounds": 7423,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NTRK2",
+      "records": 2065,
+      "compounds": 1604,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NTRK3",
+      "records": 1409,
+      "compounds": 1201,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NUAK1",
+      "records": 369,
+      "compounds": 264,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "NUAK2",
+      "records": 400,
+      "compounds": 299,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "OBSCN",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "OXSR1",
+      "records": 86,
+      "compounds": 77,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PAK1",
+      "records": 1445,
+      "compounds": 1214,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PAK2",
+      "records": 420,
+      "compounds": 306,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PAK3",
+      "records": 187,
+      "compounds": 134,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PAK4",
+      "records": 2085,
+      "compounds": 1732,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PAK5",
+      "records": 149,
+      "compounds": 101,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PAK6",
+      "records": 301,
+      "compounds": 218,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PAN3",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PANK1",
+      "records": 22,
+      "compounds": 21,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PANK2",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PANK3",
+      "records": 115,
+      "compounds": 112,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PAPSS1",
+      "records": 2,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PAPSS2",
+      "records": 3,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PASK",
+      "records": 2754,
+      "compounds": 1027,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PBK",
+      "records": 758,
+      "compounds": 745,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PCK1",
+      "records": 21,
+      "compounds": 21,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PDGFRA",
+      "records": 2213,
+      "compounds": 1767,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PDGFRB",
+      "records": 3904,
+      "compounds": 2938,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PDIK1L",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PDK1",
+      "records": 1113,
+      "compounds": 995,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PDK2",
+      "records": 1397,
+      "compounds": 1070,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PDK3",
+      "records": 59,
+      "compounds": 52,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PDK4",
+      "records": 581,
+      "compounds": 528,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PDPK1",
+      "records": 3149,
+      "compounds": 2781,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PDPK2P",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PDXK",
+      "records": 258,
+      "compounds": 256,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PEAK1",
+      "records": 4,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PFKFB1",
+      "records": 37,
+      "compounds": 37,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PFKFB2",
+      "records": 36,
+      "compounds": 36,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PFKFB3",
+      "records": 1446,
+      "compounds": 911,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PFKFB4",
+      "records": 36,
+      "compounds": 18,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PFKL",
+      "records": 4,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PFKM",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PFKP",
+      "records": 228,
+      "compounds": 226,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PGK1",
+      "records": 97,
+      "compounds": 95,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PGK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PHKG1",
+      "records": 159,
+      "compounds": 106,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PHKG2",
+      "records": 995,
+      "compounds": 851,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PI4K2A",
+      "records": 28,
+      "compounds": 27,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PI4K2B",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PI4KA",
+      "records": 192,
+      "compounds": 183,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PI4KAP2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PI4KB",
+      "records": 848,
+      "compounds": 706,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIK3C2A",
+      "records": 125,
+      "compounds": 110,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIK3C2B",
+      "records": 519,
+      "compounds": 461,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIK3C2G",
+      "records": 143,
+      "compounds": 132,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIK3C3",
+      "records": 1824,
+      "compounds": 1253,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIK3CA",
+      "records": 15015,
+      "compounds": 11661,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PIK3CB",
+      "records": 6168,
+      "compounds": 4701,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIK3CD",
+      "records": 17641,
+      "compounds": 12255,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIK3CG",
+      "records": 10016,
+      "compounds": 7417,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIK3R4",
+      "records": 4,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIKFYVE",
+      "records": 259,
+      "compounds": 149,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIM1",
+      "records": 11094,
+      "compounds": 6961,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PIM2",
+      "records": 5486,
+      "compounds": 4205,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PIM3",
+      "records": 3763,
+      "compounds": 2811,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PINK1",
+      "records": 8,
+      "compounds": 8,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIP4K2A",
+      "records": 1428,
+      "compounds": 1263,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIP4K2B",
+      "records": 217,
+      "compounds": 167,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PIP4K2C",
+      "records": 493,
+      "compounds": 421,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIP5K1A",
+      "records": 144,
+      "compounds": 101,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PIP5K1B",
+      "records": 5,
+      "compounds": 5,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PIP5K1C",
+      "records": 200,
+      "compounds": 191,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PKDCC",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PKLR",
+      "records": 1600,
+      "compounds": 539,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PKM",
+      "records": 14174,
+      "compounds": 7095,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PKMYT1",
+      "records": 857,
+      "compounds": 478,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PKN1",
+      "records": 526,
+      "compounds": 385,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PKN2",
+      "records": 1205,
+      "compounds": 1026,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PKN3",
+      "records": 157,
+      "compounds": 151,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PLK1",
+      "records": 26296,
+      "compounds": 25763,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PLK2",
+      "records": 426,
+      "compounds": 373,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PLK3",
+      "records": 1263,
+      "compounds": 1123,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PLK4",
+      "records": 2031,
+      "compounds": 1554,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PMS2P1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PMS2P11",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PMVK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PNCK",
+      "records": 18,
+      "compounds": 15,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PNKP",
+      "records": 106,
+      "compounds": 70,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "POMK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PPIP5K1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PPIP5K2",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRAG1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PRKAA1",
+      "records": 2274,
+      "compounds": 1837,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKAA2",
+      "records": 853,
+      "compounds": 783,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKACA",
+      "records": 1793,
+      "compounds": 1586,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKACB",
+      "records": 1071,
+      "compounds": 889,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKACG",
+      "records": 213,
+      "compounds": 209,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRKCA",
+      "records": 2042,
+      "compounds": 1722,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRKCB",
+      "records": 1538,
+      "compounds": 1110,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRKCD",
+      "records": 2117,
+      "compounds": 1782,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKCE",
+      "records": 787,
+      "compounds": 608,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKCG",
+      "records": 1106,
+      "compounds": 984,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRKCH",
+      "records": 479,
+      "compounds": 360,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKCI",
+      "records": 1444,
+      "compounds": 1355,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRKCQ",
+      "records": 1929,
+      "compounds": 1593,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKCZ",
+      "records": 1265,
+      "compounds": 1141,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRKD1",
+      "records": 948,
+      "compounds": 730,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKD2",
+      "records": 1246,
+      "compounds": 1080,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKD3",
+      "records": 1328,
+      "compounds": 1159,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKDC",
+      "records": 3096,
+      "compounds": 1838,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRKG1",
+      "records": 1089,
+      "compounds": 887,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKG2",
+      "records": 662,
+      "compounds": 598,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKX",
+      "records": 930,
+      "compounds": 838,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PRKY",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PRP4K",
+      "records": 86,
+      "compounds": 78,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRPS1",
+      "records": 240,
+      "compounds": 237,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PRPS1L1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PRPS2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PSKH1",
+      "records": 3,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "PSKH2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PSTK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PTK2",
+      "records": 4032,
+      "compounds": 3373,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PTK2B",
+      "records": 1413,
+      "compounds": 1220,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PTK6",
+      "records": 1145,
+      "compounds": 929,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "PTK7",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "PXK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "RAF1",
+      "records": 6167,
+      "compounds": 3972,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RBKS",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "RET",
+      "records": 27223,
+      "compounds": 5419,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RFK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "RIOK1",
+      "records": 137,
+      "compounds": 93,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RIOK2",
+      "records": 195,
+      "compounds": 157,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "RIOK3",
+      "records": 161,
+      "compounds": 88,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RIPK1",
+      "records": 6365,
+      "compounds": 4702,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RIPK2",
+      "records": 1537,
+      "compounds": 1069,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RIPK3",
+      "records": 679,
+      "compounds": 625,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "RIPK4",
+      "records": 129,
+      "compounds": 119,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "RNASEL",
+      "records": 96,
+      "compounds": 67,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ROCK1",
+      "records": 5203,
+      "compounds": 4396,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ROCK2",
+      "records": 9001,
+      "compounds": 7162,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ROR1",
+      "records": 131,
+      "compounds": 122,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ROR2",
+      "records": 4,
+      "compounds": 4,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ROS1",
+      "records": 1123,
+      "compounds": 829,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RPS6KA1",
+      "records": 745,
+      "compounds": 487,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RPS6KA2",
+      "records": 647,
+      "compounds": 441,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RPS6KA3",
+      "records": 2034,
+      "compounds": 1720,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RPS6KA4",
+      "records": 559,
+      "compounds": 331,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RPS6KA5",
+      "records": 1176,
+      "compounds": 873,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RPS6KA6",
+      "records": 582,
+      "compounds": 348,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "RPS6KB1",
+      "records": 3124,
+      "compounds": 2624,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "RPS6KB2",
+      "records": 44,
+      "compounds": 42,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "RPS6KC1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "RPS6KL1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "RSKR",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "RYK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SBK1",
+      "records": 82,
+      "compounds": 77,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SBK2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SBK3",
+      "records": 85,
+      "compounds": 77,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SCYL1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SCYL2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SCYL3",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SEPHS1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SEPHS2",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SGK1",
+      "records": 1176,
+      "compounds": 930,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SGK2",
+      "records": 765,
+      "compounds": 753,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SGK3",
+      "records": 106,
+      "compounds": 100,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SGMS1",
+      "records": 63,
+      "compounds": 59,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SGMS2",
+      "records": 138,
+      "compounds": 119,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SHPK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SIK1",
+      "records": 291,
+      "compounds": 216,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "SIK2",
+      "records": 653,
+      "compounds": 484,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "SIK3",
+      "records": 501,
+      "compounds": 407,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SLK",
+      "records": 1148,
+      "compounds": 981,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "SMG1",
+      "records": 31,
+      "compounds": 30,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SNRK",
+      "records": 83,
+      "compounds": 78,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SPEG",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SPHK1",
+      "records": 710,
+      "compounds": 534,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SPHK2",
+      "records": 494,
+      "compounds": 398,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "SRC",
+      "records": 8290,
+      "compounds": 6028,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "SRMS",
+      "records": 634,
+      "compounds": 570,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "SRPK1",
+      "records": 992,
+      "compounds": 860,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "SRPK2",
+      "records": 186,
+      "compounds": 132,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "SRPK3",
+      "records": 114,
+      "compounds": 92,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "STK10",
+      "records": 527,
+      "compounds": 386,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK11",
+      "records": 377,
+      "compounds": 276,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK16",
+      "records": 449,
+      "compounds": 325,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK17A",
+      "records": 940,
+      "compounds": 823,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK17B",
+      "records": 370,
+      "compounds": 264,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK24",
+      "records": 400,
+      "compounds": 294,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK25",
+      "records": 152,
+      "compounds": 106,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK26",
+      "records": 496,
+      "compounds": 369,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK3",
+      "records": 1559,
+      "compounds": 1280,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK31",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "STK32A",
+      "records": 80,
+      "compounds": 79,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "STK32B",
+      "records": 137,
+      "compounds": 93,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK32C",
+      "records": 133,
+      "compounds": 90,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK33",
+      "records": 189,
+      "compounds": 141,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK35",
+      "records": 84,
+      "compounds": 76,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "STK36",
+      "records": 136,
+      "compounds": 89,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK38",
+      "records": 164,
+      "compounds": 143,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "STK38L",
+      "records": 237,
+      "compounds": 173,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK39",
+      "records": 127,
+      "compounds": 116,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "STK4",
+      "records": 1241,
+      "compounds": 804,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "STK40",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "STKLD1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "STRADA",
+      "records": 242,
+      "compounds": 241,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "STRADB",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "STYK1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "SYK",
+      "records": 8911,
+      "compounds": 6548,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TAF1",
+      "records": 279,
+      "compounds": 191,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TAF1L",
+      "records": 40,
+      "compounds": 34,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TAOK1",
+      "records": 1450,
+      "compounds": 1223,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TAOK2",
+      "records": 364,
+      "compounds": 298,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TAOK3",
+      "records": 452,
+      "compounds": 383,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TBCK",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "TBK1",
+      "records": 4636,
+      "compounds": 3369,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TEC",
+      "records": 778,
+      "compounds": 598,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TEK",
+      "records": 1511,
+      "compounds": 1200,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TESK1",
+      "records": 365,
+      "compounds": 273,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TESK2",
+      "records": 171,
+      "compounds": 169,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TEX14",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "TGFBR1",
+      "records": 4814,
+      "compounds": 3204,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TGFBR2",
+      "records": 1359,
+      "compounds": 1232,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TIE1",
+      "records": 162,
+      "compounds": 114,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TK1",
+      "records": 310,
+      "compounds": 210,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TK2",
+      "records": 83,
+      "compounds": 65,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TKFC",
+      "records": 2,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TLK1",
+      "records": 142,
+      "compounds": 95,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TLK2",
+      "records": 258,
+      "compounds": 203,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TNIK",
+      "records": 1031,
+      "compounds": 800,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TNK1",
+      "records": 509,
+      "compounds": 398,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TNK2",
+      "records": 1554,
+      "compounds": 1281,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TNNI3K",
+      "records": 432,
+      "compounds": 314,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TP53RK",
+      "records": 249,
+      "compounds": 246,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TPK1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "TRIB1",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TRIB2",
+      "records": 8,
+      "compounds": 6,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TRIB3",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "TRIM24",
+      "records": 323,
+      "compounds": 269,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TRIM28",
+      "records": 6,
+      "compounds": 4,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TRIM33",
+      "records": 137,
+      "compounds": 131,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TRIM66",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "TRIO",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TRPM6",
+      "records": 75,
+      "compounds": 73,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TRPM7",
+      "records": 3,
+      "compounds": 3,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TRRAP",
+      "records": 2,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TSSK1B",
+      "records": 678,
+      "compounds": 612,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TSSK2",
+      "records": 544,
+      "compounds": 536,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TSSK3",
+      "records": 13,
+      "compounds": 11,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TSSK4",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TSSK6",
+      "records": 4,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TTBK1",
+      "records": 118,
+      "compounds": 87,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TTBK2",
+      "records": 57,
+      "compounds": 56,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TTK",
+      "records": 2861,
+      "compounds": 1826,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TTN",
+      "records": 4,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "TXK",
+      "records": 667,
+      "compounds": 586,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TYK2",
+      "records": 17271,
+      "compounds": 9661,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "TYRO3",
+      "records": 3703,
+      "compounds": 2914,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "UCK1",
+      "records": 2,
+      "compounds": 2,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "UCK2",
+      "records": 22,
+      "compounds": 12,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "UCKL1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "UHMK1",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "ULK1",
+      "records": 1289,
+      "compounds": 728,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ULK2",
+      "records": 149,
+      "compounds": 113,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ULK3",
+      "records": 349,
+      "compounds": 283,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "ULK4",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "VRK1",
+      "records": 52,
+      "compounds": 49,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "VRK2",
+      "records": 87,
+      "compounds": 85,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "VRK3",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "WEE1",
+      "records": 2262,
+      "compounds": 1603,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "WEE2",
+      "records": 95,
+      "compounds": 84,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "WHR1",
+      "records": 25,
+      "compounds": 17,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "WNK1",
+      "records": 51,
+      "compounds": 37,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "WNK2",
+      "records": 16,
+      "compounds": 14,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "WNK3",
+      "records": 9,
+      "compounds": 9,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "WNK4",
+      "records": 1,
+      "compounds": 1,
+      "sources": [
+        "chembl"
+      ]
+    },
+    {
+      "gene_symbol": "XYLB",
+      "records": 0,
+      "compounds": 0,
+      "sources": []
+    },
+    {
+      "gene_symbol": "YES1",
+      "records": 1230,
+      "compounds": 938,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    },
+    {
+      "gene_symbol": "ZAP70",
+      "records": 602,
+      "compounds": 518,
+      "sources": [
+        "chembl",
+        "pubchem"
+      ]
+    }
+  ]
+}

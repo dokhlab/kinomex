@@ -80,6 +80,7 @@ interface KinaseDetail {
   tissue_expressions: TissueExpression[];
   mutations: MutationData[];
   ligand_assays: LigandAssay[];
+  development_candidates: Array<{ name: string; mechanism: string; status: string; sourceLabel: string; sourceUrl: string }>;
   key_references: KeyReference[];
   organ_systems_impacted: string[];
   diseases_associated: { name: string; description: string; omim_id: string }[];
@@ -899,7 +900,7 @@ export default function KinaseDetailPage() {
           {activeTab === "network" && <NetworkTab gene={kinase.gene_symbol} />}
           {activeTab === "structure" && <StructureTab kinase={kinase} onStructureCount={setStructureCount} />}
           {activeTab === "expression" && <ExpressionTab tissues={kinase.tissue_expressions ?? []} />}
-          {activeTab === "chemical" && <LigandTable ligands={kinase.ligand_assays ?? []} />}
+          {activeTab === "chemical" && <LigandTable ligands={kinase.ligand_assays ?? []} candidates={kinase.development_candidates ?? []} />}
           {activeTab === "mutations" && <MutationTable mutations={kinase.mutations ?? []} />}
           {activeTab === "diseases" && <DiseasesTab diseases={kinase.diseases_associated ?? []} />}
           {activeTab === "references" && <ReferencesTab references={kinase.key_references ?? []} />}

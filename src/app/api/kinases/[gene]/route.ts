@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { deriveGroup, parseMutationCode } from "@/lib/kinase-utils";
+import { developmentCandidatesForGene } from "@/lib/development-candidates";
 
 const profileCache = new Map<string, { data: unknown; expiresAt: number }>();
 const PROFILE_CACHE_TTL = 60 * 1000;
@@ -65,9 +66,33 @@ export async function GET(
       db.collection("structures").find({
         gene_symbols: normalizedGene,
       }, { projection: { pdb_id: 1, title: 1, resolution: 1, experimental_method: 1, bound_ligands: 1 } }).limit(20).toArray().catch(() => []),
-      db.collection("bioactivities").find({
-        target_gene_symbol: normalizedGene,
-      }, { projection: { source: 1, standard_value: 1, standard_units: 1, pubchem_cid: 1, compound_name: 1, compound_id: 1, binding_type: 1, assay_type: 1, standard_relation: 1, pubmed_ids: 1, pubmed_id: 1, doi: 1, document_journal: 1, document_year: 1 } }).sort({ source: -1, standard_value: 1 }).limit(200).toArray().catch(() => []),
+      db.collection("bioactivities").aggregate([
+        { $match: { target_gene_symbol: normalizedGene } },
+        { $addFields: {
+          _numeric_value: { $convert: { input: "$standard_value", to: "double", onError: null, onNull: null } },
+          _ligand_key: { $concat: [
+            { $ifNull: ["$source", "unknown"] }, ":",
+            { $ifNull: ["$compound_id", { $toString: { $ifNull: ["$pubchem_cid", "unknown"] } }] },
+          ] },
+        } },
+        // Put the most potent finite measurement first, then retain one row
+        // per source compound while reporting how many assays support it.
+        { $sort: { _numeric_value: 1, activity_id: 1 } },
+        { $group: {
+          _id: "$_ligand_key",
+          best: { $first: "$$ROOT" },
+          assay_count: { $sum: 1 },
+        } },
+        { $replaceRoot: { newRoot: { $mergeObjects: ["$best", { assay_count: "$assay_count" }] } } },
+        { $sort: { _numeric_value: 1, compound_id: 1 } },
+        { $project: {
+          source: 1, standard_value: 1, standard_units: 1, pubchem_cid: 1,
+          compound_name: 1, compound_id: 1, binding_type: 1, assay_type: 1,
+          standard_relation: 1, pubmed_ids: 1, pubmed_id: 1, doi: 1,
+          document_journal: 1, document_year: 1, assay_chembl_id: 1,
+          activity_id: 1, assay_count: 1,
+        } },
+      ]).toArray().catch(() => []),
       db.collection("expression").find({
         gene_symbol: normalizedGene,
       }, { projection: { tissue_site: 1, median_tpm: 1, organ_system: 1, tau: 1, source: 1 } }).toArray().catch(() => []),
@@ -163,6 +188,14 @@ export async function GET(
           relation: b.standard_relation || "=",
           target_conformation: "",
           source: b.source || "chembl",
+          assay_count: b.assay_count || 1,
+          source_url: isPubChem && b.pubchem_cid
+            ? `https://pubchem.ncbi.nlm.nih.gov/compound/${b.pubchem_cid}`
+            : b.compound_id
+              ? `https://www.ebi.ac.uk/chembl/explore/compound/${b.compound_id}`
+              : b.assay_chembl_id
+                ? `https://www.ebi.ac.uk/chembl/explore/assay/${b.assay_chembl_id}`
+                : null,
           reference: {
             pubmed_id: b.pubmed_ids?.length ? (Array.isArray(b.pubmed_ids) ? b.pubmed_ids[0] : b.pubmed_ids) : "",
             doi: b.doi || "",
@@ -171,6 +204,7 @@ export async function GET(
           },
         };
       }),
+      development_candidates: developmentCandidatesForGene(normalizedGene),
       key_references: buildReferences(normalizedGene, variants, bioactivities, structures),
       organ_systems_impacted: Array.from(new Set(expression.map((e) => e.organ_system).filter(Boolean))),
       diseases_associated: (diseasesDoc?.diseases || []).map((d: { disease_id: string; description: string; omim_id: string }) => ({
