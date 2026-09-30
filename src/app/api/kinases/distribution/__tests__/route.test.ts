@@ -1,6 +1,6 @@
 import { GET } from "@/app/api/kinases/distribution/route";
-import { connectToDatabase } from "@/lib/mongodb";
-import { resolveOrganGenes } from "@/lib/kinase-utils";
+import { loadCatalog } from "@/lib/catalog/load";
+import { flat } from "@/lib/catalog/__tests__/fixtures";
 
 jest.mock("next/server", () => ({
   NextResponse: {
@@ -10,51 +10,36 @@ jest.mock("next/server", () => ({
     }),
   },
 }));
-jest.mock("@/lib/mongodb", () => ({ connectToDatabase: jest.fn() }));
-jest.mock("@/lib/kinase-utils", () => ({ resolveOrganGenes: jest.fn() }));
+jest.mock("@/lib/catalog/load", () => ({ loadCatalog: jest.fn() }));
 
-type Doc = Record<string, any>;
-const kinases = ["ZERO", "FIVE", "HUNDRED", "MISSING", "INVALID"].map((gene_symbol) => ({ gene_symbol, group: "TK" }));
-const pdis = [
-  { gene_symbol: "ZERO", pdis_total: 0 },
-  { gene_symbol: "FIVE", pdis_total: 5 },
-  { gene_symbol: "HUNDRED", pdis_total: 100 },
-  { gene_symbol: "INVALID", pdis_total: 101 },
-];
+const cns = { tau: 0.9, top_tissue: "Brain Cortex", top_organ: "CNS", top_tpm: 20, gencode_id: null };
 
-function collection(name: string) {
-  const docs: Doc[] = name === "kinases" ? kinases : pdis;
-  return {
-    find: jest.fn((query: Doc = {}) => ({
-      toArray: async () => docs.filter((doc) => {
-        if (query.group && doc.group !== query.group) return false;
-        if (query.gene_symbol?.$in && !query.gene_symbol.$in.includes(doc.gene_symbol)) return false;
-        return true;
-      }),
-    })),
-  };
+async function call(query = "") {
+  const response = await GET({ url: `http://localhost/api/kinases/distribution?${query}` } as never);
+  return { status: response.status, body: await response.json() };
 }
 
 beforeEach(() => {
-  (connectToDatabase as jest.Mock).mockResolvedValue({ connection: { db: { collection } } });
-  (resolveOrganGenes as jest.Mock).mockResolvedValue([]);
+  (loadCatalog as jest.Mock).mockResolvedValue({
+    rows: [flat("ZERO", 0), flat("FIVE", 5, { expression: cns }), flat("HUNDRED", 100), flat("MISSING", null)],
+    accounting: {},
+  });
 });
 
 describe("GET /api/kinases/distribution", () => {
   it("places 0, internal edges, and 100 in the correct inclusive endpoint buckets", async () => {
-    const response = await GET({ url: "http://localhost/api/kinases/distribution?group=TK" } as any);
-    const body = await response.json();
+    const { body } = await call();
+    expect(body.buckets).toHaveLength(20);
     expect(body.buckets[0].count).toBe(1);
     expect(body.buckets[1].count).toBe(1);
     expect(body.buckets[19].count).toBe(1);
-    expect(body).toMatchObject({ total: 3, unscored: 2 });
+    expect(body.total).toBe(3);
+    expect(body.unscored).toBe(1);
   });
 
-  it("applies organ filtering before building the distribution", async () => {
-    (resolveOrganGenes as jest.Mock).mockResolvedValue(["FIVE", "MISSING"]);
-    const response = await GET({ url: "http://localhost/api/kinases/distribution?organ_system=Liver" } as any);
-    const body = await response.json();
-    expect(body.buckets.reduce((sum: number, bucket: Doc) => sum + bucket.count, 0)).toBe(1);
-    expect(body).toMatchObject({ total: 1, unscored: 1 });
+  it("applies evidence filters before building the distribution and ignores the PDIS interval", async () => {
+    const { body } = await call("organ=CNS&minPDIS=50&maxPDIS=100");
+    expect(body.total).toBe(1);
+    expect(body.buckets[1].count).toBe(1);
   });
 });

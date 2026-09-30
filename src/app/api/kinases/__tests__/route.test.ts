@@ -1,6 +1,6 @@
 import { GET } from "@/app/api/kinases/route";
-import { connectToDatabase } from "@/lib/mongodb";
-import { resolveOrganGenes } from "@/lib/kinase-utils";
+import { loadCatalog } from "@/lib/catalog/load";
+import { flat } from "@/lib/catalog/__tests__/fixtures";
 
 jest.mock("next/server", () => ({
   NextResponse: {
@@ -10,120 +10,80 @@ jest.mock("next/server", () => ({
     }),
   },
 }));
-jest.mock("@/lib/mongodb", () => ({ connectToDatabase: jest.fn() }));
-jest.mock("@/lib/kinase-utils", () => ({ resolveOrganGenes: jest.fn() }));
+jest.mock("@/lib/catalog/load", () => ({ loadCatalog: jest.fn() }));
 
-type Doc = Record<string, any>;
-
-const kinases: Doc[] = [
-  { gene_symbol: "LOW", full_name: "Low", group: "TK" },
-  { gene_symbol: "EDGE_MIN", full_name: "Minimum edge", group: "TK" },
-  { gene_symbol: "MID", full_name: "Middle", group: "TK" },
-  { gene_symbol: "EDGE_MAX", full_name: "Maximum edge", group: "TK" },
-  { gene_symbol: "HIGH", full_name: "High", group: "TK" },
-  { gene_symbol: "MISSING", full_name: "Missing", group: "TK" },
+const cns = { tau: 0.9, top_tissue: "Brain Cortex", top_organ: "CNS", top_tpm: 20, gencode_id: null };
+const rows = [
+  flat("LOW", 10.49),
+  flat("EDGE_MIN", 10.5),
+  flat("MID", 50, { expression: cns }),
+  flat("EDGE_MAX", 90.5, { expression: cns }),
+  flat("HIGH", 90.51),
+  flat("MISSING", null),
+  flat("EXT", 30, { partition: "uniprot_extended", group: null, extension_class: "Lipid kinase", display_category: "Lipid kinase" }),
 ];
 
-const pdis: Doc[] = [
-  { gene_symbol: "LOW", pdis_total: 10.49 },
-  { gene_symbol: "EDGE_MIN", pdis_total: 10.5 },
-  { gene_symbol: "MID", pdis_total: 50 },
-  { gene_symbol: "EDGE_MAX", pdis_total: 90.5 },
-  { gene_symbol: "HIGH", pdis_total: 90.51 },
-];
-
-function matches(doc: Doc, query: Doc): boolean {
-  return Object.entries(query).every(([key, condition]) => {
-    if (key === "$and") return (condition as Doc[]).every((part) => matches(doc, part));
-    if (key === "$or") return (condition as Doc[]).some((part) => matches(doc, part));
-    const value = doc[key];
-    if (condition && typeof condition === "object") {
-      if ("$in" in condition) return condition.$in.includes(value);
-      if ("$regex" in condition) return new RegExp(condition.$regex, condition.$options).test(value || "");
-      if ("$gte" in condition && value < condition.$gte) return false;
-      if ("$lte" in condition && value > condition.$lte) return false;
-      return true;
-    }
-    return value === condition;
-  });
+async function call(query: string) {
+  const response = await GET({ url: `http://localhost/api/kinases?${query}` } as never);
+  return { status: response.status, body: await response.json() };
 }
 
-function cursor(docs: Doc[]) {
-  let result = [...docs];
-  const api: {
-    sort: jest.Mock;
-    skip: jest.Mock;
-    limit: jest.Mock;
-    toArray: jest.Mock;
-  } = {
-    sort: jest.fn((sort: Doc) => {
-      const [field, direction] = Object.entries(sort)[0] as [string, number];
-      result.sort((a, b) => String(a[field]).localeCompare(String(b[field])) * direction);
-      return api;
-    }),
-    skip: jest.fn((count: number) => { result = result.slice(count); return api; }),
-    limit: jest.fn((count: number) => { result = result.slice(0, count); return api; }),
-    toArray: jest.fn(async () => result),
-  };
-  return api;
-}
-
-function collection(name: string) {
-  const docs = name === "kinases" ? kinases : name === "pdis" ? pdis : [];
-  return {
-    find: jest.fn((query: Doc = {}) => cursor(docs.filter((doc) => matches(doc, query)))),
-    countDocuments: jest.fn(async (query: Doc = {}) => docs.filter((doc) => matches(doc, query)).length),
-    aggregate: jest.fn((pipeline: Doc[] = []) => {
-      if (name !== "kinases" || !pipeline.some((stage) => stage.$group)) return cursor([]);
-      const matchStage = pipeline.find((stage) => stage.$match)?.$match || {};
-      const counts = new Map<string, number>();
-      for (const doc of docs.filter((item) => matches(item, matchStage))) {
-        const group = doc.group || "Atypical";
-        counts.set(group, (counts.get(group) || 0) + 1);
-      }
-      return cursor(Array.from(counts, ([_id, count]) => ({ _id, count })));
-    }),
-  };
-}
+const genes = (body: { kinases: { gene_symbol: string }[] }) => body.kinases.map((k) => k.gene_symbol).sort();
 
 beforeEach(() => {
-  (connectToDatabase as jest.Mock).mockResolvedValue({ connection: { db: { collection } } });
-  (resolveOrganGenes as jest.Mock).mockResolvedValue([]);
+  (loadCatalog as jest.Mock).mockResolvedValue({ rows, accounting: { snapshot_date: "2026-09-30" } });
 });
 
-async function request(query: string) {
-  const response = await GET({ url: `http://localhost/api/kinases?${query}` } as any);
-  return { response, body: await response.json() };
-}
-
-describe("GET /api/kinases filtering", () => {
-  it("uses inclusive fractional PDIS boundaries without rounding", async () => {
-    const { body } = await request("minPDIS=0.105&maxPDIS=0.905&limit=20");
-    expect(body.kinases.map((k: Doc) => k.gene_symbol)).toEqual(["EDGE_MAX", "EDGE_MIN", "MID"]);
-    expect(body.kinases.map((k: Doc) => k.pdis_score)).toEqual([0.905, 0.105, 0.5]);
-    expect(body.total).toBe(3);
+describe("GET /api/kinases", () => {
+  it("uses inclusive PDIS boundaries on the 0-100 scale", async () => {
+    const { body } = await call("minPDIS=10.5&maxPDIS=90.5&limit=100");
+    expect(genes(body)).toEqual(["EDGE_MAX", "EDGE_MIN", "EXT", "MID"]);
   });
 
-  it("returns missing PDIS records only when no interval was requested", async () => {
-    const unfiltered = await request("limit=20&search=Missing");
-    expect(unfiltered.body.kinases[0].pdis_score).toBeNull();
-
-    const filtered = await request("limit=20&search=Missing&minPDIS=0&maxPDIS=1");
-    expect(filtered.body).toMatchObject({ kinases: [], total: 0, totalPages: 0 });
+  it("returns entries without PDIS only when no interval is requested", async () => {
+    expect(genes((await call("limit=100")).body)).toContain("MISSING");
+    expect(genes((await call("minPDIS=0&maxPDIS=100&limit=100")).body)).toContain("MISSING");
+    expect(genes((await call("minPDIS=1&maxPDIS=100&limit=100")).body)).not.toContain("MISSING");
   });
 
-  it("intersects organ and PDIS gene sets", async () => {
-    (resolveOrganGenes as jest.Mock).mockResolvedValue(["LOW", "EDGE_MIN", "MISSING"]);
-    const { body } = await request("organ_system=Liver&minPDIS=0.105&maxPDIS=0.5&limit=20");
-    expect(body.kinases.map((k: Doc) => k.gene_symbol)).toEqual(["EDGE_MIN"]);
-    expect(body.total).toBe(1);
+  it("intersects organ and PDIS filters", async () => {
+    const { body } = await call("organ=CNS&tissue_enriched=1&minPDIS=60&maxPDIS=100");
+    expect(genes(body)).toEqual(["EDGE_MAX"]);
   });
 
-  it("computes totals and pages before pagination", async () => {
-    const { body } = await request("minPDIS=0.105&maxPDIS=0.905&page=2&limit=2");
-    expect(body.kinases.map((k: Doc) => k.gene_symbol)).toEqual(["MID"]);
-    expect(body).toMatchObject({ total: 3, page: 2, totalPages: 2 });
-    expect(body.groupBreakdown).toEqual({ TK: 3 });
-    expect(Object.values(body.groupBreakdown).reduce((sum: number, count) => sum + Number(count), 0)).toBe(body.total);
+  it("computes totals and breakdowns before pagination", async () => {
+    const { body } = await call("limit=2&page=2&sort=pdis");
+    expect(body.total).toBe(7);
+    expect(body.totalPages).toBe(4);
+    expect(body.kinases.map((k: { gene_symbol: string }) => k.gene_symbol)).toEqual(["MID", "EXT"]);
+    expect(body.categoryBreakdown).toEqual({ TK: 6, "Lipid kinase": 1 });
+    expect(body.partitionBreakdown).toEqual({ kinhub_core: 6, uniprot_extended: 1 });
+  });
+
+  it("filters by partition and category and returns both group and display_category", async () => {
+    const { body } = await call("partition=uniprot_extended");
+    expect(body.kinases).toHaveLength(1);
+    expect(body.kinases[0]).toMatchObject({ group: null, display_category: "Lipid kinase", extension_class: "Lipid kinase" });
+    expect((await call("catalog=core")).body.total).toBe(6);
+    expect((await call("category=Lipid%20kinase")).body.total).toBe(1);
+  });
+
+  it("returns weighted scores and ranks", async () => {
+    const tilted = [
+      flat("A", null, { components: { citation: 100, clinical_trials: 0, structure: 0, compound_diversity: 0 }, pdis_default: 33.33 }),
+      flat("B", null, { components: { citation: 0, clinical_trials: 0, structure: 0, compound_diversity: 100 }, pdis_default: 16.67 }),
+    ];
+    (loadCatalog as jest.Mock).mockResolvedValue({ rows: tilted, accounting: {} });
+    const { body } = await call("weights=0,0,0,1&sort=pdis");
+    expect(body.kinases.map((k: { gene_symbol: string; pdis_weighted: number; rank_weighted: number }) =>
+      [k.gene_symbol, k.pdis_weighted, k.rank_weighted])).toEqual([["B", 100, 1], ["A", 0, 2]]);
+    expect(body.kinases[0].pdis_default).toBe(16.67);
+    expect(body.weights).toEqual([0, 0, 0, 1]);
+  });
+
+  it("rejects invalid parameters", async () => {
+    for (const query of ["weights=0,0,0,0", "weights=1,2", "partition=other", "category=Nope", "minPDIS=5&maxPDIS=1", "maxPDIS=101", "sort=$where", "max_citations=-1"]) {
+      expect((await call(query)).status).toBe(400);
+    }
   });
 });

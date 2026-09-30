@@ -230,7 +230,30 @@ def migrate_expression(db, apply: bool) -> dict[str, Any]:
     }
 
 
+# ---------------------------------------------------------------------------
+# Release metadata (snapshot date shown by the accounting endpoint)
+# ---------------------------------------------------------------------------
+
+RELEASE = {
+    "snapshot_date": "2026-09-30",
+    "release": "v1.1.0-jmb",
+    "manuscript": "JMB-D-26-01062",
+    "pdis_evidence_retrieved": "2026-08-12",
+}
+
+
+def migrate_release_metadata(db, apply: bool) -> dict[str, Any]:
+    if apply:
+        db.catalog_metadata.update_one(
+            {"_id": "release"},
+            {"$set": {**RELEASE, "updated_at": datetime.now(timezone.utc)}},
+            upsert=True,
+        )
+    return dict(RELEASE)
+
+
 STEPS = {
+    "release": migrate_release_metadata,
     "extension": migrate_extension_classes,
     "pdis": migrate_pdis,
     "expression": migrate_expression,

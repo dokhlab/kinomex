@@ -1,108 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
-import { resolveOrganGenes } from "@/lib/kinase-utils";
-import { escapeRegExp, isKinaseGroup } from "@/lib/api-validation";
+import { loadCatalog } from "@/lib/catalog/load";
+import { parseCatalogQuery } from "@/lib/catalog/params";
+import { queryCatalog } from "@/lib/catalog/query";
 
 export const dynamic = "force-dynamic";
 
-const NUM_BUCKETS = 20;
-const BUCKET_WIDTH = 100 / NUM_BUCKETS;
-
-const cache = new Map<string, { data: unknown; expiry: number }>();
-const CACHE_TTL = 5 * 60 * 1000;
-
-function getCached(key: string) {
-  const entry = cache.get(key);
-  if (entry && Date.now() < entry.expiry) return entry.data;
-  cache.delete(key);
-  return null;
-}
-
-function setCache(key: string, data: unknown) {
-  cache.set(key, { data, expiry: Date.now() + CACHE_TTL });
-}
-
+// 20-bin histogram (0-100) of the weighted PDIS over the evidence-filtered set.
 export async function GET(request: NextRequest) {
+  const parsed = parseCatalogQuery(new URL(request.url).searchParams);
+  if ("error" in parsed) {
+    return NextResponse.json({ error: `Invalid query parameters: ${parsed.error}` }, { status: 400 });
+  }
   try {
-    const { searchParams } = new URL(request.url);
-    const search = searchParams.get("search") || "";
-    const group = searchParams.get("group") || "";
-    const organ_system = searchParams.get("organ_system") || "";
-
-    if (search.length > 100 || organ_system.length > 50 || !isKinaseGroup(group)) {
-      return NextResponse.json({ error: "Invalid query parameters" }, { status: 400 });
-    }
-
-    const cacheKey = JSON.stringify({ search, group, organ_system });
-    const cached = getCached(cacheKey);
-    if (cached) {
-      return NextResponse.json(cached);
-    }
-
-    const mongoose = await connectToDatabase();
-    const db = mongoose.connection.db!;
-
-    const matchStage: Record<string, unknown> = {};
-    if (search) {
-      const escapedSearch = escapeRegExp(search);
-      matchStage.$or = [
-        { gene_symbol: { $regex: escapedSearch, $options: "i" } },
-        { full_name: { $regex: escapedSearch, $options: "i" } },
-      ];
-    }
-    if (group) {
-      matchStage.group = group;
-    }
-    if (organ_system) {
-      const organGenes = await resolveOrganGenes(db, organ_system);
-      matchStage.gene_symbol = { $in: organGenes };
-    }
-
-    const kinaseDocs = await db
-      .collection("kinases")
-      .find(matchStage, { projection: { gene_symbol: 1 } })
-      .toArray();
-    const genes = kinaseDocs.map((k) => k.gene_symbol).filter(Boolean) as string[];
-
-    const buckets = Array.from({ length: NUM_BUCKETS }, (_, i) => ({
-      min: i * BUCKET_WIDTH,
-      max: (i + 1) * BUCKET_WIDTH,
-      count: 0,
-    }));
-
-    if (genes.length > 0) {
-      const pdisDocs = await db.collection("pdis")
-        .find({ gene_symbol: { $in: genes } })
-        .toArray();
-      const scoreMap = new Map<string, number>();
-      for (const p of pdisDocs) {
-        if (
-          p.gene_symbol &&
-          Number.isFinite(p.pdis_total) &&
-          p.pdis_total >= 0 &&
-          p.pdis_total <= 100
-        ) {
-          scoreMap.set(p.gene_symbol, p.pdis_total);
-        }
-      }
-      for (const score of Array.from(scoreMap.values())) {
-        const idx = Math.min(NUM_BUCKETS - 1, Math.max(0, Math.floor(score / BUCKET_WIDTH)));
-        buckets[idx].count += 1;
-      }
-      const response = { buckets, total: scoreMap.size, unscored: genes.length - scoreMap.size };
-      setCache(cacheKey, response);
-      return NextResponse.json(response);
-    }
-
-    const response = { buckets, total: 0, unscored: 0 };
-    setCache(cacheKey, response);
-
-    return NextResponse.json(response);
+    const { rows } = await loadCatalog();
+    const { pdisMin: _min, pdisMax: _max, ...evidence } = parsed.filters; // eslint-disable-line @typescript-eslint/no-unused-vars
+    const result = queryCatalog(rows, evidence, parsed.weights);
+    const scored = result.rows.filter((row) => row.pdis_weighted !== null).length;
+    return NextResponse.json({ buckets: result.histogram, total: scored, unscored: result.total - scored, weights: parsed.weights });
   } catch (error) {
     console.error("GET /api/kinases/distribution error:", error);
-    return NextResponse.json(
-      { error: "Failed to compute PDIS distribution" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to compute PDIS distribution" }, { status: 500 });
   }
 }
