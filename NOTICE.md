@@ -6,6 +6,9 @@ KinomeX integrates scientific records from independent providers. KinomeX does n
 - **STRING** — CC BY 4.0. https://string-db.org/cgi/access?footer_active_subpage=licensing
 - **RCSB PDB / wwPDB archive and API data** — CC0 1.0; citation is encouraged. https://www.rcsb.org/pages/usage-policy
 - **AlphaFold Protein Structure Database** — CC BY 4.0; predictions are not experimentally or clinically validated. https://alphafold.ebi.ac.uk/faq
+- **EMDB (Electron Microscopy Data Bank)** — CC0; KinomeX displays map accessions and links only. https://www.ebi.ac.uk/emdb/documentation/policies
+- **Pharos / TCRD** — public target development levels; cite Pharos/TCRD when reusing the labels. https://pharos.nih.gov/about
+- **KLIFS** — kinase pocket alignment used to locate gatekeeper residues; cite KLIFS when reusing the mapping. https://klifs.net/faq.php
 - **ChEMBL** — CC BY-SA 3.0. ChEMBL-derived records and adaptations remain subject to attribution and ShareAlike. https://www.ebi.ac.uk/chembl/
 - **PubChem** — open NLM archive with record/contributor-specific rights. Preserve record provenance and inspect the current source license before redistribution. https://pubchem.ncbi.nlm.nih.gov/docs/downloads
 - **GTEx** — public aggregate Portal data only; acknowledge the GTEx Portal, release, and access date. https://gtexportal.org/home/documentationPage

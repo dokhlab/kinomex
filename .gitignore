@@ -41,3 +41,4 @@ __pycache__/
 next-env.d.ts
 /.next-dev/
 /.next-jmb/
+/.next-jmb-build/

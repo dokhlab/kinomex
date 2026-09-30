@@ -1,0 +1,50 @@
+[
+ [
+  "/max_abs_dev_stored_vs_formula/cd",
+  "val",
+  0.003106714778525088,
+  97.72
+ ],
+ [
+  "/max_abs_dev_stored_vs_formula/tot",
+  "val",
+  0.006666666666674814,
+  16.28666666666667
+ ],
+ [
+  "/scenarios/Without structure/rho",
+  "val",
+  0.9204028137799057,
+  0.9204062316906723
+ ],
+ [
+  "/scenarios/Without structure/rho_core",
+  "val",
+  0.927818999885175,
+  0.9278251812785752
+ ],
+ [
+  "/scenarios/Without compound diversity/rho",
+  "val",
+  0.9664189901657719,
+  0.9664127911539078
+ ],
+ [
+  "/scenarios/Without compound diversity/rho_core",
+  "val",
+  0.9729180317503067,
+  0.9729113040447095
+ ],
+ [
+  "/coverage/nonGTEx_expr_records",
+  "val",
+  322,
+  0
+ ],
+ [
+  "/coverage/nonGTEx_expr_genes",
+  "val",
+  161,
+  0
+ ]
+]
