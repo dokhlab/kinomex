@@ -1,0 +1,1826 @@
+{
+  "generated_at": "2026-09-30T19:44:49+00:00",
+  "rcsb_retrieved_at": "2026-09-30T19:39:03+00:00",
+  "import": {
+    "date": "2026-08-12",
+    "note": "The stored structures come from one ingestor run on 2026-08-12 (ObjectId times 19:12-19:13 UTC), after the weekly PDB release of Wednesday 2026-08-12 (00:00 UTC).",
+    "import_query": "Homo sapiens source organism AND resolution_combined < 3.5 AND catalog UniProt accession; experimental entries",
+    "min_insert_time": "2026-08-12T19:12:55+00:00",
+    "max_insert_time": "2026-08-12T19:12:58+00:00",
+    "inserted_before_2026-08-13": 10043,
+    "inserted_on_or_after_2026-08-13": 0
+  },
+  "rcsb_today": {
+    "all": 10938,
+    "le35": 10184,
+    "cryo_em_le35": 390,
+    "all_by_method": {
+      "X-RAY DIFFRACTION": 9923,
+      "ELECTRON MICROSCOPY": 742,
+      "SOLUTION NMR": 264,
+      "NEUTRON DIFFRACTION": 4,
+      "SOLID-STATE NMR": 4,
+      "ELECTRON CRYSTALLOGRAPHY": 1,
+      "SOLUTION SCATTERING": 1
+    },
+    "le35_by_method": {
+      "X-RAY DIFFRACTION": 9793,
+      "ELECTRON MICROSCOPY": 390,
+      "NEUTRON DIFFRACTION": 4,
+      "ELECTRON CRYSTALLOGRAPHY": 1
+    },
+    "import_query_today": 10125,
+    "expected_2026_09_30": {
+      "all": 10938,
+      "le35": 10184,
+      "cryo_em_le35": 390
+    },
+    "query": "analysis/rcsb.py: catalog UniProt accessions (678), experimental entries"
+  },
+  "stored": {
+    "le35_entries": 10043,
+    "by_method": {
+      "X-RAY DIFFRACTION": 9688,
+      "ELECTRON MICROSCOPY": 354,
+      "ELECTRON CRYSTALLOGRAPHY": 1
+    },
+    "entries_with_neutron_component": 4,
+    "covered_genes": 476,
+    "covered_core_genes": 384,
+    "covered_extension_genes": 92,
+    "pdis_pdb_count_gt0": 476,
+    "cryo_em_entries": 354,
+    "cryo_em_with_emdb": 354,
+    "with_bound_ligand": 8255,
+    "latest_release_date": "2026-08-12",
+    "release_date_counts_since_2026-07-01": {
+      "2026-07-01": 5,
+      "2026-07-08": 8,
+      "2026-07-15": 37,
+      "2026-07-22": 14,
+      "2026-07-29": 23,
+      "2026-08-05": 23,
+      "2026-08-12": 9
+    }
+  },
+  "differences": {
+    "rcsb_le35_not_stored": 141,
+    "rcsb_le35_not_stored_released_on_or_before_import": 56,
+    "rcsb_le35_not_stored_released_after_import": 85,
+    "rcsb_le35_not_stored_cryo_em": 36,
+    "reason_counts": {
+      "released after the 2026-08-12 import": 85,
+      "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5": 51,
+      "no Homo sapiens source organism; the import query required one": 8
+    },
+    "primary_reason_counts": {
+      "released after the 2026-08-12 import": 85,
+      "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5": 49,
+      "no Homo sapiens source organism; the import query required one": 7
+    },
+    "stored_not_in_rcsb_le35": 0,
+    "stored_not_in_rcsb_le35_entries": [],
+    "stored_not_returned_by_import_query_today": 0,
+    "import_query_today_not_stored": 82,
+    "import_query_today_not_stored_released_after_import": 82,
+    "not_returned_by_data_api": [],
+    "rcsb_le35_not_stored_entries": [
+      {
+        "pdb_id": "10JK",
+        "release_date": "2026-09-23",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.8,
+        "gene_symbols": [
+          "CSNK1A1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "10RR",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "NOL9"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import",
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "11GV",
+        "release_date": "2026-09-02",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.59,
+        "gene_symbols": [
+          "CDK2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "11ZL",
+        "release_date": "2026-09-02",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.55,
+        "gene_symbols": [
+          "MAPK8"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "12CV",
+        "release_date": "2026-09-02",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.5,
+        "gene_symbols": [
+          "MAPK8"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "13GK",
+        "release_date": "2026-09-30",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.44,
+        "gene_symbols": [
+          "CDK2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "1I0E",
+        "release_date": "2003-04-01",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "CKM"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "1JKT",
+        "release_date": "2002-04-01",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "DAPK1"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "1P62",
+        "release_date": "2003-07-01",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.9,
+        "gene_symbols": [
+          "DCK"
+        ],
+        "reasons": [
+          "no Homo sapiens source organism; the import query required one"
+        ]
+      },
+      {
+        "pdb_id": "1SHA",
+        "release_date": "1993-10-31",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.5,
+        "gene_symbols": [
+          "PDGFRB"
+        ],
+        "reasons": [
+          "no Homo sapiens source organism; the import query required one"
+        ]
+      },
+      {
+        "pdb_id": "1UU9",
+        "release_date": "2004-03-04",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.95,
+        "gene_symbols": [
+          "PDPK1"
+        ],
+        "reasons": [
+          "no Homo sapiens source organism; the import query required one"
+        ]
+      },
+      {
+        "pdb_id": "1UWJ",
+        "release_date": "2004-03-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "BRAF"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "21EI",
+        "release_date": "2026-09-30",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.3,
+        "gene_symbols": [
+          "FLT4"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "21ES",
+        "release_date": "2026-09-30",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.3,
+        "gene_symbols": [
+          "FLT4"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "22HA",
+        "release_date": "2026-09-23",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.1,
+        "gene_symbols": [
+          "BRD4"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "23EW",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.7,
+        "gene_symbols": [
+          "ATR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "23EX",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.2,
+        "gene_symbols": [
+          "ATR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "23EY",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.2,
+        "gene_symbols": [
+          "ATR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "23FA",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.1,
+        "gene_symbols": [
+          "ATR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "23FB",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.0,
+        "gene_symbols": [
+          "ATR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "23FE",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.9,
+        "gene_symbols": [
+          "ATR",
+          "CHEK1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "26FF",
+        "release_date": "2026-09-30",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.4,
+        "gene_symbols": [
+          "BRD4"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "26ZN",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "ATR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import",
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "29QL",
+        "release_date": "2026-09-30",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.1,
+        "gene_symbols": [
+          "BRD4"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "2E9W",
+        "release_date": "2007-08-07",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "KIT"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "2G01",
+        "release_date": "2006-04-18",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "MAPK8"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "2GHG",
+        "release_date": "2007-03-27",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "CHEK1"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "2GMX",
+        "release_date": "2006-06-06",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "MAPK8"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "2HLQ",
+        "release_date": "2006-11-28",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.45,
+        "gene_symbols": [
+          "BMPR2"
+        ],
+        "reasons": [
+          "no Homo sapiens source organism; the import query required one"
+        ]
+      },
+      {
+        "pdb_id": "2JIV",
+        "release_date": "2008-01-22",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "EGFR"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "2RF9",
+        "release_date": "2007-12-04",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "EGFR"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "30IX",
+        "release_date": "2026-08-26",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.9,
+        "gene_symbols": [
+          "CSNK1G2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "31ZN",
+        "release_date": "2026-08-19",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.9,
+        "gene_symbols": [
+          "CDK11B"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "35UA",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.18,
+        "gene_symbols": [
+          "KIT"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "35UC",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.328,
+        "gene_symbols": [
+          "KIT"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "35VB",
+        "release_date": "2026-09-23",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.85,
+        "gene_symbols": [
+          "BRAF"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "35WJ",
+        "release_date": "2026-09-23",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.7,
+        "gene_symbols": [
+          "IPMK"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "35WK",
+        "release_date": "2026-09-23",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.646,
+        "gene_symbols": [
+          "IPMK"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "3B43",
+        "release_date": "2008-01-22",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.3,
+        "gene_symbols": [
+          "TTN"
+        ],
+        "reasons": [
+          "no Homo sapiens source organism; the import query required one"
+        ]
+      },
+      {
+        "pdb_id": "3FYK",
+        "release_date": "2009-04-07",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "MAPKAPK2"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "3PRI",
+        "release_date": "2011-02-02",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "BRAF"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "3PWY",
+        "release_date": "2011-04-20",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "PDPK1"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "3QBN",
+        "release_date": "2012-01-18",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "AURKA"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "3VUD",
+        "release_date": "2013-02-13",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "MAPK8"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "3VUT",
+        "release_date": "2012-09-05",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "MAP2K4"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "3WSQ",
+        "release_date": "2015-03-25",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "ERBB2"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "4CFX",
+        "release_date": "2014-12-10",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "CDK2"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "4EHG",
+        "release_date": "2013-04-24",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "BRAF"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "4G9C",
+        "release_date": "2012-11-14",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "BRAF"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "4JSV",
+        "release_date": "2013-05-01",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "MTOR"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "4JSX",
+        "release_date": "2013-05-08",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "MTOR"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "4MD9",
+        "release_date": "2013-11-20",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "CSNK2A1"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "4OGA",
+        "release_date": "2014-08-27",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "INSR"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "4OVV",
+        "release_date": "2014-09-03",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "PIK3CA"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "4R5Y",
+        "release_date": "2016-02-24",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "BRAF"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "5HVK",
+        "release_date": "2016-05-04",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "LIMK1"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "5SWO",
+        "release_date": "2017-02-15",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "PIK3CA"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "5SXD",
+        "release_date": "2017-02-15",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "PIK3CA"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "6CYT",
+        "release_date": "2018-12-12",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "CDK9"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "6G5I",
+        "release_date": "2018-06-06",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "RIOK1"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "6NBS",
+        "release_date": "2019-07-31",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.9,
+        "gene_symbols": [
+          "MAPK1"
+        ],
+        "reasons": [
+          "no Homo sapiens source organism; the import query required one"
+        ]
+      },
+      {
+        "pdb_id": "6S73",
+        "release_date": "2020-06-10",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "NEK7"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "6SIS",
+        "release_date": "2019-12-04",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "BRD4"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "6VNO",
+        "release_date": "2020-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "LRRK2"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "6VP7",
+        "release_date": "2020-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "LRRK2"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "6VP8",
+        "release_date": "2020-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "LRRK2"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "7LFS",
+        "release_date": "2021-11-17",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "EGFR"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "7LHT",
+        "release_date": "2021-06-16",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "LRRK2"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "7TYK",
+        "release_date": "2023-02-15",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "INSRR"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "7YQE",
+        "release_date": "2023-08-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "SRC"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "8BUI",
+        "release_date": "2023-09-13",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "CDK12"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "8BZO",
+        "release_date": "2023-06-28",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "CDK2"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "8PVU",
+        "release_date": "2024-10-16",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "MAPK1"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "8QRI",
+        "release_date": "2024-08-07",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "TRRAP"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "8RPN",
+        "release_date": "2026-09-02",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.72,
+        "gene_symbols": [
+          "JAK3"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "8XN6",
+        "release_date": "2024-01-24",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.4,
+        "gene_symbols": [
+          "GSK3B"
+        ],
+        "reasons": [
+          "no Homo sapiens source organism; the import query required one"
+        ]
+      },
+      {
+        "pdb_id": "9B9G",
+        "release_date": "2024-09-11",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "PI4KA"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "9HUK",
+        "release_date": "2025-07-23",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "GSK3B"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "9I9I",
+        "release_date": "2025-10-15",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "CDK11B",
+          "CDK7"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "9O0V",
+        "release_date": "2025-10-15",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "MAP2K1",
+          "RAF1"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "9P0J",
+        "release_date": "2026-09-23",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.2,
+        "gene_symbols": [
+          "PFKL"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9Q3N",
+        "release_date": "2026-08-26",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.1,
+        "gene_symbols": [
+          "CDK5"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9Q3O",
+        "release_date": "2026-08-26",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.5,
+        "gene_symbols": [
+          "CDK5"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9Q8R",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.05,
+        "gene_symbols": [
+          "ROCK1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9S76",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.73,
+        "gene_symbols": [
+          "CSNK2A1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9S77",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.79,
+        "gene_symbols": [
+          "CSNK2A1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9S7A",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.03,
+        "gene_symbols": [
+          "CSNK2A1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9S7H",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.09,
+        "gene_symbols": [
+          "CSNK2A1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9S7I",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.11,
+        "gene_symbols": [
+          "CSNK2A1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9S8J",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.48,
+        "gene_symbols": [
+          "CSNK2A1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9S9Y",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.86,
+        "gene_symbols": [
+          "CSNK2A1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9SE8",
+        "release_date": "2026-08-26",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.0,
+        "gene_symbols": [
+          "ULK1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9SE9",
+        "release_date": "2026-08-26",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.97,
+        "gene_symbols": [
+          "ULK2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9SIV",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.5,
+        "gene_symbols": [
+          "CSNK1D"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9SIW",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.55,
+        "gene_symbols": [
+          "CSNK1D"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9SIX",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.23,
+        "gene_symbols": [
+          "CSNK1D"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9SIY",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.8,
+        "gene_symbols": [
+          "CSNK1D"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9SIZ",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.5,
+        "gene_symbols": [
+          "CSNK1D"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9SJ0",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.75,
+        "gene_symbols": [
+          "CSNK1D"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9SJ1",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.6,
+        "gene_symbols": [
+          "CSNK1D"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9T0U",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.07,
+        "gene_symbols": [
+          "CSNK2A2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9T2X",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.1,
+        "gene_symbols": [
+          "CSNK2A2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9T3R",
+        "release_date": "2026-03-11",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "ERBB2"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "9TM3",
+        "release_date": "2026-08-19",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.2,
+        "gene_symbols": [
+          "CSNK2A2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import",
+          "no Homo sapiens source organism; the import query required one"
+        ]
+      },
+      {
+        "pdb_id": "9TMT",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.1,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TMU",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.4,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TMV",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.9,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TMW",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.0,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TMY",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.2,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TMZ",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.2,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TN0",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.4,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TN1",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.2,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TN2",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.3,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TN3",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.4,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9TN4",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.4,
+        "gene_symbols": [
+          "AKT1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9U8C",
+        "release_date": "2025-11-12",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.5,
+        "gene_symbols": [
+          "EGFR"
+        ],
+        "reasons": [
+          "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5"
+        ]
+      },
+      {
+        "pdb_id": "9WD3",
+        "release_date": "2026-08-26",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.22,
+        "gene_symbols": [
+          "MAP4K1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WDJ",
+        "release_date": "2026-09-02",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 3.15,
+        "gene_symbols": [
+          "PIP4K2B"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WDO",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.57,
+        "gene_symbols": [
+          "PKLR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WDQ",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.93,
+        "gene_symbols": [
+          "PKLR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WDR",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.92,
+        "gene_symbols": [
+          "PKLR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WDT",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.93,
+        "gene_symbols": [
+          "PKLR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WEZ",
+        "release_date": "2026-08-26",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.64,
+        "gene_symbols": [
+          "PKLR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WFK",
+        "release_date": "2026-08-26",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.89,
+        "gene_symbols": [
+          "FGFR1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WGT",
+        "release_date": "2026-09-02",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.9,
+        "gene_symbols": [
+          "FGFR1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WOI",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.239,
+        "gene_symbols": [
+          "FN3K"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WOJ",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.833,
+        "gene_symbols": [
+          "FN3K"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WOK",
+        "release_date": "2026-09-09",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.45,
+        "gene_symbols": [
+          "FN3K"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WR8",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.33,
+        "gene_symbols": [
+          "EGFR"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WS2",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.9,
+        "gene_symbols": [
+          "PAK2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WS3",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 1.85,
+        "gene_symbols": [
+          "PAK2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WS5",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.4,
+        "gene_symbols": [
+          "PAK2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9WS6",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.0,
+        "gene_symbols": [
+          "PAK2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9XW0",
+        "release_date": "2026-08-26",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.4,
+        "gene_symbols": [
+          "TNIK"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9XW5",
+        "release_date": "2026-09-23",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.31,
+        "gene_symbols": [
+          "PIK3CA"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9XW7",
+        "release_date": "2026-09-23",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.01,
+        "gene_symbols": [
+          "PIK3CA"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9XW8",
+        "release_date": "2026-09-23",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.86,
+        "gene_symbols": [
+          "PIK3CA"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9Y3S",
+        "release_date": "2026-09-16",
+        "experimental_method": "X-RAY DIFFRACTION",
+        "resolution": 2.2,
+        "gene_symbols": [
+          "PANK3"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9YBL",
+        "release_date": "2026-08-19",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.44,
+        "gene_symbols": [
+          "LRRK2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9YGT",
+        "release_date": "2026-08-19",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 3.42,
+        "gene_symbols": [
+          "LRRK2"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      },
+      {
+        "pdb_id": "9ZDQ",
+        "release_date": "2026-09-16",
+        "experimental_method": "ELECTRON MICROSCOPY",
+        "resolution": 2.51,
+        "gene_symbols": [
+          "ARAF",
+          "MAP2K1"
+        ],
+        "reasons": [
+          "released after the 2026-08-12 import"
+        ]
+      }
+    ]
+  },
+  "audit_2026_08_13": {
+    "reported": 10034,
+    "current": 10043,
+    "difference": 9,
+    "stored_released_2026-08-12": [
+      "36IV",
+      "9OM2",
+      "9OXH",
+      "9OYA",
+      "9RN5",
+      "9S6G",
+      "9W7Y",
+      "9W81",
+      "9Y68"
+    ],
+    "explanation": "KinomeX stores 10,043 entries; the August 13 audit reported 10,034. All 10,043 documents carry ObjectId insertion times of 2026-08-12 and none of 2026-08-13 or later, and the 2026-08-14 database backup holds the same 10,043 PDB IDs. 9 stored entries have the RCSB initial release date 2026-08-12 (the Wednesday weekly release that precedes the import by about 19 hours). Without these 9 entries the snapshot holds exactly 10,034 entries, the value that the August 11 manuscript draft already reports. The August 13 audit value therefore describes the same query against the PDB release of 2026-08-05, and the import of 2026-08-12 adds the 9 entries of the next weekly release."
+  },
+  "summary": {
+    "rcsb_all_le35_em_today": [
+      10938,
+      10184,
+      390
+    ],
+    "stored": 10043,
+    "covered_genes": 476,
+    "covered_core_genes": 384,
+    "cryo_em_stored": 354,
+    "le35_not_stored": 141,
+    "le35_not_stored_after_import": 85,
+    "primary_reasons": {
+      "released after the 2026-08-12 import": 85,
+      "resolution exactly 3.5 \u00c5; the import query used < 3.5 \u00c5": 49,
+      "no Homo sapiens source organism; the import query required one": 7
+    },
+    "stored_not_in_rcsb": 0,
+    "audit_difference_explained": true
+  }
+}

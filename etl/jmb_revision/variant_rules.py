@@ -112,8 +112,9 @@ def clinvar_fields(uid: str, summary: Mapping[str, Any] | None) -> dict[str, Any
 GATEKEEPER_POCKET_INDEX = 45
 GATEKEEPER_METHOD = "KLIFS pocket residue 45 mapped to UniProt canonical sequence"
 # KLIFS regions beta5 (42-44), gatekeeper (45), hinge (46-48) and linker (49-52) form
-# one contiguous stretch of sequence; alpha-D (53-59) usually follows directly.
-ANCHOR_WINDOWS = ((42, 52), (42, 59))
+# one contiguous stretch of sequence; alpha-D (53-59) usually follows directly. Shorter
+# windows cover kinases with an insertion in the hinge or linker (PIM1, PI3K, MTOR).
+ANCHOR_WINDOWS = ((42, 52), (42, 59), (42, 48), (45, 52))
 GAP_CHARS = set("-_.")
 
 
@@ -269,6 +270,16 @@ def parse_context(context: str | None) -> dict[str, Any]:
 
 def named_in(text: str, phrase: str) -> bool:
     return re.search(r"(?<![A-Za-z0-9])" + re.escape(phrase) + r"(?![A-Za-z0-9])", text, re.IGNORECASE) is not None
+
+
+def citation_check(gene: str, mutation_code: str, publication_text: str | None) -> dict[str, Any]:
+    """Whether the cited publication resolves and names the gene and the mutation."""
+    text = publication_text or ""
+    return {
+        "pmid_resolves": bool(text.strip()),
+        "names_gene": bool(text) and named_in(text, gene),
+        "names_mutation": bool(text) and bool(mutation_code) and named_in(text, mutation_code),
+    }
 
 
 def curated_fields(context: str | None, publication_text: str | None) -> dict[str, Any]:

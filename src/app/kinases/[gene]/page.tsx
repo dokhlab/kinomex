@@ -1,734 +1,90 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { createPortal } from "react-dom";
-import GroupBadge, { type KinaseGroup } from "@/components/ui/GroupBadge";
 import dynamic from "next/dynamic";
-import { stringProteinUrl, type StringInteraction } from "@/lib/string-network";
+import GroupBadge from "@/components/ui/GroupBadge";
+import { DEFAULT_WEIGHTS, parseWeightsParam } from "@/lib/pdis";
+import type { KinaseDetail } from "@/components/kinase/dossier/types";
 
 const TabPanel = dynamic(() => import("@/components/ui/TabPanel"));
 const PDISBadge = dynamic(() => import("@/components/ui/PDISBadge"));
-const NGLViewer = dynamic(() => import("@/components/kinase/NGLViewer"), { ssr: false });
-const LigandTable = dynamic(() => import("@/components/kinase/LigandTable"));
-const MutationTable = dynamic(() => import("@/components/kinase/MutationTable"));
-const StringNetworkGraph = dynamic(() => import("@/components/visualizations/StringNetworkGraph"), { ssr: false });
+const PDISCard = dynamic(() => import("@/components/kinase/dossier/PDISCard"));
+const StructureTab = dynamic(() => import("@/components/kinase/dossier/StructureTab"));
+const ExpressionTab = dynamic(() => import("@/components/kinase/dossier/ExpressionTab"));
+const LigandsTab = dynamic(() => import("@/components/kinase/dossier/LigandsTab"));
+const VariantsTab = dynamic(() => import("@/components/kinase/dossier/VariantsTab"));
+const NetworkTab = dynamic(() => import("@/components/kinase/dossier/NetworkTab"));
+const DiseasesTab = dynamic(() => import("@/components/kinase/dossier/DiseasesTab"));
+const ReferencesTab = dynamic(() => import("@/components/kinase/dossier/ReferencesTab"));
 const AiSummary = dynamic(() => import("@/components/kinase/AiSummary"), {
-  loading: () => <div className="h-24 rounded-2xl bg-white/5 animate-shimmer" />,
+  loading: () => <div className="h-24 animate-shimmer rounded-2xl bg-white/5" />,
 });
 
-interface TissueExpression {
-  tissue_name: string;
-  organ_system: string;
-  tpm_value: number;
-  protein_abundance: string;
-  tau_specificity: number;
-  data_source: string;
-}
-
-interface KeyReference {
-  pubmed_id: string;
-  citation_text: string;
-  doi?: string;
-  relevance_tag: string;
-}
-
-interface MutationData {
-  mutation_code: string;
-  position: number;
-  pathogenicity: string;
-  associated_diseases: string[];
-  drug_resistance_effects: { drug_name: string; fold_resistance: number; mechanism: string }[];
-  organ_systems_affected: string[];
-}
-
-interface LigandAssay {
-  ligand_name: string;
-  chembl_id?: string;
-  binding_type: string;
-  assay_type: string;
-  value_nm: number;
-  relation: string;
-  target_conformation?: string;
-  source?: string;
-  source_url?: string;
-  assay_count?: number;
-  pubchem_cid?: string | number;
-  reference: { pubmed_id: string; doi?: string; title?: string; year?: number };
-}
-
-interface PDISScore {
-  overall_score: number;
-  citation_component: number | null;
-  clinical_component: number | null;
-  structure_component: number | null;
-  compound_diversity_component: number | null;
-}
-
-interface KinaseDetail {
-  gene_symbol: string;
-  name: string;
-  uniprot_id: string;
-  swiss_prot_annotation?: {
-    reviewed: boolean;
-    section: string;
-    functions: string[];
-    catalytic_activities: string[];
-    subunit_annotations: string[];
-    source_url: string | null;
-  };
-  ec_number?: string;
-  classification: { group: string; family: string; subfamily: string };
-  pdis_score: PDISScore | null;
-  tissue_expressions: TissueExpression[];
-  mutations: MutationData[];
-  ligand_assays: LigandAssay[];
-  development_candidates: Array<{ name: string; mechanism: string; status: string; sourceLabel: string; sourceUrl: string }>;
-  key_references: KeyReference[];
-  organ_systems_impacted: string[];
-  diseases_associated: { name: string; description: string; omim_id: string }[];
-  pathways?: { reactome_id: string; pathway_name: string; role: string }[];
-  domains?: { name: string; start: number; end: number }[];
+function TabIcon({ d }: { d: string }) {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={d} />
+    </svg>
+  );
 }
 
 const TABS = [
   { id: "structure", label: "Structure", color: "kinome-cyan", icon: <TabIcon d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /> },
   { id: "expression", label: "Distribution", color: "amber", icon: <TabIcon d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> },
   { id: "chemical", label: "Ligands", color: "kinome-cyan", icon: <TabIcon d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /> },
-  { id: "mutations", label: "Mutations", color: "kinome-violet", icon: <TabIcon d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /> },
+  { id: "mutations", label: "Variants", color: "kinome-violet", icon: <TabIcon d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /> },
   { id: "network", label: "Network", color: "kinome-violet", icon: <TabIcon d="M12 5a2 2 0 100-4 2 2 0 000 4zM5 14a2 2 0 100-4 2 2 0 000 4zm14 0a2 2 0 100-4 2 2 0 000 4zm-7 9a2 2 0 100-4 2 2 0 000 4zM10.7 4.5L6.3 10.5m7-6l4.4 6M6.7 13.5l4.1 6m6.5-6l-4.1 6" /> },
-  { id: "diseases", label: "Diseases", color: "rose", icon: <TabIcon d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" /> },
+  { id: "diseases", label: "Diseases", color: "rose", icon: <TabIcon d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342" /> },
   { id: "references", label: "References", color: "kinome-emerald", icon: <TabIcon d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /> },
 ];
 
-function TabIcon({ d }: { d: string }) {
-  return (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={d} />
-    </svg>
-  );
-}
-
 function DetailSkeleton() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="space-y-3 mb-8">
-        <div className="h-4 w-48 rounded bg-white/5 animate-shimmer" />
-        <div className="h-10 w-40 rounded bg-white/5 animate-shimmer" />
-        <div className="h-5 w-96 rounded bg-white/5 animate-shimmer" />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="h-24 rounded-2xl bg-white/5 animate-shimmer" />
-        <div className="h-24 rounded-2xl bg-white/5 animate-shimmer" />
-        <div className="h-24 rounded-2xl bg-white/5 animate-shimmer" />
-      </div>
-      <div className="h-12 rounded-xl bg-white/5 animate-shimmer mb-6" />
-      <div className="space-y-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-16 rounded-xl bg-white/5 animate-shimmer" />
-        ))}
-      </div>
+    <div className="mx-auto max-w-7xl space-y-4 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="h-10 w-40 animate-shimmer rounded bg-white/5" />
+      <div className="h-5 w-96 animate-shimmer rounded bg-white/5" />
+      <div className="h-40 animate-shimmer rounded-2xl bg-white/5" />
+      <div className="h-12 animate-shimmer rounded-xl bg-white/5" />
     </div>
   );
 }
 
 function NotFound({ gene }: { gene: string }) {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-      <div className="text-6xl mb-6 opacity-30">
-        <svg className="mx-auto h-20 w-20 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-      <h2 className="text-2xl font-bold text-slate-300 mb-2">
-        Kinase &quot;{gene}&quot; not found
-      </h2>
-      <p className="text-slate-500 mb-6">The requested gene symbol does not exist in our database.</p>
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-kinome-cyan/20 hover:bg-kinome-cyan/30 border border-kinome-cyan/30 rounded-xl transition-colors"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back to Dashboard
-      </Link>
+    <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8">
+      <h2 className="mb-2 text-2xl font-bold text-slate-300">Kinase &quot;{gene}&quot; not found</h2>
+      <p className="mb-6 text-slate-500">The KinomeX catalog holds no entry with this gene symbol.</p>
+      <Link href="/explorer" className="rounded-xl border border-kinome-cyan/30 bg-kinome-cyan/20 px-5 py-2.5 text-sm font-medium text-white hover:bg-kinome-cyan/30">Open the Explorer</Link>
     </div>
   );
 }
 
-function StructureTab({ kinase, onStructureCount }: { kinase: KinaseDetail; onStructureCount?: (count: number) => void }) {
-  const domains = kinase.domains ?? [];
-  const [pdbStructures, setPdbStructures] = useState<Array<{ pdb_id: string; title: string; resolution: number | null; method: string }>>([]);
-  const [loadingStructures, setLoadingStructures] = useState(true);
-  const [selectedPdb, setSelectedPdb] = useState<string | null>(null);
-
-  useEffect(() => {
-    const gene = kinase.gene_symbol;
-    if (!gene) return;
-    setLoadingStructures(true);
-
-    fetch("https://search.rcsb.org/rcsbsearch/v2/query", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        query: {
-          type: "terminal",
-          service: "text",
-          parameters: {
-            attribute: "rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession",
-            operator: "exact_match",
-            value: kinase.uniprot_id || "",
-          },
-        },
-        return_type: "entry",
-        request_options: {
-          results_content_type: ["experimental"],
-          sort: [{ sort_by: "score", direction: "desc" }],
-          paginate: { start: 0, rows: 20 },
-        },
-      }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        const ids = (data.result_set || []).map((r: Record<string, string>) => r.identifier).filter(Boolean);
-        if (ids.length === 0) {
-          setPdbStructures([]);
-          setLoadingStructures(false);
-          onStructureCount?.(1);
-          return;
-        }
-        return fetch(`https://data.rcsb.org/rest/v1/core/entry/${ids[0]}`)
-          .then((r) => r.json())
-          .then((entry) => {
-            const method = entry.exptl?.[0]?.method || "X-ray diffraction";
-            const resolution = entry.rcsb_entry_info?.resolution_combined?.[0] || null;
-            const title = entry.struct?.title || "";
-            const structures = ids.map((id: string) => ({ pdb_id: id, title, resolution, method }));
-            setPdbStructures(structures);
-            setSelectedPdb(ids[0]);
-            onStructureCount?.(ids.length);
-          });
-      })
-      .catch(() => {
-        setPdbStructures([]);
-        onStructureCount?.(1);
-      })
-      .finally(() => setLoadingStructures(false));
-  }, [kinase.gene_symbol, kinase.uniprot_id, onStructureCount]);
-
-  const hasPdb = pdbStructures.length > 0;
-
-  return (
-    <div className="space-y-6">
-      <div className="glass-card p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">3D Structure</h3>
-          {selectedPdb && (
-            <a
-              href={`https://www.rcsb.org/structure/${selectedPdb}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-kinome-cyan hover:underline"
-            >
-              View on RCSB PDB ↗
-            </a>
-          )}
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left: Viewer */}
-          <div className="flex-1 min-w-0 max-w-[640px]">
-            {loadingStructures ? (
-              <div className="aspect-video rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-10 h-10 rounded-full border-2 border-white/5 border-t-kinome-cyan/60 animate-spin mx-auto mb-3" />
-                  <p className="text-sm text-slate-500">Fetching structures from RCSB PDB...</p>
-                </div>
-              </div>
-            ) : hasPdb ? (
-              <div className="rounded-xl overflow-hidden border border-white/5 h-[320px]">
-                <NGLViewer key={selectedPdb} pdbId={selectedPdb} domains={domains} />
-              </div>
-            ) : (
-              <div className="rounded-xl overflow-hidden border border-white/5 h-[320px]">
-                <NGLViewer alphafoldId={kinase.uniprot_id} domains={domains} />
-              </div>
-            )}
-
-            {domains.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
-                {domains.map((d, i) => {
-                  const colors = ["#38bdf8","#34d399","#a855f7","#f59e0b","#f472b6","#22d3ee","#fb923c","#818cf8","#2dd4bf","#e879f9"];
-                  return (
-                    <span key={d.name} className="inline-flex items-center gap-1.5 text-xs text-slate-400">
-                      <span className="w-2.5 h-2.5 rounded-sm" style={{ background: colors[i % colors.length] }} />
-                      {d.name}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-            <p className="text-xs text-slate-600 mt-3">
-              Source: {hasPdb ? `RCSB PDB (Experimental) — ${selectedPdb}` : "AlphaFold Database (AI Prediction)"}
-            </p>
-          </div>
-
-          {/* Right: Available structures list */}
-          <div className="w-full lg:w-72 flex-shrink-0">
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden h-full flex flex-col">
-              <div className="px-4 py-3 border-b border-white/10">
-                <h3 className="text-sm font-semibold text-white">
-                  {pdbStructures.length > 0
-                    ? `Available Structures (${pdbStructures.length})`
-                    : "Structure Info"}
-                </h3>
-              </div>
-              <div className="flex-1 overflow-y-auto max-h-[320px]">
-                {pdbStructures.length === 0 && !loadingStructures ? (
-                  <div className="px-4 py-4 space-y-3">
-                    <div className="bg-kinome-violet/10 border border-kinome-violet/20 rounded-lg px-3 py-2.5">
-                      <p className="text-xs font-semibold text-kinome-violet">AlphaFold Predicted Model</p>
-                    </div>
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">UniProt</span>
-                        <span className="text-slate-300 font-mono">{kinase.uniprot_id || "—"}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Gene</span>
-                        <span className="text-slate-300">{kinase.gene_symbol || "—"}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Source</span>
-                        <span className="text-slate-300">AlphaFold DB</span>
-                      </div>
-                    </div>
-                    <a
-                      href={`https://alphafold.ebi.ac.uk/entry/${kinase.uniprot_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1.5 w-full px-3 py-2 text-xs font-medium text-kinome-violet bg-kinome-violet/10 hover:bg-kinome-violet/20 border border-kinome-violet/20 rounded-lg transition-colors"
-                    >
-                      View on AlphaFold DB
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-white/5">
-                    {pdbStructures.map((s) => (
-                      <button
-                        key={s.pdb_id}
-                        onClick={() => setSelectedPdb(s.pdb_id)}
-                        className={`w-full text-left px-4 py-3 transition-colors ${
-                          selectedPdb === s.pdb_id
-                            ? "bg-kinome-cyan/10 border-l-2 border-kinome-cyan"
-                            : "hover:bg-white/[0.03] border-l-2 border-transparent"
-                        }`}
-                      >
-                        <div className="font-mono text-sm font-medium text-kinome-cyan">{s.pdb_id}</div>
-                        <div className="text-xs text-slate-400 mt-1 truncate">{s.method}</div>
-                        {s.resolution != null && (
-                          <div className="text-xs text-slate-500 mt-0.5">{s.resolution.toFixed(2)} Å</div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ExpressionTab({ tissues }: { tissues: TissueExpression[] }) {
-  const sorted = [...tissues].sort((a, b) => b.tpm_value - a.tpm_value);
-  const maxTpm = Math.max(...sorted.map((t) => t.tpm_value), 1);
-
-  return (
-    <div className="space-y-6">
-      <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Tissue Expression Profile</h3>
-        {sorted.length === 0 ? (
-          <p className="text-slate-500 text-sm">No expression data available.</p>
-        ) : (
-          <div className="space-y-2">
-            {sorted.map((tissue) => (
-              <div key={tissue.tissue_name} className="flex items-center gap-3">
-                <span className="w-40 text-sm text-slate-300 truncate text-right flex-shrink-0">
-                  {tissue.tissue_name}
-                </span>
-                <div className="flex-1 h-5 bg-white/5 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full"
-                    style={{
-                      background: `linear-gradient(90deg, rgba(56,189,248,0.6), rgba(168,85,247,0.6))`,
-                      width: `${(tissue.tpm_value / maxTpm) * 100}%`,
-                    }}
-                  />
-                </div>
-                <span className="w-20 text-xs text-slate-400 tabular-nums text-right">
-                  {tissue.tpm_value.toFixed(1)} TPM
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="glass-card overflow-hidden">
-        <div className="p-4 border-b border-white/5">
-          <h3 className="text-sm font-semibold text-white">Expression Details</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/5">
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Tissue</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Organ System</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">TPM <InfoTip text="Transcripts Per Million — a normalized measure of gene expression level from RNA-seq data." /></th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Abundance</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Tau <InfoTip text="Tissue specificity index (0–1), where 0 means uniform expression across tissues and 1 means exclusive to one tissue." /></th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Source</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {sorted.map((t, i) => (
-                <tr key={t.tissue_name} className={i % 2 === 0 ? "bg-white/[0.02]" : ""}>
-                  <td className="px-4 py-3 text-slate-200 font-medium">{t.tissue_name}</td>
-                  <td className="px-4 py-3 text-slate-400">{t.organ_system}</td>
-                  <td className="px-4 py-3 text-slate-300 tabular-nums">{t.tpm_value.toFixed(1)}</td>
-                  <td className="px-4 py-3">
-                    <AbundanceBadge abundance={t.protein_abundance} />
-                  </td>
-                  <td className="px-4 py-3 text-slate-400 tabular-nums">{t.tau_specificity.toFixed(2)}</td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">{t.data_source}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function InfoTip({ text }: { text: string }) {
-  const [show, setShow] = useState(false);
-  const [pos, setPos] = useState({ top: 0, left: 0 });
-  const ref = useRef<HTMLSpanElement>(null);
-
-  const showTooltip = () => {
-    if (ref.current) {
-      const r = ref.current.getBoundingClientRect();
-      setPos({ top: r.top - 8, left: r.left + r.width / 2 });
-    }
-    setShow(true);
-  };
-
-  const hideTooltip = () => setShow(false);
-
-  return (
-    <span className="inline-flex items-center">
-      <span
-        ref={ref}
-        className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-slate-500/50 text-[9px] text-slate-500 cursor-help hover:border-kinome-cyan/50 hover:text-kinome-cyan transition-colors"
-        onMouseEnter={showTooltip}
-        onMouseLeave={hideTooltip}
-        onFocus={showTooltip}
-        onBlur={hideTooltip}
-        tabIndex={0}
-        role="button"
-        aria-label="More information"
-      >
-        ?
-      </span>
-      {show && typeof document !== "undefined" && createPortal(
-        <div
-          className="fixed z-50 px-3 py-1.5 text-xs leading-tight text-white bg-slate-800/95 backdrop-blur-sm rounded-lg border border-white/10 shadow-lg pointer-events-none w-56 text-center"
-          style={{ top: pos.top, left: pos.left, transform: "translateX(-50%) translateY(-100%)" }}
-        >
-          {text}
-          <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800/95" />
-        </div>,
-        document.body
-      )}
-    </span>
-  );
-}
-
-function AbundanceBadge({ abundance }: { abundance: string }) {
-  const colors: Record<string, string> = {
-    high: "bg-kinome-emerald/15 text-kinome-emerald border border-kinome-emerald/20",
-    moderate: "bg-kinome-cyan/15 text-kinome-cyan border border-kinome-cyan/20",
-    low: "bg-amber-500/15 text-amber-400 border border-amber-500/20",
-    undetectable: "bg-slate-500/15 text-slate-400 border border-slate-500/20",
-  };
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[abundance] ?? colors.undetectable}`}>
-      {abundance}
-    </span>
-  );
-}
-
-function ReferencesTab({ references }: { references: KeyReference[] }) {
-  const relevanceColors: Record<string, string> = {
-    review: "bg-kinome-cyan/15 text-kinome-cyan border border-kinome-cyan/20",
-    structural: "bg-kinome-violet/15 text-kinome-violet border border-kinome-violet/20",
-    functional: "bg-kinome-emerald/15 text-kinome-emerald border border-kinome-emerald/20",
-    clinical: "bg-rose-500/15 text-rose-400 border border-rose-500/20",
-    "drug discovery": "bg-amber-500/15 text-amber-400 border border-amber-500/20",
-    "pathway analysis": "bg-blue-500/15 text-blue-400 border border-blue-500/20",
-  };
-
-  function getTagColor(tag: string): string {
-    const lower = tag.toLowerCase();
-    for (const [key, val] of Object.entries(relevanceColors)) {
-      if (lower.includes(key)) return val;
-    }
-    return "bg-slate-500/15 text-slate-400 border border-slate-500/20";
-  }
-
-  return (
-    <div className="space-y-3">
-      {references.length === 0 ? (
-        <div className="glass-card p-8 text-center text-slate-500 text-sm">
-          No references available.
-        </div>
-      ) : (
-        references.map((ref, idx) => (
-          <div
-            key={ref.pubmed_id ?? idx}
-            className="glass-card p-4"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-200 leading-relaxed mb-2">
-                  {ref.citation_text}
-                </p>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${getTagColor(ref.relevance_tag)}`}>
-                    {ref.relevance_tag}
-                  </span>
-                  {ref.pubmed_id && (
-                    <a
-                      href={`https://pubmed.ncbi.nlm.nih.gov/${ref.pubmed_id}/`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-kinome-cyan hover:text-kinome-cyan/80 transition-colors"
-                    >
-                      PubMed
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  )}
-                  {ref.doi && (
-                    <a
-                      href={`https://doi.org/${ref.doi}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-kinome-violet hover:text-kinome-violet/80 transition-colors"
-                    >
-                      DOI
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ))
-      )}
-    </div>
-  );
-}
-
-function DiseasesTab({ diseases }: { diseases: { name: string; description: string; omim_id: string }[] }) {
-  return (
-    <div className="space-y-3">
-      {diseases.length === 0 ? (
-        <div className="p-8 text-center text-slate-500 text-sm rounded-2xl bg-slate-900/40 backdrop-blur-sm border border-rose-500/20">
-          No disease associations reported for this kinase.
-        </div>
-      ) : (
-        diseases.map((disease, idx) => (
-          <div
-            key={disease.name ?? idx}
-            className="p-5 rounded-2xl bg-slate-900/40 backdrop-blur-sm border border-rose-500/20"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-white mb-2">
-                  {disease.omim_id ? (
-                    <a
-                      href={`https://omim.org/entry/${disease.omim_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-kinome-cyan transition-colors"
-                    >
-                      {disease.name}
-                      <svg className="w-3 h-3 inline ml-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  ) : (
-                    disease.name
-                  )}
-                </h4>
-                {disease.description && (
-                  <p className="text-sm text-slate-400 leading-relaxed">
-                    {disease.description}
-                  </p>
-                )}
-              </div>
-              {disease.omim_id && (
-                <a
-                  href={`https://omim.org/entry/${disease.omim_id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-lg hover:bg-rose-500/20 transition-colors flex-shrink-0"
-                >
-                  OMIM:{disease.omim_id}
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-              )}
-            </div>
-          </div>
-        ))
-      )}
-    </div>
-  );
-}
-
-interface NetworkResponse {
-  nodes: { id: string }[];
-  interactions: StringInteraction[];
-}
-
-function NetworkTab({ gene }: { gene: string }) {
-  const [score, setScore] = useState(700);
-  const [networkType, setNetworkType] = useState("functional");
-  const [data, setData] = useState<NetworkResponse>({ nodes: [], interactions: [] });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    setError("");
-    const params = new URLSearchParams({
-      genes: gene,
-      score: String(score),
-      network_type: networkType,
-      add_nodes: "20",
-    });
-    fetch(`/api/interactions?${params}`, { signal: controller.signal })
-      .then(async (response) => {
-        const body = await response.json();
-        if (!response.ok) throw new Error(body.error || "Interaction network unavailable");
-        return body as NetworkResponse;
-      })
-      .then(setData)
-      .catch((reason) => {
-        if (reason instanceof DOMException && reason.name === "AbortError") return;
-        setData({ nodes: [], interactions: [] });
-        setError(reason instanceof Error ? reason.message : "Interaction network unavailable");
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, [gene, score, networkType]);
-
-  const interactions = [...data.interactions]
-    .filter((edge) => edge.source.toUpperCase() === gene.toUpperCase() || edge.target.toUpperCase() === gene.toUpperCase())
-    .sort((a, b) => b.score - a.score);
-
-  return (
-    <div className="space-y-5">
-      <div className="glass-card p-5">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-semibold text-white">Protein Interaction Network</h3>
-            <p className="mt-1 text-sm text-slate-400">Proteins associated with {gene} in STRING. Associations may be functional or physical and do not necessarily imply direct binding.</p>
-          </div>
-          <div className="flex flex-wrap items-end gap-3">
-            <label className="text-xs text-slate-400">Network type
-              <select value={networkType} onChange={(event) => setNetworkType(event.target.value)} className="mt-1 block rounded-lg border border-white/10 bg-slate-800 px-3 py-2 text-sm text-white">
-                <option value="functional">Functional</option><option value="physical">Physical</option>
-              </select>
-            </label>
-            <label className="w-40 text-xs text-slate-400">Confidence ≥ {(score / 1000).toFixed(2)}
-              <input className="mt-2 w-full" type="range" min="150" max="900" step="50" value={score} onChange={(event) => setScore(Number(event.target.value))} />
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-950/60 p-3">
-        {loading ? <div className="flex h-[500px] items-center justify-center text-sm text-slate-500">Loading STRING interactions…</div>
-          : error ? <p className="p-10 text-center text-rose-400">{error}</p>
-          : data.nodes.length ? <StringNetworkGraph {...data} focalNode={gene} />
-          : <p className="p-10 text-center text-slate-500">No interactions meet the selected threshold.</p>}
-      </div>
-
-      {!loading && !error && interactions.length > 0 && (
-        <div className="glass-card overflow-hidden">
-          <div className="border-b border-white/5 px-5 py-4"><h3 className="text-sm font-semibold text-white">Directly connected proteins ({interactions.length})</h3></div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead><tr className="border-b border-white/5 text-left text-xs uppercase tracking-wide text-slate-500"><th className="px-5 py-3">Protein</th><th className="px-5 py-3">Combined confidence</th><th className="px-5 py-3">Experimental</th><th className="px-5 py-3">Database</th><th className="px-5 py-3">Text mining</th></tr></thead>
-              <tbody className="divide-y divide-white/5">{interactions.map((edge) => {
-                const partner = edge.source.toUpperCase() === gene.toUpperCase() ? edge.target : edge.source;
-                return <tr key={`${edge.source}-${edge.target}`}><td className="px-5 py-3 font-semibold text-kinome-cyan"><a href={stringProteinUrl(partner)} target="_blank" rel="noreferrer" className="hover:underline">{partner} ↗</a></td><td className="px-5 py-3 text-slate-200">{edge.score.toFixed(3)}</td><td className="px-5 py-3 text-slate-400">{edge.experimentalScore.toFixed(3)}</td><td className="px-5 py-3 text-slate-400">{edge.databaseScore.toFixed(3)}</td><td className="px-5 py-3 text-slate-400">{edge.textMiningScore.toFixed(3)}</td></tr>;
-              })}</tbody>
-            </table>
-          </div>
-        </div>
-      )}
-      <p className="text-xs text-slate-500">Source: <a href="https://string-db.org/" target="_blank" rel="noreferrer" className="text-kinome-cyan hover:underline">STRING</a>. The graph shows up to 20 neighboring proteins.</p>
-    </div>
-  );
-}
-
-export default function KinaseDetailPage() {
+function KinaseDetailPage() {
   const params = useParams();
+  const search = useSearchParams();
   const gene = params.gene as string;
+  const weights = parseWeightsParam(search.get("w")) ?? DEFAULT_WEIGHTS;
 
   const [kinase, setKinase] = useState<KinaseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [activeTab, setActiveTab] = useState("structure");
-  const [structureCount, setStructureCount] = useState(0);
 
   useEffect(() => {
     if (!gene) return;
     setLoading(true);
     setNotFound(false);
-
-    fetch(`/api/kinases/${gene}`)
+    fetch(`/api/kinases/${encodeURIComponent(gene)}`)
       .then((res) => {
         if (res.status === 404) {
           setNotFound(true);
-          setLoading(false);
           return null;
         }
         return res.json();
       })
-      .then((data) => {
-        if (data) setKinase(data);
-      })
+      .then((data) => data && setKinase(data))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [gene]);
@@ -737,179 +93,106 @@ export default function KinaseDetailPage() {
   if (notFound) return <NotFound gene={gene} />;
   if (!kinase) return null;
 
-  const group = (kinase.classification?.group ?? "") as KinaseGroup;
-
   const tabCounts: Record<string, number> = {
-    structure: structureCount,
-    expression: kinase.tissue_expressions?.length ?? 0,
-    chemical: kinase.ligand_assays?.length ?? 0,
-    mutations: kinase.mutations?.length ?? 0,
-    diseases: kinase.diseases_associated?.length ?? 0,
-    references: kinase.key_references?.length ?? 0,
+    structure: kinase.structures.total,
+    expression: kinase.tissue_expressions.length,
+    chemical: kinase.ligand_summary?.representative_rows ?? 0,
+    mutations: kinase.clinvar_variants.length + kinase.curated_mutations.length,
+    diseases: kinase.diseases_associated.length,
+    references: kinase.key_references.length,
   };
+  const isExtension = kinase.partition === "uniprot_extended";
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <nav className="flex items-center gap-1.5 text-sm text-slate-500">
-          <Link href="/" className="hover:text-slate-300 transition-colors">
-            Home
+      <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+        <nav className="flex items-center gap-1.5 text-sm text-slate-500" aria-label="Breadcrumb">
+          <Link href="/explorer" className="hover:text-slate-300">Explorer</Link>
+          <span aria-hidden>›</span>
+          <Link href={`/explorer?${new URLSearchParams(isExtension ? { partition: "uniprot_extended", category: kinase.display_category } : { partition: "kinhub_core", category: kinase.display_category })}`} className="hover:text-slate-300">
+            {kinase.display_category}
           </Link>
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          <Link href="/" className="hover:text-slate-300 transition-colors">
-            {group}
-          </Link>
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          <span className="text-slate-300 font-medium">{kinase.gene_symbol}</span>
+          <span aria-hidden>›</span>
+          <span className="font-medium text-slate-300">{kinase.gene_symbol}</span>
         </nav>
       </div>
 
-      {/* Header */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
-        <div
-          className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6"
-        >
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-                {kinase.gene_symbol}
-              </h1>
-              {group && <GroupBadge group={group} />}
+      <section className="mx-auto max-w-7xl px-4 pb-6 pt-6 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex flex-wrap items-center gap-3">
+              <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">{kinase.gene_symbol}</h1>
+              <GroupBadge group={kinase.display_category} />
+              <span className="rounded-full border border-white/10 px-2.5 py-0.5 text-xs text-slate-400">{isExtension ? "UniProt extension" : "KinHub core"}</span>
+              {kinase.uniprot_record_status === "inactive" && <span className="rounded-full border border-amber-500/30 px-2.5 py-0.5 text-xs text-amber-300">Inactive UniProt record</span>}
             </div>
-            <p className="text-base text-slate-400 leading-relaxed mb-3 max-w-2xl">
-              {kinase.name}
-            </p>
+            <p className="mb-3 max-w-2xl text-base leading-relaxed text-slate-400">{kinase.name}</p>
             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
-              {kinase.uniprot_id && (
-                <span className="flex items-center gap-1.5">
-                  <span className="text-slate-600">UniProt:</span>
-                  <a
-                    href={`https://www.uniprot.org/uniprot/${kinase.uniprot_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-kinome-cyan hover:text-kinome-cyan/80 transition-colors"
-                  >
-                    {kinase.uniprot_id}
-                  </a>
-                </span>
-              )}
-              {kinase.ec_number && (
-                <span>
-                  <span className="text-slate-600">EC:</span> {kinase.ec_number}
-                </span>
-              )}
-              {kinase.classification?.family && (
-                <span>
-                  <span className="text-slate-600">Family:</span> {kinase.classification.family}
-                </span>
-              )}
-              {kinase.classification?.subfamily && (
-                <span>
-                  <span className="text-slate-600">Subfamily:</span> {kinase.classification.subfamily}
-                </span>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-x-8 gap-y-2 mt-4 text-sm">
-              {kinase.organ_systems_impacted.length > 0 && (
-                <div>
-                  <span className="text-xs text-slate-500 font-medium uppercase tracking-wider block mb-1.5">Organ Systems</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {kinase.organ_systems_impacted.map((system) => (
-                      <span
-                        key={system}
-                        className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-white/5 text-slate-300 border border-white/5"
-                      >
-                        {system}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {kinase.diseases_associated.length > 0 && (
-                <div>
-                  <span className="text-xs text-slate-500 font-medium uppercase tracking-wider block mb-1.5">Disease Associations</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {kinase.diseases_associated.map((disease) => (
-                      <span
-                        key={disease.name}
-                        className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-500/5 text-rose-400/80 border border-rose-500/10"
-                      >
-                        {disease.omim_id ? (
-                          <a
-                            href={`https://omim.org/entry/${disease.omim_id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:underline"
-                          >
-                            {disease.name}
-                          </a>
-                        ) : (
-                          disease.name
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <span>UniProt: <a href={`https://www.uniprot.org/uniprotkb/${kinase.uniprot_id}/entry`} target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">{kinase.uniprot_id}</a></span>
+              {kinase.ec_number && <span>EC: {kinase.ec_number}</span>}
+              {kinase.classification.family && <span>Family: {kinase.classification.family}</span>}
+              {kinase.classification.subfamily && <span>Subfamily: {kinase.classification.subfamily}</span>}
+              <span>Pharos TDL: {kinase.pharos?.tdl ? <a href={kinase.pharos.url} target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">{kinase.pharos.tdl}</a> : "unavailable"}</span>
             </div>
           </div>
-
-          {/* PDIS Score */}
-          <div className="flex-shrink-0">
-            <div className="glass-card p-4 flex flex-col items-center gap-2">
-              <PDISBadge score={kinase.pdis_score?.overall_score ?? null} size="lg" />
-              <span className="text-xs text-slate-500 font-medium">PDIS Score</span>
-            </div>
+          <div className="glass-card flex flex-shrink-0 flex-col items-center gap-2 p-4">
+            <PDISBadge score={kinase.pdis_score?.overall_score ?? null} size="lg" />
+            <span className="text-xs font-medium text-slate-500">Default-weight PDIS</span>
           </div>
         </div>
+
+        {kinase.extension_banner && (
+          <div role="note" className="mt-5 rounded-xl border border-dashed border-orange-300/40 bg-orange-400/5 px-4 py-3 text-sm text-orange-200">
+            {kinase.extension_banner}
+          </div>
+        )}
       </section>
 
-      {/* Summary */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+      <section className="mx-auto max-w-7xl space-y-6 px-4 pb-6 sm:px-6 lg:px-8">
+        <PDISCard pdis={kinase.pdis_score} weights={weights} />
         <AiSummary data={kinase} />
-      </section>
-
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         <div className="glass-card p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-base font-semibold text-white">Curated Function</h2>
+            <h2 className="text-base font-semibold text-white">Curated function</h2>
             {kinase.swiss_prot_annotation?.source_url && (
-              <a href={kinase.swiss_prot_annotation.source_url} target="_blank" rel="noreferrer" className="text-xs text-kinome-cyan hover:underline">
-                UniProtKB/{kinase.swiss_prot_annotation.section}
-              </a>
+              <a href={kinase.swiss_prot_annotation.source_url} target="_blank" rel="noreferrer" className="text-xs text-kinome-cyan hover:underline">UniProtKB/{kinase.swiss_prot_annotation.section}</a>
             )}
           </div>
           {kinase.swiss_prot_annotation?.functions.length ? (
             <div className="mt-3 space-y-2">
-              {kinase.swiss_prot_annotation.functions.map((annotation, index) => <p key={index} className="text-sm leading-relaxed text-slate-300">{annotation}</p>)}
+              {kinase.swiss_prot_annotation.functions.map((annotation, i) => <p key={i} className="text-sm leading-relaxed text-slate-300">{annotation}</p>)}
               {kinase.swiss_prot_annotation.catalytic_activities.length > 0 && (
-                <div className="mt-3 border-t border-white/5 pt-3"><span className="text-xs font-medium uppercase tracking-wide text-slate-500">Catalytic activity</span>{kinase.swiss_prot_annotation.catalytic_activities.map((activity, index) => <p key={index} className="mt-1 text-xs text-slate-400">{activity}</p>)}</div>
+                <div className="mt-3 border-t border-white/5 pt-3">
+                  <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Catalytic activity</span>
+                  {kinase.swiss_prot_annotation.catalytic_activities.map((a, i) => <p key={i} className="mt-1 text-xs text-slate-400">{a}</p>)}
+                </div>
               )}
             </div>
           ) : (
-            <p className="mt-2 text-sm text-slate-500">No Swiss-Prot functional annotation is present in the current import.</p>
+            <p className="mt-2 text-sm text-slate-500">The current import holds no Swiss-Prot functional annotation for this entry.</p>
           )}
         </div>
       </section>
 
-      {/* Tabs */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <TabPanel tabs={TABS.map(t => ({ ...t, count: t.id === "network" ? undefined : tabCounts[t.id] ?? 0 }))} activeTab={activeTab} onTabChange={setActiveTab}>
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <TabPanel tabs={TABS.map((t) => ({ ...t, count: t.id === "network" ? undefined : tabCounts[t.id] ?? 0 }))} activeTab={activeTab} onTabChange={setActiveTab}>
+          {activeTab === "structure" && <StructureTab kinase={kinase} />}
+          {activeTab === "expression" && <ExpressionTab kinase={kinase} />}
+          {activeTab === "chemical" && <LigandsTab kinase={kinase} />}
+          {activeTab === "mutations" && <VariantsTab kinase={kinase} />}
           {activeTab === "network" && <NetworkTab gene={kinase.gene_symbol} />}
-          {activeTab === "structure" && <StructureTab kinase={kinase} onStructureCount={setStructureCount} />}
-          {activeTab === "expression" && <ExpressionTab tissues={kinase.tissue_expressions ?? []} />}
-          {activeTab === "chemical" && <LigandTable ligands={kinase.ligand_assays ?? []} candidates={kinase.development_candidates ?? []} />}
-          {activeTab === "mutations" && <MutationTable mutations={kinase.mutations ?? []} />}
-          {activeTab === "diseases" && <DiseasesTab diseases={kinase.diseases_associated ?? []} />}
-          {activeTab === "references" && <ReferencesTab references={kinase.key_references ?? []} />}
+          {activeTab === "diseases" && <DiseasesTab diseases={kinase.diseases_associated} />}
+          {activeTab === "references" && <ReferencesTab references={kinase.key_references} />}
         </TabPanel>
       </section>
     </div>
+  );
+}
+
+export default function KinaseDetailRoute() {
+  return (
+    <Suspense fallback={<DetailSkeleton />}>
+      <KinaseDetailPage />
+    </Suspense>
   );
 }

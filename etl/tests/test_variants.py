@@ -88,7 +88,7 @@ def test_gatekeeper_gap_at_45_and_mismatch():
     pocket = "A" * 44 + "-" + "A" * 40
     assert rules.map_pocket_residue(pocket, "AAAA") is None
     pocket = "A" * 41 + "YIITEFMTYGN" + "C" * 33
-    mapped = rules.map_pocket_residue(pocket, "KKYIITEFMSYGNKK")
+    mapped = rules.map_pocket_residue(pocket, "KKYIVTEFMSYGNKK")
     assert mapped["position"] == 6 and mapped["exact_match"] is False
 
 
@@ -159,3 +159,20 @@ def test_parse_pubmed_xml():
     <AbstractText>Two.</AbstractText></Abstract></Article></MedlineCitation></PubmedArticle></PubmedArticleSet>"""
     rec = parse_pubmed_xml(xml)["1"]
     assert rec["title"] == "T315I and imatinib" and rec["abstract"] == "One. Two."
+
+
+def test_gatekeeper_mapping_hinge_insertion():
+    # PIM1-like: the sequence carries one extra hinge residue, so only pocket 42-48 is contiguous
+    pocket = "A" * 41 + "VLILERPEVQDLFDFITE" + "C" * 26
+    sequence = "MKK" + "VLILERPEPVQDLFDFITERG"
+    mapped = rules.map_pocket_residue(pocket, sequence)
+    assert mapped["anchor_pocket_range"] == [42, 48]
+    assert mapped["position"] == 3 + 3 + 1 and mapped["residue"] == "L"
+
+
+def test_citation_check():
+    check = rules.citation_check("ABL1", "T315I", "BCR-ABL1 T315I confers resistance to imatinib.")
+    assert check == {"pmid_resolves": True, "names_gene": True, "names_mutation": True}
+    check = rules.citation_check("ABL1", "T315I", "Key strategies for reducing avian influenza.")
+    assert check == {"pmid_resolves": True, "names_gene": False, "names_mutation": False}
+    assert rules.citation_check("ABL1", "T315I", None)["pmid_resolves"] is False

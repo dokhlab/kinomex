@@ -71,7 +71,7 @@ export async function readCatalogInputs(db: Db): Promise<CatalogInputs> {
     kinases, pdis, expression, variantCounts, diseases, catalogMetadata, releaseMetadata,
     structureGenes: structureGenes as string[], structureCount, ligandStats, alphafold, pharos,
     quarantineExpression, quarantineChembl,
-  } as CatalogInputs;
+  } as unknown as CatalogInputs;
 }
 
 // Representative ligand rows exist after the release migration; before that the

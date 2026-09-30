@@ -2,27 +2,27 @@ import { getScoreColor, parseMutationCode, deriveGroup } from "@/lib/kinase-util
 
 describe("getScoreColor", () => {
   it("returns green for score >= 0.45", () => {
-    expect(getScoreColor(0.45)).toBe("#34d399");
-    expect(getScoreColor(0.8)).toBe("#34d399");
-    expect(getScoreColor(1)).toBe("#34d399");
+    expect(getScoreColor(45)).toBe("#34d399");
+    expect(getScoreColor(80)).toBe("#34d399");
+    expect(getScoreColor(100)).toBe("#34d399");
   });
 
   it("returns blue for score >= 0.25", () => {
-    expect(getScoreColor(0.25)).toBe("#38bdf8");
-    expect(getScoreColor(0.3)).toBe("#38bdf8");
-    expect(getScoreColor(0.44)).toBe("#38bdf8");
+    expect(getScoreColor(25)).toBe("#38bdf8");
+    expect(getScoreColor(30)).toBe("#38bdf8");
+    expect(getScoreColor(44)).toBe("#38bdf8");
   });
 
   it("returns amber for score >= 0.1", () => {
-    expect(getScoreColor(0.1)).toBe("#f59e0b");
-    expect(getScoreColor(0.15)).toBe("#f59e0b");
-    expect(getScoreColor(0.24)).toBe("#f59e0b");
+    expect(getScoreColor(10)).toBe("#f59e0b");
+    expect(getScoreColor(15)).toBe("#f59e0b");
+    expect(getScoreColor(24)).toBe("#f59e0b");
   });
 
   it("returns rose for score < 0.1", () => {
     expect(getScoreColor(0)).toBe("#f43f5e");
-    expect(getScoreColor(0.05)).toBe("#f43f5e");
-    expect(getScoreColor(0.099)).toBe("#f43f5e");
+    expect(getScoreColor(5)).toBe("#f43f5e");
+    expect(getScoreColor(9.9)).toBe("#f43f5e");
   });
 });
 

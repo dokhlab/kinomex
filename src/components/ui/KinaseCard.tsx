@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import GlassCard from "./GlassCard";
-import GroupBadge, { type KinaseGroup } from "./GroupBadge";
+import GroupBadge from "./GroupBadge";
 import PDISBadge from "./PDISBadge";
 
 interface Kinase {
@@ -42,7 +42,7 @@ export default function KinaseCard({ kinase }: KinaseCardProps) {
               <h3 className="text-xl font-bold text-white tracking-tight truncate">
                 {kinase.gene_symbol}
               </h3>
-              <GroupBadge group={kinase.classification as KinaseGroup} />
+              <GroupBadge group={kinase.classification} />
             </div>
             <p className="text-sm text-slate-400 leading-relaxed mb-3 line-clamp-2">
               {kinase.full_name}

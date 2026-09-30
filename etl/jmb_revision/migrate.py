@@ -252,8 +252,25 @@ def migrate_release_metadata(db, apply: bool) -> dict[str, Any]:
     return dict(RELEASE)
 
 
+INDEXES = {
+    "structures": [[("uniprot_ids", 1)]],
+    "structures_other": [[("uniprot_ids", 1)]],
+    "expression": [[("source", 1), ("gene_symbol", 1), ("median_tpm", -1)]],
+    "variants": [[("gene_symbol", 1), ("source", 1)]],
+}
+
+
+def migrate_indexes(db, apply: bool) -> dict[str, Any]:
+    if apply:
+        for collection, indexes in INDEXES.items():
+            for keys in indexes:
+                db[collection].create_index(keys)
+    return {name: [str(k) for k in keys] for name, keys in INDEXES.items()}
+
+
 STEPS = {
     "release": migrate_release_metadata,
+    "indexes": migrate_indexes,
     "extension": migrate_extension_classes,
     "pdis": migrate_pdis,
     "expression": migrate_expression,

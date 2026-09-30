@@ -7,6 +7,7 @@ import { getScoreColor } from "@/lib/kinase-utils";
 type BadgeSize = "sm" | "md" | "lg";
 
 interface PDISBadgeProps {
+  // PDIS on the 0-100 scale.
   score: number | null;
   size?: BadgeSize;
 }
@@ -44,7 +45,7 @@ export default function PDISBadge({ score, size = "md" }: PDISBadgeProps) {
   const numericScore = hasScore ? score : 0;
   const color = hasScore ? getScoreColor(numericScore) : "#64748b";
   const circumference = 2 * Math.PI * config.radius;
-  const dashOffset = circumference - Math.min(numericScore, 1) * circumference;
+  const dashOffset = circumference - Math.min(Math.max(numericScore, 0), 100) / 100 * circumference;
   const center = (config.radius * 2 + config.stroke * 2) / 2;
 
   return (
@@ -109,7 +110,7 @@ export default function PDISBadge({ score, size = "md" }: PDISBadgeProps) {
         )}
         style={{ color }}
       >
-        {hasScore ? numericScore.toFixed(2) : "N/A"}
+        {hasScore ? numericScore.toFixed(size === "lg" ? 2 : 1) : "N/A"}
       </span>
     </div>
   );

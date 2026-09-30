@@ -8,12 +8,14 @@ export interface PDISBucket {
   count: number;
 }
 
+// PDIS values and bucket edges use the 0-100 scale.
 interface PDISHistogramProps {
   buckets: PDISBucket[];
   minPDIS: number;
   maxPDIS: number;
   onChange: (min: number, max: number) => void;
   loading?: boolean;
+  title?: string;
 }
 
 const WIDTH = 620;
@@ -23,7 +25,7 @@ const PAD_RIGHT = 10;
 const PAD_BOTTOM = 26;
 const PAD_LEFT = 10;
 
-const round2 = (v: number) => Math.round(v * 100) / 100;
+const round1 = (v: number) => Math.round(v * 10) / 10;
 
 export default function PDISHistogram({
   buckets,
@@ -31,6 +33,7 @@ export default function PDISHistogram({
   maxPDIS,
   onChange,
   loading = false,
+  title = "PDIS distribution",
 }: PDISHistogramProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const dragRef = useRef<"min" | "max" | null>(null);
@@ -40,14 +43,14 @@ export default function PDISHistogram({
   const barW = buckets.length > 0 ? innerW / buckets.length : innerW;
   const maxCount = buckets.reduce((m, b) => Math.max(m, b.count), 0);
 
-  const valueToX = (v: number) => PAD_LEFT + v * innerW;
+  const valueToX = (v: number) => PAD_LEFT + (v / 100) * innerW;
 
   const clientToValue = useCallback(
     (clientX: number) => {
       const rect = svgRef.current?.getBoundingClientRect();
       if (!rect) return 0;
       const svgX = ((clientX - rect.left) / rect.width) * WIDTH;
-      return Math.min(1, Math.max(0, (svgX - PAD_LEFT) / innerW));
+      return Math.min(100, Math.max(0, ((svgX - PAD_LEFT) / innerW) * 100));
     },
     [innerW]
   );
@@ -61,7 +64,7 @@ export default function PDISHistogram({
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
       if (!dragRef.current) return;
-      const v = round2(clientToValue(e.clientX));
+      const v = round1(clientToValue(e.clientX));
       if (dragRef.current === "min") {
         onChange(Math.min(v, maxPDIS), maxPDIS);
       } else {
@@ -75,17 +78,17 @@ export default function PDISHistogram({
     dragRef.current = null;
   }, []);
 
-  const minSel = minPDIS * 100;
-  const maxSel = maxPDIS * 100;
+  const minSel = minPDIS;
+  const maxSel = maxPDIS;
 
   return (
     <div className="bg-slate-900/40 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-slate-500">PDIS Distribution</span>
+        <span className="text-xs text-slate-500">{title}</span>
         <span className="text-xs font-medium tabular-nums">
-          <span className="text-kinome-cyan">{minPDIS.toFixed(2)}</span>
+          <span className="text-kinome-cyan">{minPDIS.toFixed(1)}</span>
           <span className="text-slate-600 mx-1">–</span>
-          <span className="text-kinome-violet">{maxPDIS.toFixed(2)}</span>
+          <span className="text-kinome-violet">{maxPDIS.toFixed(1)}</span>
         </span>
       </div>
 
@@ -126,12 +129,12 @@ export default function PDISHistogram({
                 rx={1.5}
                 fill={inSel ? "rgba(56,189,248,0.75)" : "rgba(148,163,184,0.28)"}
               >
-                <title>{`${(b.min / 100).toFixed(2)}–${(b.max / 100).toFixed(2)} PDIS: ${b.count} kinase${b.count !== 1 ? "s" : ""}`}</title>
+                <title>{`PDIS ${b.min}–${b.max}: ${b.count} entr${b.count !== 1 ? "ies" : "y"}`}</title>
               </rect>
             );
           })}
 
-          {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+          {[0, 25, 50, 75, 100].map((t) => (
             <g key={t}>
               <line
                 x1={valueToX(t)}
@@ -144,7 +147,7 @@ export default function PDISHistogram({
               <text
                 x={valueToX(t)}
                 y={HEIGHT - 8}
-                textAnchor={t === 0 ? "start" : t === 1 ? "end" : "middle"}
+                textAnchor={t === 0 ? "start" : t === 100 ? "end" : "middle"}
                 fill="#64748b"
                 fontSize={9}
               >
@@ -191,8 +194,8 @@ export default function PDISHistogram({
       )}
 
       <div className="flex justify-between text-[10px] text-slate-600 mt-2 px-0.5 select-none">
-        <span>0 — lower interest</span>
-        <span>1 — higher interest</span>
+        <span>0 — less documented evidence</span>
+        <span>100 — more documented evidence</span>
       </div>
     </div>
   );

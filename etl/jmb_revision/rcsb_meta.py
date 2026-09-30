@@ -27,16 +27,17 @@ ADDITIVES = frozenset({
     "GOL", "EDO", "PEG", "PG4", "PGE", "1PE", "P6G", "2PE", "12P", "15P", "PE4", "PE5",
     "PE8", "P33", "PG0", "PG5", "PG6", "XPE", "7PE", "MPD", "MRD", "PGO", "PGR", "HEZ",
     "BU3", "BU1", "1BO", "IPA", "EOH", "MOH", "ETE", "TOE", "P4C", "PDO", "SRT",
+    "PE3", "ETX", "DIO", "SGM",
     # organic solvents
-    "DMS", "DMF", "ACN", "ACE", "NH2", "BNZ",
+    "DMS", "DMF", "ACN", "ACE", "NH2",
     # carboxylic acids and their salts
     "FMT", "ACY", "CIT", "FLC", "TAR", "TLA", "MLI", "MLA", "SIN", "OXL", "LAC", "MAE",
-    "FUM", "GLY",
+    "FUM", "GLY", "MLT", "PPI", "PHS",
     # buffers
     "TRS", "TAM", "MES", "EPE", "HEPES", "MPO", "PIN", "CXS", "B3P", "BTB", "CAC", "IMD",
-    "BIC", "NHE", "CHE", "TBU",
+    "BIC", "BCN", "NHE", "TBU", "144", "TMA", "BEN",
     # reducing agents
-    "BME", "DTT", "DTU", "DTV", "TCE", "TCEP",
+    "BME", "DTT", "DTU", "DTV", "DTD", "TCE", "TCEP",
     # detergents and lipids used as additives
     "BOG", "LDA", "LMT", "BNG", "C8E", "SDS", "DMU", "UMQ", "HTG", "CPS", "Y01",
     # placeholder components

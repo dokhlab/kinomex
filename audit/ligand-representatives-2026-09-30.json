@@ -1,0 +1,164 @@
+{
+  "generated_at": "2026-09-30T19:53:30+00:00",
+  "database": "kinomex_jmb",
+  "pipeline_version": "jmb-2026-09-30",
+  "selection_rule": "Representative-row selection for ligand records (Task 5.1), pure logic.\n\nTiers, applied over every record of one (gene, source, compound) pair:\n\n1. uncensored Kd or Ki\n2. uncensored IC50 or EC50\n3. any other uncensored activity type\n4. censored bound (>, >=, >>), any activity type\n\nUncensored relations are =, <, <=, ~ and a missing relation (read as =).\nWithin the lowest tier present, the lowest value wins; ties go to the lower\nactivity_id.",
+  "cache": {
+    "first_retrieved_at": "2026-09-30T19:45:38+00:00",
+    "last_retrieved_at": "2026-09-30T19:45:38+00:00",
+    "chemreps": {
+      "file": "chembl_37_chemreps.txt.gz",
+      "url": "https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_37/chembl_37_chemreps.txt.gz",
+      "sha256": "ea6181ce8dc7af41974e35b92e1febb0c9dcbe2c62f7ccc4a5d983ac19f696e7",
+      "sha256_expected": "ea6181ce8dc7af41974e35b92e1febb0c9dcbe2c62f7ccc4a5d983ac19f696e7"
+    }
+  },
+  "chembl_release": "ChEMBL_37",
+  "total_rows": 717452,
+  "genes_with_rows": 566,
+  "rows_by_source": {
+    "chembl": 715385,
+    "pubchem": 2067
+  },
+  "assay_count_sum_by_source": {
+    "chembl": 1019354,
+    "pubchem": 2067
+  },
+  "assay_count_sum": 1021421,
+  "rows_by_activity_type": {
+    "IC50": 421197,
+    "Ki": 145790,
+    "Kd": 82995,
+    "POTENCY": 52086,
+    "EC50": 11261,
+    "AC50": 1762,
+    "DC50": 984,
+    "GI50": 795,
+    "KM": 250,
+    "% INHIBITION": 85,
+    "ACTIVITY": 75,
+    "KL": 41,
+    "C50": 37,
+    "CC50": 33,
+    "INH": 20,
+    "CKI": 9,
+    "OCC50": 6,
+    "EC150": 5,
+    "K": 5,
+    "FIC50": 3,
+    "IC": 3,
+    "IC5": 3,
+    "KDAPP": 2,
+    "IC60": 1,
+    "IC90": 1,
+    "ID50": 1,
+    "MEC": 1,
+    "SELECTIVITY RATIO": 1
+  },
+  "rows_by_activity_type_and_source": {
+    "chembl:IC50": 421197,
+    "chembl:Ki": 145790,
+    "chembl:Kd": 80928,
+    "chembl:POTENCY": 52086,
+    "chembl:EC50": 11261,
+    "pubchem:Kd": 2067,
+    "chembl:AC50": 1762,
+    "chembl:DC50": 984,
+    "chembl:GI50": 795,
+    "chembl:KM": 250,
+    "chembl:% INHIBITION": 85,
+    "chembl:ACTIVITY": 75,
+    "chembl:KL": 41,
+    "chembl:C50": 37,
+    "chembl:CC50": 33,
+    "chembl:INH": 20,
+    "chembl:CKI": 9,
+    "chembl:OCC50": 6,
+    "chembl:EC150": 5,
+    "chembl:K": 5,
+    "chembl:FIC50": 3,
+    "chembl:IC": 3,
+    "chembl:IC5": 3,
+    "chembl:KDAPP": 2,
+    "chembl:IC60": 1,
+    "chembl:IC90": 1,
+    "chembl:ID50": 1,
+    "chembl:MEC": 1,
+    "chembl:SELECTIVITY RATIO": 1
+  },
+  "rows_by_relation": {
+    "=": 475125,
+    ">": 186914,
+    "<": 51426,
+    "<=": 2948,
+    ">=": 1008,
+    "~": 23,
+    ">>": 8
+  },
+  "rows_by_relation_original": {
+    "=": 447390,
+    ">": 186914,
+    "<": 51426,
+    "None": 27735,
+    "<=": 2948,
+    ">=": 1008,
+    "~": 23,
+    ">>": 8
+  },
+  "rows_by_tier": {
+    "2": 376715,
+    "4": 187930,
+    "1": 97782,
+    "3": 55025
+  },
+  "rows_by_censored": {
+    "false": 529522,
+    "true": 187930
+  },
+  "rows_with_inchikey_by_source": {
+    "chembl": 714322,
+    "pubchem": 2067
+  },
+  "pairs_also_in_other_source_by_source": {
+    "chembl": 1586,
+    "pubchem": 1586
+  },
+  "pairs_also_in_other_source": 3172,
+  "distinct_inchikeys_in_both_sources": 36,
+  "rows_with_binding_mode": 680,
+  "rows_by_binding_mode": {
+    "not_annotated": 716772,
+    "INHIBITOR": 672,
+    "ACTIVATOR": 5,
+    "NEGATIVE ALLOSTERIC MODULATOR": 2,
+    "POSITIVE ALLOSTERIC MODULATOR": 1
+  },
+  "check_gene": {
+    "gene_symbol": "CSNK1D",
+    "rows": 2537,
+    "new_hierarchy": {
+      "uncensored_ic50_ki_kd_ec50": 1808,
+      "of_which_le_10nm": 964
+    },
+    "old_rule": {
+      "rows": 2537,
+      "relation_eq_or_missing": {
+        "uncensored_ic50_ki_kd_ec50": 1489,
+        "of_which_le_10nm": 649
+      },
+      "relation_uncensored_set": {
+        "uncensored_ic50_ki_kd_ec50": 1808,
+        "of_which_le_10nm": 964
+      },
+      "any_relation": {
+        "uncensored_ic50_ki_kd_ec50": 2534,
+        "of_which_le_10nm": 965
+      }
+    },
+    "manuscript_old_rule_values": {
+      "uncensored_ic50_ki_kd_ec50": 1808,
+      "of_which_le_10nm": 964
+    }
+  },
+  "collection_count": 717452
+}

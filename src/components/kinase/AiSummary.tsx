@@ -3,331 +3,98 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { StringInteraction } from "@/lib/string-network";
-
-interface TissueExpression {
-  tissue_name: string;
-  organ_system: string;
-  tpm_value: number;
-  protein_abundance: string;
-  tau_specificity: number;
-}
-
-interface MutationData {
-  mutation_code: string;
-  pathogenicity: string;
-  associated_diseases: string[];
-  drug_resistance_effects: { drug_name: string }[];
-}
-
-interface LigandAssay {
-  ligand_name: string;
-  binding_type: string;
-  assay_type: string;
-  value_nm: number;
-}
-
-interface Domain {
-  name: string;
-  start: number;
-  end: number;
-}
-
-interface Disease {
-  name: string;
-  description: string;
-  omim_id: string;
-}
-
-interface SummaryData {
-  gene_symbol: string;
-  name: string;
-  pdis_score?: { overall_score: number } | null;
-  classification: { group: string; family: string; subfamily: string };
-  domains?: Domain[];
-  tissue_expressions: TissueExpression[];
-  ligand_assays: LigandAssay[];
-  mutations: MutationData[];
-  diseases_associated: Disease[];
-  key_references: { pubmed_id: string; relevance_tag: string }[];
-  organ_systems_impacted: string[];
-  swiss_prot_annotation?: {
-    functions: string[];
-    section: string;
-    source_url: string | null;
-  };
-}
-
-
-
-function formatScore(score: number): string {
-  return (score * 100).toFixed(0);
-}
-
-function bestAffinity(ligands: LigandAssay[]): string {
-  const sorted = ligands.filter(l => l.value_nm > 0).sort((a, b) => a.value_nm - b.value_nm);
-  if (sorted.length === 0) return "";
-  const best = sorted[0];
-  if (best.value_nm < 1) return `${best.ligand_name} (${best.value_nm.toFixed(2)} nM)`;
-  if (best.value_nm < 10) return `${best.ligand_name} (${best.value_nm.toFixed(1)} nM)`;
-  return `${best.ligand_name} (${best.value_nm.toFixed(0)} nM)`;
-}
+import { PDIS_NOTE } from "@/lib/pdis";
+import type { KinaseDetail } from "@/components/kinase/dossier/types";
 
 function Para({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-slate-300 leading-relaxed">{children}</p>;
+  return <p className="text-sm leading-relaxed text-slate-300">{children}</p>;
 }
 
-export default function AiSummary({ data }: { data: SummaryData }) {
+const n = (value: number) => value.toLocaleString("en-US");
+
+// A factual summary assembled from the imported records; every sentence maps to
+// a tab that shows the underlying source records.
+export default function AiSummary({ data }: { data: KinaseDetail }) {
   const [expanded, setExpanded] = useState(false);
   const [interactions, setInteractions] = useState<StringInteraction[]>([]);
-  const [interactomeStatus, setInteractomeStatus] = useState<"idle" | "loading" | "ready" | "unavailable">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "unavailable">("idle");
   const g = data.gene_symbol;
-  const name = data.name;
-  const group = data.classification?.group || "";
-  const family = data.classification?.family || "";
-  const subfamily = data.classification?.subfamily || "";
-
-  const nTissues = data.tissue_expressions.length;
-  const sortedTissues = [...data.tissue_expressions].sort((a, b) => b.tpm_value - a.tpm_value);
-  const topTissue = sortedTissues[0];
-  const nSystems = data.organ_systems_impacted.length;
-  const nLigands = data.ligand_assays.length;
-  const nMutations = data.mutations.length;
-  const nDiseases = data.diseases_associated.length;
-  const nRefs = data.key_references.length;
-  const nDomains = data.domains?.length || 0;
-  const pdis = data.pdis_score?.overall_score;
-  const curatedFunctions = data.swiss_prot_annotation?.functions ?? [];
 
   useEffect(() => {
     if (!expanded) return;
     const controller = new AbortController();
-    const params = new URLSearchParams({
-      genes: g,
-      score: "700",
-      network_type: "functional",
-      add_nodes: "10",
-    });
-    setInteractions([]);
-    setInteractomeStatus("loading");
+    const params = new URLSearchParams({ genes: g, score: "700", network_type: "functional", add_nodes: "10" });
+    setStatus("loading");
     fetch(`/api/interactions?${params}`, { signal: controller.signal })
       .then(async (response) => {
         const body = await response.json();
         if (!response.ok) throw new Error(body.error || "STRING unavailable");
-        return (body.interactions ?? []) as StringInteraction[];
-      })
-      .then((records) => {
-        setInteractions(records);
-        setInteractomeStatus("ready");
+        setInteractions(body.interactions ?? []);
+        setStatus("ready");
       })
       .catch((reason) => {
-        if (reason instanceof DOMException && reason.name === "AbortError") return;
-        setInteractomeStatus("unavailable");
-    });
+        if (!(reason instanceof DOMException && reason.name === "AbortError")) setStatus("unavailable");
+      });
     return () => controller.abort();
   }, [expanded, g]);
 
-  const directInteractions = interactions
-    .filter((edge) => edge.source.toUpperCase() === g.toUpperCase() || edge.target.toUpperCase() === g.toUpperCase())
-    .sort((a, b) => b.score - a.score);
-  const topPartners = directInteractions.slice(0, 5).map((edge) =>
-    edge.source.toUpperCase() === g.toUpperCase() ? edge.target : edge.source
-  );
+  const partners = interactions
+    .filter((e) => e.source.toUpperCase() === g.toUpperCase() || e.target.toUpperCase() === g.toUpperCase())
+    .sort((a, b) => b.score - a.score)
+    .map((e) => (e.source.toUpperCase() === g.toUpperCase() ? e.target : e.source));
 
-  const pathCounts: Record<string, number> = {};
-  for (const m of data.mutations) {
-    const p = m.pathogenicity || "Unknown";
-    pathCounts[p] = (pathCounts[p] || 0) + 1;
-  }
-  const pathDetails = Object.entries(pathCounts)
-    .sort(([, a], [, b]) => b - a)
-    .map(([p, c]) => {
-      const label = p.toLowerCase() === "variant_of_uncertain_significance" ? "VUS" : p;
-      return `${c} ${label}`;
-    })
-    .join(", ");
-
-  const drugResistant = data.mutations.filter(m => m.drug_resistance_effects.length > 0).length;
-  const bindingTypes = Array.from(new Set(data.ligand_assays.map(l => l.binding_type)));
+  const functions = data.swiss_prot_annotation?.functions ?? [];
+  const pdis = data.pdis_score;
+  const top = data.tissue_expressions[0];
+  const tau = data.expression.tau_specificity;
+  const ligands = data.ligand_summary;
+  const clinvar = data.clinvar_variants.length;
+  const curated = data.curated_mutations.length;
+  const category = data.partition === "kinhub_core" ? `the KinHub ${data.group} group` : `the UniProt extension class "${data.extension_class}"`;
 
   return (
     <div className="glass-card overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-5 py-4 group"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-kinome-cyan/10 border border-kinome-cyan/20 flex items-center justify-center">
-            <svg className="w-4 h-4 text-kinome-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-          </div>
-          <div className="text-left">
-            <h2 className="text-sm font-semibold text-white group-hover:text-kinome-cyan transition-colors">
-              Summary
-            </h2>
-            <p className="text-[11px] text-slate-500">
-              {expanded ? "Hide" : "Show"} narrative summary of {g}
-            </p>
-          </div>
+      <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} className="group flex w-full items-center justify-between px-5 py-4">
+        <div className="text-left">
+          <h2 className="text-sm font-semibold text-white transition-colors group-hover:text-kinome-cyan">Summary</h2>
+          <p className="text-[11px] text-slate-500">{expanded ? "Hide" : "Show"} a summary of the {g} records</p>
         </div>
-        <motion.svg
-          animate={{ rotate: expanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="w-4 h-4 text-slate-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <motion.svg animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }} className="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </motion.svg>
       </button>
-
       <AnimatePresence>
         {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <div className="px-5 pb-6 border-t border-white/5">
-              <div className="pt-4 space-y-3">
-
-                <Para>
-                  {g} ({name}) is a member of the {group} kinase group
-                  {family ? `, ${family} family` : ""}
-                  {subfamily ? `, ${subfamily} subfamily` : ""}.
-                  {pdis !== undefined && (
-                    <>
-                      {" "}It has a PDIS score of {pdis.toFixed(2)} ({formatScore(pdis)}/100),
-                      {pdis >= 0.7
-                        ? " indicating high pharmaceutical interest and prioritization for drug development."
-                        : pdis >= 0.4
-                        ? " reflecting moderate pharmaceutical interest across available evidence."
-                        : " suggesting limited pharmaceutical characterization to date."}
-                    </>
-                  )}
-                </Para>
-
-                <Para>
-                  {curatedFunctions.length > 0
-                    ? <>According to the reviewed UniProtKB/{data.swiss_prot_annotation?.section || "Swiss-Prot"} record, {curatedFunctions[0]}</>
-                    : `No reviewed Swiss-Prot functional description is present for ${g} in the current import.`}
-                </Para>
-
-                <Para>
-                  {interactomeStatus === "loading"
-                    ? `Loading the high-confidence ${g} interactome from STRING…`
-                    : interactomeStatus === "unavailable"
-                    ? `The STRING interactome is temporarily unavailable; no interaction claims are inferred.`
-                    : directInteractions.length > 0
-                    ? <>At a STRING combined-confidence threshold of 0.70, {g} is directly connected in the retrieved functional-association network to {directInteractions.length} protein{directInteractions.length === 1 ? "" : "s"}. The strongest displayed neighbors are {topPartners.join(", ")}. These STRING links integrate functional evidence and do not necessarily represent direct physical binding; detailed component scores are available in the Network tab.</>
-                    : interactomeStatus === "ready"
-                    ? `STRING returned no direct functional associations for ${g} at the 0.70 confidence threshold.`
-                    : `The high-confidence STRING interactome will load when this summary is opened.`}
-                </Para>
-
-                <Para>
-                  {nDomains === 0
-                    ? `No domain architecture annotations are currently available for ${g}.`
-                    : (() => {
-                        const names = data.domains!.map(d => d.name).join(", ");
-                        const totalLen = Math.max(...data.domains!.map(d => d.end));
-                        let s = `The ${g} protein spans ${totalLen} residues and contains ${nDomains} annotated domain${nDomains > 1 ? "s" : ""}: ${names}`;
-                        const groupDesc: Record<string, string> = {
-                          TK: "characteristic of receptor or non-receptor tyrosine kinases that catalyze phosphotransfer to tyrosine residues.",
-                          TKL: "typical of tyrosine kinase-like kinases that function in TGF-β and MAPK signaling cascades.",
-                          AGC: "a group that includes PKA, PKC, and PKG families involved in second-messenger signaling.",
-                          CAMK: "consistent with calcium/calmodulin-dependent kinases that respond to intracellular calcium signals.",
-                          CMGC: "encompassing CDK, MAPK, GSK, and CLK families that regulate the cell cycle and transcription.",
-                          STE: "part of the STE kinase family that functions upstream of MAPK signaling modules.",
-                          CK1: "a casein kinase 1 family member involved in Wnt signaling and circadian rhythm regulation.",
-                        };
-                        s += groupDesc[group] || `belonging to the ${group} group of the human kinome.`;
-                        return s;
-                      })()
-                  }
-                </Para>
-
-                <Para>
-                  {nTissues === 0
-                    ? `Expression data for ${g} are not currently available.`
-                    : <>
-                        {g} is expressed across {nTissues} tissue{nTissues > 1 ? "s" : ""}
-                        {nSystems > 0 && <> spanning {nSystems} organ system{nSystems > 1 ? "s" : ""} ({data.organ_systems_impacted.join(", ")})</>}.
-                        {topTissue && <>
-                          {" "}Highest expression is observed in {topTissue.tissue_name} at{" "}
-                          {topTissue.tpm_value.toFixed(0)} TPM
-                          {topTissue.protein_abundance ? ` with ${topTissue.protein_abundance.toLowerCase()} protein abundance` : ""}.
-                        </>}
-                        {topTissue && topTissue.tau_specificity > 0.8 && <>
-                          {" "}The high tissue specificity (τ = {topTissue.tau_specificity.toFixed(2)}) suggests a specialized physiological role.
-                        </>}
-                        {topTissue && topTissue.tau_specificity > 0.5 && topTissue.tau_specificity <= 0.8 && <>
-                          {" "}Moderate tissue specificity (τ = {topTissue.tau_specificity.toFixed(2)}) indicates broad but regulated expression.
-                        </>}
-                        {topTissue && topTissue.tau_specificity <= 0.5 && <>
-                          {" "}Low tissue specificity (τ = {topTissue.tau_specificity.toFixed(2)}) suggests ubiquitous or housekeeping-type expression.
-                        </>}
-                      </>
-                  }
-                </Para>
-
-                <Para>
-                  {nMutations > 0 || nLigands > 0 || nDiseases > 0
-                    ? <>
-                        {nMutations > 0 && <>
-                          {nMutations} mutation{nMutations > 1 ? "s" : ""} have been cataloged for {g}
-                          {pathDetails ? <> ({pathDetails})</> : ""}.
-                          {drugResistant > 0 && <>
-                            {" "}Of these, {drugResistant} {drugResistant > 1 ? "are" : "is"} associated with drug resistance
-                            {(() => {
-                              const drugNames = Array.from(new Set(
-                                data.mutations
-                                  .filter(m => m.drug_resistance_effects.length > 0)
-                                  .flatMap(m => m.drug_resistance_effects.map(e => e.drug_name))
-                              ));
-                              return drugNames.length > 0 ? <> ({drugNames.join(", ")})</> : null;
-                            })()}.
-                          </>}
-                          {" "}
-                        </>}
-                        {nLigands > 0 && <>
-                          {nLigands} ligand assay{nLigands > 1 ? "s" : ""} have been reported
-                          {bindingTypes.length > 0 && <> ({bindingTypes.join(", ")})</>}
-                          {bestAffinity(data.ligand_assays) && <>, with the highest affinity observed for {bestAffinity(data.ligand_assays)}</>}.
-                          {" "}
-                        </>}
-                        {nDiseases > 0 && <>
-                          {g} is implicated in {nDiseases} disease{nDiseases > 1 ? "s" : ""}: {data.diseases_associated.map(d => d.name).join(", ")}.
-                        </>}
-                      </>
-                    : `No mutations, ligand assays, or disease associations have been recorded for ${g} in the current database.`
-                  }
-                </Para>
-
-                {nRefs > 0 && (() => {
-                  const tagCounts: Record<string, number> = {};
-                  for (const r of data.key_references) {
-                    const tag = r.relevance_tag || "general";
-                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-                  }
-                  const tagStr = Object.entries(tagCounts)
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([t, c]) => `${c} ${t}`)
-                    .join(", ");
-                  const s = `The current literature includes ${nRefs} reference${nRefs > 1 ? "s" : ""}${tagStr ? ` covering ${tagStr}` : ""}. Together, these data position ${g} as ${
-                    pdis !== undefined && pdis >= 0.7
-                      ? "a well-characterized kinase with substantial pharmaceutical and clinical relevance."
-                      : pdis !== undefined && pdis >= 0.4
-                      ? "a kinase with moderate characterization and emerging therapeutic interest."
-                      : "a comparatively understudied kinase that may represent a novel research opportunity."
-                  }`;
-                  return <Para>{s}</Para>;
-                })()}
-
-              </div>
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+            <div className="space-y-3 border-t border-white/5 px-5 pb-6 pt-4">
+              <Para>
+                {g} ({data.name}) belongs to {category}.
+                {pdis && <> Its default-weight PDIS is {pdis.overall_score.toFixed(2)} of 100 (rank {pdis.rank_default ?? "unavailable"} of 678). {PDIS_NOTE}</>}
+              </Para>
+              <Para>
+                {functions.length > 0
+                  ? <>The reviewed UniProtKB/{data.swiss_prot_annotation?.section || "Swiss-Prot"} record states: {functions[0]}</>
+                  : `The current import holds no reviewed Swiss-Prot functional description for ${g}.`}
+              </Para>
+              <Para>
+                {status === "loading" ? `KinomeX loads the STRING interactome for ${g}…`
+                  : status === "unavailable" ? "STRING is unavailable at the moment; the summary infers no interactions."
+                  : status === "ready" && partners.length > 0
+                    ? <>At a STRING combined confidence of 0.70, {g} connects directly to {partners.length} protein{partners.length === 1 ? "" : "s"}; the strongest neighbors are {partners.slice(0, 5).join(", ")}. STRING associations combine functional evidence and do not necessarily indicate direct binding.</>
+                    : `STRING returns no direct association for ${g} at a combined confidence of 0.70.`}
+              </Para>
+              <Para>
+                {top
+                  ? <>In GTEx v10, the highest median expression is {top.tpm_value.toFixed(1)} TPM in {top.tissue_name}; tissue specificity τ is {tau === null ? "unavailable" : tau.toFixed(2)} across {data.tissue_expressions.length} tissues.</>
+                  : "GTEx v10 expression is unavailable for this entry."}
+              </Para>
+              <Para>
+                KinomeX holds {data.structures.total} experimental structure{data.structures.total === 1 ? "" : "s"} at ≤3.5 Å,{" "}
+                {data.alphafold.available ? `an AlphaFold DB model (global pLDDT ${data.alphafold.global_plddt?.toFixed(1) ?? "unavailable"})` : "no AlphaFold DB model"},{" "}
+                {ligands ? `${n(ligands.representative_rows)} source compounds with ${n(ligands.records)} ligand records` : "ligand records that are unavailable"},{" "}
+                {n(clinvar)} ClinVar missense record{clinvar === 1 ? "" : "s"}, {curated} literature-curated mutation{curated === 1 ? "" : "s"}, and{" "}
+                {data.diseases_associated.length} UniProt disease annotation{data.diseases_associated.length === 1 ? "" : "s"}.
+              </Para>
             </div>
           </motion.div>
         )}

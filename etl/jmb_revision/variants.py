@@ -38,6 +38,12 @@ KLIFS_API = "https://klifs.net/api"
 CLINVAR_BATCH = 400
 EXPECTED_CLINVAR = (63_649, 260)
 EXPECTED_CURATED = (87, 36)
+# Literature gatekeepers used to verify the mapping (UniProt canonical numbering).
+REFERENCE_GATEKEEPERS = {
+    "ABL1": "T315", "EGFR": "T790", "KIT": "T670", "PDGFRA": "T674", "RET": "V804", "ALK": "L1196",
+    "FGFR1": "V561", "FGFR2": "V564", "FGFR3": "V555", "FGFR4": "V550", "ERBB2": "T798",
+    "MET": "L1157", "BTK": "T474", "SRC": "T341", "JAK2": "M929", "FLT3": "F691", "BRAF": "T529",
+}
 USER_AGENT = "KinomeX-JMB-revision/1.0 (kinomex ETL)"
 
 
@@ -239,6 +245,11 @@ def plan_gatekeepers(db, klifs: list[dict[str, Any]]) -> tuple[dict[str, Any], d
         "with_gatekeeper": sum(1 for g in gatekeepers.values() if g),
         "not_in_klifs": no_klifs,
         "klifs_but_unmapped": sorted(unmapped),
+        "reference_check": {
+            gene: {"expected": ref, "mapped": (gatekeepers.get(gene) or {}).get("label"),
+                   "agrees": (gatekeepers.get(gene) or {}).get("label") == ref}
+            for gene, ref in REFERENCE_GATEKEEPERS.items()
+        },
         "approximate_anchor": sorted(g for g, v in gatekeepers.items() if v and not v["exact_anchor_match"]),
     }
     return gatekeepers, summary
@@ -260,7 +271,9 @@ def plan_clinvar(db, summaries: dict[str, Any], meta: dict[str, Any]) -> tuple[l
         by_class[fields["germline_classification"] or "(none)"] += 1
         by_stars["null" if fields["review_stars"] is None else fields["review_stars"]] += 1
         ops.append(UpdateOne({"_id": doc["_id"]}, {"$set": fields}))
-    einfo = meta.get("einfo", {})
+    einfo = meta.get("einfo") or {}
+    if isinstance(einfo, list):
+        einfo = einfo[0] if einfo else {}
     summary = {
         "records": len(ops),
         "genes": len(genes),
@@ -296,6 +309,7 @@ def plan_curated(db, gatekeepers: dict[str, Any], pubmed: dict[str, dict[str, st
             "pubmed_url": f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid else None,
             "publication_title": record["title"] if record else None,
             "publication_checked": record is not None,
+            "citation_check": rules.citation_check(doc["gene_symbol"], doc.get("mutation_code") or "", pub_text) if pmid else None,
         })
         rows.append((doc, fields, legacy))
         ops.append(UpdateOne({"_id": doc["_id"]}, {"$set": fields}))
@@ -315,6 +329,12 @@ def plan_curated(db, gatekeepers: dict[str, Any], pubmed: dict[str, dict[str, st
             f"{'' if f['publication_checked'] else ', no publication record'})"
             for d, f, _ in rows if f["unconfirmed_drugs"]
         ],
+        "citations_naming_gene_or_mutation": [
+            f"{label(d)} (PMID {d['pubmed_id']})" for d, f, _ in rows
+            if f["citation_check"] and (f["citation_check"]["names_gene"] or f["citation_check"]["names_mutation"])
+        ],
+        "citations_not_naming_gene_or_mutation": sum(
+            1 for _, f, _ in rows if f["citation_check"] and not (f["citation_check"]["names_gene"] or f["citation_check"]["names_mutation"])),
         "missing_pubmed_id": sum(1 for d, _, _ in rows if not d.get("pubmed_id")),
         "pmids_not_in_cache": sorted({str(d["pubmed_id"]) for d, f, _ in rows if d.get("pubmed_id") and not f["publication_checked"]}),
         "curated_gatekeepers": {g: (gatekeepers.get(g) or {}).get("label") for g in sorted({d["gene_symbol"] for d, _, _ in rows})},
