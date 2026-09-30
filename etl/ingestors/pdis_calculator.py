@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import math
 import os
 from datetime import datetime, timezone
 from typing import Any
@@ -12,27 +11,10 @@ import aiohttp
 
 from ..config import settings
 from ..database import COLLECTIONS, batch_upsert, get_db
+from ..jmb_revision import pdis_v3
 
 logger = logging.getLogger(__name__)
-FORMULA_VERSION = "2.0-evidence-only"
-
-
-def _log_component(count: int, maximum: int) -> float:
-    if count <= 0 or maximum <= 0:
-        return 0.0
-    return math.log10(count + 1) / math.log10(maximum + 1) * 100.0
-
-
-def _clinical_component(trial_count: int, target: int) -> float:
-    return min(100.0, trial_count / max(target, 1) * 100.0)
-
-
-def _structure_component(avg_resolution: float | None, best_resolution: float | None) -> float:
-    if avg_resolution is None or best_resolution is None:
-        return 0.0
-    best_score = max(0.0, min(100.0, (4.0 - best_resolution) / 2.5 * 100.0))
-    average_score = max(0.0, min(100.0, (4.0 - avg_resolution) / 2.5 * 100.0))
-    return 0.6 * best_score + 0.4 * average_score
+FORMULA_VERSION = pdis_v3.FORMULA_VERSION
 
 
 async def _fetch_pubmed_count(
@@ -124,16 +106,21 @@ async def ingest_pdis() -> int:
     ]):
         structure_stats[str(row["_id"])] = row
 
+    # Distinct source compound identifiers (ChEMBL molecule ID or PubChem CID)
+    # per gene; equals the number of representative ligand rows in the dossier.
     compound_counts: dict[str, int] = {}
     async for row in db[COLLECTIONS["bioactivities"]].aggregate([
         {"$match": {
             "source": {"$in": ["chembl", "pubchem"]},
             "target_gene_symbol": {"$in": genes},
-            "compound_id": {"$nin": [None, ""]},
         }},
-        {"$group": {"_id": "$target_gene_symbol", "compounds": {"$addToSet": "$compound_id"}}},
-        {"$project": {"count": {"$size": "$compounds"}}},
-    ]):
+        {"$group": {"_id": {
+            "gene": "$target_gene_symbol",
+            "source": "$source",
+            "compound": {"$ifNull": ["$compound_id", {"$toString": "$pubchem_cid"}]},
+        }}},
+        {"$group": {"_id": "$_id.gene", "count": {"$sum": 1}}},
+    ], allowDiskUse=True):
         compound_counts[str(row["_id"])] = int(row["count"])
 
     timeout = aiohttp.ClientTimeout(total=45)
@@ -171,36 +158,26 @@ async def ingest_pdis() -> int:
         "structure": settings.rate.pdis_w_structure,
         "compound_diversity": settings.rate.pdis_w_compound_diversity,
     }
-    weight_total = sum(weights.values())
     retrieved_at = datetime.now(timezone.utc)
     records: list[dict[str, Any]] = []
 
     for gene, (publication_count, trial_count) in evidence.items():
         structures = structure_stats.get(gene, {})
-        compound_count = compound_counts.get(gene, 0)
-        components = {
-            "citation": _log_component(publication_count, max_publications),
-            "clinical_trials": _clinical_component(
-                trial_count, settings.rate.pdis_clinical_target
-            ),
-            "structure": _structure_component(
-                structures.get("avg_resolution"), structures.get("best_resolution")
-            ),
-            "compound_diversity": _log_component(compound_count, max_compounds),
+        raw_values = {
+            "pubmed_publication_count": publication_count,
+            "clinical_trial_count": trial_count,
+            "pdb_count": int(structures.get("pdb_count", 0)),
+            "best_resolution_angstrom": structures.get("best_resolution"),
+            "average_resolution_angstrom": structures.get("avg_resolution"),
+            "distinct_compound_count": compound_counts.get(gene, 0),
         }
-        total = sum(weights[name] * value for name, value in components.items()) / weight_total
+        components = pdis_v3.components(raw_values, max_publications, max_compounds)
         records.append({
             "gene_symbol": gene,
-            "pdis_total": round(total, 2),
-            "components": {name: round(value, 2) for name, value in components.items()},
-            "raw_values": {
-                "pubmed_publication_count": publication_count,
-                "clinical_trial_count": trial_count,
-                "pdb_count": int(structures.get("pdb_count", 0)),
-                "best_resolution_angstrom": structures.get("best_resolution"),
-                "average_resolution_angstrom": structures.get("avg_resolution"),
-                "distinct_compound_count": compound_count,
-            },
+            "pdis_total": round(pdis_v3.weighted_total(components, weights), 2),
+            "components": components,
+            "raw_values": raw_values,
+            "scale": "0-100",
             "weights": weights,
             "formula_version": FORMULA_VERSION,
             "source": "pdis_calculator",
