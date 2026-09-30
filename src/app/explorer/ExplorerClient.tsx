@@ -127,7 +127,7 @@ export default function ExplorerClient() {
             )}
           </div>
 
-          <aside className="flex-shrink-0 lg:w-64">
+          <aside className="flex-shrink-0 lg:w-56">
             <div className="sticky top-24 rounded-2xl border border-white/10 bg-slate-900/40 p-5 backdrop-blur-sm">
               <h2 className="mb-4 text-sm font-semibold text-white">Filtered result</h2>
               <div className="flex items-center justify-between">

@@ -21,10 +21,10 @@ function Bar({ value }: { value: number | null }) {
   if (value === null) return <span className="text-[11px] text-slate-600">unavailable</span>;
   return (
     <div className="flex items-center gap-1.5" title={value.toFixed(2)}>
-      <div className="h-1.5 w-12 overflow-hidden rounded-full bg-white/5">
+      <div className="h-1.5 w-8 overflow-hidden rounded-full bg-white/5">
         <div className="h-full rounded-full bg-kinome-cyan/70" style={{ width: `${value}%` }} />
       </div>
-      <span className="w-9 text-right text-[11px] tabular-nums text-slate-400">{value.toFixed(1)}</span>
+      <span className="w-7 text-right text-[11px] tabular-nums text-slate-400">{value.toFixed(0)}</span>
     </div>
   );
 }
@@ -43,13 +43,13 @@ export default function ResultsTable({ rows, weights, sort, onSort }: ResultsTab
   const w = formatWeightsParam(weights);
   return (
     <div className="overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/40">
-      <table className="w-full min-w-[980px] text-sm">
+      <table className="w-full min-w-[860px] text-sm">
         <thead>
           <tr className="border-b border-white/5 text-left text-[11px] font-medium">
             <th className="px-3 py-3"><SortHeader label="Rank" value="pdis" sort={sort} onSort={onSort} /></th>
             <th className="px-3 py-3"><SortHeader label="Entry" value="gene_symbol" sort={sort} onSort={onSort} /></th>
             <th className="px-3 py-3"><SortHeader label="Category" value="category" sort={sort} onSort={onSort} /></th>
-            {COMPONENT_KEYS.map((key) => <th key={key} className="px-3 py-3 uppercase tracking-wider text-slate-400">{COMPONENT_LABELS[key]}</th>)}
+            {COMPONENT_KEYS.map((key) => <th key={key} className="px-2 py-3 uppercase tracking-wider text-slate-400">{COMPONENT_LABELS[key]}</th>)}
             <th className="px-3 py-3 text-right uppercase tracking-wider text-slate-400">PDIS</th>
             <th className="px-3 py-3 text-right uppercase tracking-wider text-slate-500" title="Default-weight PDIS">Default</th>
           </tr>
@@ -62,11 +62,11 @@ export default function ResultsTable({ rows, weights, sort, onSort }: ResultsTab
                 <Link href={`/kinases/${encodeURIComponent(row.gene_symbol)}${w ? `?w=${w}` : ""}`} className="font-semibold text-white hover:text-kinome-cyan">
                   {row.gene_symbol}
                 </Link>
-                <div className="max-w-[16rem] truncate text-xs text-slate-500" title={row.name}>{row.name}</div>
+                <div className="max-w-[11rem] truncate text-xs text-slate-500" title={row.name}>{row.name}</div>
               </td>
               <td className="px-3 py-2.5"><GroupBadge group={row.display_category} /></td>
               {COMPONENT_KEYS.map((key) => (
-                <td key={key} className="px-3 py-2.5"><Bar value={row.components?.[key] ?? null} /></td>
+                <td key={key} className="px-2 py-2.5"><Bar value={row.components?.[key] ?? null} /></td>
               ))}
               <td className="px-3 py-2.5 text-right font-semibold tabular-nums" style={{ color: row.pdis_weighted === null ? undefined : getScoreColor(row.pdis_weighted) }}>
                 {num(row.pdis_weighted, 2)}
