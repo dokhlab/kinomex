@@ -46,6 +46,7 @@ export interface CatalogRow {
   group: string | null;
   extension_class: string | null;
   display_category: string;
+  family: string;
   subfamily: string;
   uniprot_record_status: string;
   kinase_domain_count: number;

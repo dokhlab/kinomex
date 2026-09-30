@@ -89,6 +89,7 @@ export function buildCatalogRows(inputs: CatalogInputs): CatalogRow[] {
         group: partition === "kinhub_core" ? k.group ?? null : null,
         extension_class: partition === "uniprot_extended" ? k.extension_class ?? null : null,
         display_category: displayCategory(k),
+        family: k.family || "",
         subfamily: k.subfamily || "",
         uniprot_record_status: k.uniprot_record_status || "active",
         kinase_domain_count: Array.isArray(k.kinhub_domains) ? k.kinhub_domains.length : 0,

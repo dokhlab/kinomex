@@ -35,7 +35,7 @@ export async function readCatalogInputs(db: Db): Promise<CatalogInputs> {
   ] = await Promise.all([
     db.collection("kinases").find({}, { projection: {
       gene_symbol: 1, uniprot_id: 1, full_name: 1, kinhub_domains: 1, catalog_membership: 1, group: 1,
-      extension_class: 1, subfamily: 1, uniprot_record_status: 1,
+      extension_class: 1, family: 1, subfamily: 1, uniprot_record_status: 1,
     } }).toArray(),
     db.collection("pdis").find({}, { projection: { gene_symbol: 1, components: 1, raw_values: 1, pdis_total: 1, rank_default: 1, formula_version: 1 } }).toArray(),
     db.collection("expression").aggregate([

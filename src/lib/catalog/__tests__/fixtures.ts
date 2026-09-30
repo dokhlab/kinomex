@@ -9,6 +9,7 @@ export function row(gene: string, overrides: Partial<CatalogRow> = {}): CatalogR
     group: "TK",
     extension_class: null,
     display_category: "TK",
+    family: "",
     subfamily: "",
     uniprot_record_status: "active",
     kinase_domain_count: 1,
