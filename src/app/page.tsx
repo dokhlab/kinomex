@@ -46,20 +46,20 @@ interface StatsData {
   totalStructures: number | null;
   totalDiseases: number | null;
   catalogAccounting: {
-    totalEntries: number;
-    kinhubDomainRows: number;
-    kinhubCoreEntries: number;
-    uniprotExtendedEntries: number;
-    inactiveHistoricalEntries: number;
-    unresolvedKinHubAccessions: string[];
-    reconciled: boolean;
+    total_entries: number;
+    core_entries: number;
+    extension_entries: number;
+    kinhub_domain_rows: number;
+    inactive_historical_entries: number;
+    snapshot_date: string | null;
   } | null;
 }
 
 interface KinaseListItem {
   gene_symbol: string;
   name: string;
-  group: string;
+  group: string | null;
+  display_category: string;
   subfamily?: string;
   pdis_score: number | null;
   organ_systems_impacted: string[];
@@ -231,7 +231,7 @@ function HomePageContent() {
             </h1>
             <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
               Human Kinome Explorer{" "}
-              <span className="text-kinome-cyan font-medium">{stats?.totalKinases ?? "..."}</span> Catalogued Protein Entries
+              <span className="text-kinome-cyan font-medium">{stats?.totalKinases ?? "..."}</span> catalog entries
             </p>
           </motion.div>
         </div>
@@ -254,21 +254,20 @@ function HomePageContent() {
             <div className="space-y-3">
               <h2 className="text-base font-semibold text-white">Welcome to KinomeX</h2>
               <p className="text-sm text-slate-300 leading-relaxed max-w-5xl">
-                KinomeX is an integrated research server for exploring the human protein kinase landscape. Its catalogue reconciles <span className="text-white">KinHub/Manning and UniProt</span>; verified evidence currently available from GTEx, ClinVar, and UniProt connects kinase identity with tissue expression, pathogenic variants, and disease associations. Structure, ligand, and PDIS fields remain explicitly unavailable until their kinase-scoped imports pass validation.
+                KinomeX is a source-linked atlas of human kinase entries. Its catalog reconciles <span className="text-white">KinHub/Manning and reviewed UniProt</span> records and links each entry to its experimental structures (RCSB PDB, EMDB), AlphaFold DB model, ligand records (ChEMBL, PubChem), GTEx v10 expression, ClinVar and literature-curated variants, UniProt disease annotations, and STRING networks. Every record links to its source.
               </p>
               <p className="text-sm text-slate-400 leading-relaxed max-w-5xl">
-                Browse <span className="text-kinome-cyan font-medium">{stats?.totalKinases ?? "500+"} accounted catalogue entries</span>, compare kinase groups, inspect expression profiles, or search for genes, tissues, diseases, and therapeutic evidence. When all required evidence sources are verified, the <span className="text-kinome-violet font-medium">Pharmaceutical Development Interest Score (PDIS)</span> summarizes development activity; otherwise it is shown as unavailable rather than estimated.
+                The <span className="text-kinome-violet font-medium">Pharmaceutical Development Interest Score (PDIS)</span> is the weighted mean of four documented-evidence components (citations, clinical trials, structures, compounds); the Explorer lets users set the weights. PDIS summarizes documented development evidence; it does not measure biological importance, efficacy, safety, or clinical priority.
               </p>
               {stats?.catalogAccounting && (
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  <span className="text-white font-medium">Fully reconciled catalogue:</span>{" "}
-                  {stats.catalogAccounting.kinhubCoreEntries} KinHub-indexed core entries representing{" "}
-                  {stats.catalogAccounting.kinhubDomainRows} kinase domains, plus{" "}
-                  {stats.catalogAccounting.uniprotExtendedEntries} additional reviewed UniProt Protein kinase entries.
-                  {stats.catalogAccounting.inactiveHistoricalEntries > 0 &&
-                    ` ${stats.catalogAccounting.inactiveHistoricalEntries} KinHub entry is retained as a labeled historical/inactive UniProt record.`}
-                  {stats.catalogAccounting.unresolvedKinHubAccessions.length > 0 &&
-                    ` ${stats.catalogAccounting.unresolvedKinHubAccessions.length} historical KinHub accessions are unresolved.`}
+                  <span className="text-white font-medium">Catalog:</span>{" "}
+                  {stats.catalogAccounting.total_entries} entries: {stats.catalogAccounting.core_entries} KinHub core entries
+                  ({stats.catalogAccounting.kinhub_domain_rows} KinHub kinase-domain rows) and {stats.catalogAccounting.extension_entries} reviewed
+                  UniProt extensions (keyword KW-0418).
+                  {stats.catalogAccounting.inactive_historical_entries > 0 &&
+                    ` The catalog keeps ${stats.catalogAccounting.inactive_historical_entries} inactive historical UniProt entry with a label.`}
+                  {stats.catalogAccounting.snapshot_date && ` Snapshot ${stats.catalogAccounting.snapshot_date}.`}
                 </p>
               )}
             </div>
@@ -353,7 +352,7 @@ function HomePageContent() {
                     kinase={{
                       gene_symbol: kinase.gene_symbol,
                       full_name: kinase.name,
-                      classification: kinase.group,
+                      classification: kinase.display_category,
                       pdis_score: kinase.pdis_score,
                       organ_systems_impacted: kinase.organ_systems_impacted ?? [],
                       diseases_associated: kinase.diseases_associated ?? [],

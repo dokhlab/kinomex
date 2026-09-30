@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/tree", label: "Kinome Tree" },
   { href: "/explorer", label: "Explorer" },
   { href: "/search", label: "AI Assistant" },
+  { href: "/tutorial", label: "Tutorial" },
   { href: "/docs", label: "Docs" },
 ];
 

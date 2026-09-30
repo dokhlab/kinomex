@@ -15,14 +15,19 @@ describe("resolveStructuredGeneSet", () => {
       collection: jest.fn((name: string) => ({
         find: jest.fn(() => name === "expression"
           ? resultCursor([{ gene_symbol: "ABL1" }, { gene_symbol: "EGFR" }])
-          : resultCursor([{ target_gene_symbol: "EGFR" }, { target_gene_symbol: "BRAF" }])),
+          : resultCursor([{ gene_symbol: "EGFR" }, { gene_symbol: "BRAF" }])),
       })),
     };
     const genes = await resolveStructuredGeneSet(
       db as any,
-      parseQuery("TK kinases in brain with Type II inhibitors"),
+      parseQuery("TK kinases in brain with allosteric inhibitors"),
     );
     expect(genes).toEqual(["EGFR"]);
+  });
+
+  it("matches no gene for a binding mode that no source annotates", async () => {
+    const db = { collection: jest.fn(() => ({ find: jest.fn(() => resultCursor([{ gene_symbol: "ABL1" }])) })) };
+    expect(await resolveStructuredGeneSet(db as any, parseQuery("kinases in brain with Type II binding"))).toEqual([]);
   });
 
   it("returns null when no evidence-backed gene filter was requested", async () => {

@@ -2,19 +2,21 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/ui/Navigation";
 import BiomedicalBackground from "@/components/ui/BiomedicalBackground";
-export const metadata: Metadata = {
-  title: "KinomeX - Human Kinome Explorer",
-  description:
-    "Explore the human kinome with interactive visualizations, pathway analysis, and AI-powered search across 518+ kinases.",
-  keywords: [
-    "kinome",
-    "kinase",
-    "phosphorylation",
-    "signal transduction",
-    "proteomics",
-    "bioinformatics",
-  ],
-};
+import { loadCatalog } from "@/lib/catalog/load";
+import { siteDescription } from "@/lib/catalog/description";
+
+export const dynamic = "force-dynamic";
+const KEYWORDS = ["kinome", "kinase", "phosphorylation", "signal transduction", "proteomics", "bioinformatics"];
+
+// The description reads its counts from the catalog accounting at request time.
+export async function generateMetadata(): Promise<Metadata> {
+  const accounting = await loadCatalog().then((c) => c.accounting).catch(() => null);
+  return {
+    title: "KinomeX - Human Kinome Explorer",
+    description: siteDescription(accounting),
+    keywords: KEYWORDS,
+  };
+}
 
 export default function RootLayout({
   children,
