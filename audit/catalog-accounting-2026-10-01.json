@@ -1,0 +1,175 @@
+{
+    "snapshot_date": "2026-09-30",
+    "total_entries": 678,
+    "core_entries": 522,
+    "extension_entries": 156,
+    "kinhub_domain_rows": 536,
+    "inactive_historical_entries": 1,
+    "inactive_entries": [
+        {
+            "gene_symbol": "PRKY",
+            "uniprot_id": "O43930"
+        }
+    ],
+    "reviewed_uniprot_keyword_entries": 625,
+    "kinhub_keyword_overlap_entries": 469,
+    "kinhub_supplemental_entries": 53,
+    "core_group_counts": {
+        "AGC": 63,
+        "CAMK": 74,
+        "CK1": 12,
+        "CMGC": 63,
+        "STE": 47,
+        "TK": 90,
+        "TKL": 43,
+        "RGC": 5,
+        "Atypical": 44,
+        "Other": 81
+    },
+    "extension_class_counts": {
+        "Protein kinase outside KinHub roster": 5,
+        "Lipid kinase": 38,
+        "Inositol phosphate kinase": 11,
+        "Nucleotide, nucleoside or nucleic-acid kinase": 36,
+        "Carbohydrate or central-metabolism kinase": 38,
+        "Cofactor, amino-acid or other small-molecule kinase": 20,
+        "Keyword-annotated entry without established kinase catalytic role": 8
+    },
+    "sources": [
+        {
+            "source": "uniprot",
+            "label": "UniProtKB/Swiss-Prot entries",
+            "records": 678,
+            "entries_with_records": 678,
+            "gap": 0,
+            "core_entries_with_records": 522
+        },
+        {
+            "source": "pdb",
+            "label": "Experimental structures (\u22643.5 \u00c5, RCSB PDB)",
+            "records": 10043,
+            "entries_with_records": 476,
+            "gap": 202,
+            "core_entries_with_records": 384
+        },
+        {
+            "source": "alphafold",
+            "label": "AlphaFold DB models",
+            "records": 667,
+            "entries_with_records": 667,
+            "gap": 11,
+            "core_entries_with_records": 512
+        },
+        {
+            "source": "ligands",
+            "label": "Ligand records (ChEMBL + PubChem)",
+            "records": 1021421,
+            "entries_with_records": 566,
+            "gap": 112,
+            "core_entries_with_records": 472
+        },
+        {
+            "source": "chembl",
+            "label": "ChEMBL activity records",
+            "records": 1019354,
+            "entries_with_records": 566,
+            "gap": 112,
+            "core_entries_with_records": 472
+        },
+        {
+            "source": "pubchem",
+            "label": "PubChem AID 1433 records",
+            "records": 2067,
+            "entries_with_records": 271,
+            "gap": 407,
+            "core_entries_with_records": 268
+        },
+        {
+            "source": "compound_pairs",
+            "label": "Compound\u2013kinase pairs",
+            "records": 717452,
+            "entries_with_records": 566,
+            "gap": 112,
+            "core_entries_with_records": 472
+        },
+        {
+            "source": "gtex",
+            "label": "GTEx v10 median expression records",
+            "records": 36396,
+            "entries_with_records": 674,
+            "gap": 4,
+            "core_entries_with_records": 519
+        },
+        {
+            "source": "clinvar",
+            "label": "ClinVar missense records",
+            "records": 63649,
+            "entries_with_records": 260,
+            "gap": 418,
+            "core_entries_with_records": 208
+        },
+        {
+            "source": "curated_mutations",
+            "label": "Literature-curated mutations",
+            "records": 87,
+            "entries_with_records": 36,
+            "gap": 642,
+            "core_entries_with_records": 35
+        },
+        {
+            "source": "uniprot_disease",
+            "label": "UniProt disease documents",
+            "records": 256,
+            "entries_with_records": 256,
+            "gap": 422,
+            "core_entries_with_records": 199
+        },
+        {
+            "source": "pdis",
+            "label": "PDIS documents",
+            "records": 678,
+            "entries_with_records": 678,
+            "gap": 0,
+            "core_entries_with_records": 522
+        },
+        {
+            "source": "pubmed",
+            "label": "Entries with \u22651 PubMed count",
+            "records": null,
+            "entries_with_records": 671,
+            "gap": 7,
+            "core_entries_with_records": 520
+        },
+        {
+            "source": "clinicaltrials",
+            "label": "Entries with \u22651 counted trial",
+            "records": null,
+            "entries_with_records": 168,
+            "gap": 510,
+            "core_entries_with_records": 153
+        },
+        {
+            "source": "pharos",
+            "label": "Pharos TDL assignments",
+            "records": 676,
+            "entries_with_records": 676,
+            "gap": 2,
+            "core_entries_with_records": 520
+        }
+    ],
+    "quarantine": [
+        {
+            "collection": "expression_quarantine",
+            "records": 322,
+            "genes": 161,
+            "reason": "no GTEx identifier or source record"
+        },
+        {
+            "collection": "bioactivities_quarantine",
+            "records": null,
+            "genes": null,
+            "reason": "legacy ChEMBL rows without a current activity record"
+        }
+    ],
+    "generated_at": "2026-10-01T14:05:11.386Z"
+}

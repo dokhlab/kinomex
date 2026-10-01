@@ -1,0 +1,157 @@
+gene_symbol,uniprot_id,extension_class,legacy_displayed_group,classification_basis
+ADK,P55263,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+ADPGK,Q9BRR6,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+AGK,Q53H12,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+AK1,P00568,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+AK2,P54819,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+AK3,Q9UIJ7,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+AK4,P27144,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+AK5,Q9Y6K8,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+AK6,Q9Y3D8,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+AK7,Q96M32,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+AK8,Q96MA6,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+AK9,Q5TCS8,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+ALDH18A1,P54886,"Cofactor, amino-acid or other small-molecule kinase",Atypical,Bifunctional enzyme with glutamate 5-kinase activity (EC 2.7.2.11).
+CDK11A,Q9UQ88,Protein kinase outside KinHub roster,CMGC,Protein kinase domain; CDK family member absent from the KinHub roster (paralog of CDK11B).
+CERK,Q8TCT0,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+CHKA,P35790,Lipid kinase,TK,Choline/ethanolamine kinase (phospholipid head-group); carries KW-0723 but phosphorylates a small molecule.
+CHKB,Q9Y259,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+CIITA,P33076,Keyword-annotated entry without established kinase catalytic role,Atypical,Transcriptional coactivator; reported autophosphorylation/kinase activity not established as a primary function.
+CKB,P12277,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+CKM,P06732,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+CKMT1A,P12532,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+CKMT2,P17540,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+CLP1,Q92989,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+CMPK1,P30085,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+CMPK2,Q5EBM0,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+COASY,Q13057,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+CSNK2A3,Q8NEV1,Protein kinase outside KinHub roster,CMGC,Protein kinase domain; casein kinase II alpha paralog absent from the KinHub roster.
+DCAF1,Q9Y4B6,Protein kinase outside KinHub roster,Atypical,Reported atypical histone H2A protein kinase activity (EC 2.7.11.1); primarily a CRL4 substrate receptor.
+DCK,P27707,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+DGKA,P23743,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGKB,Q9Y6T7,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGKD,Q16760,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGKE,P52429,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGKG,P49619,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGKH,Q86XP1,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGKI,O75912,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGKK,Q5KSL6,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGKQ,P52824,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGKZ,Q13574,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DGUOK,Q16854,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+DOLK,Q9UPQ8,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+DTYMK,P23919,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+ETNK1,Q9HBU6,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+ETNK2,Q9NVF9,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+FAM20B,O75063,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+FAM20C,Q8IXL6,Protein kinase outside KinHub roster,Atypical,Secreted serine protein kinase (Golgi casein kinase) with a non-ePK fold; EC 2.7.11.1.
+FCSK,Q8N0W3,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+FGGY,Q96C11,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+FN3K,Q9H479,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+FN3KRP,Q9HA64,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GALK1,P51570,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GALK2,Q01415,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GCK,P35557,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GK,P32189,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GK2,Q14410,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GK3,Q14409,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GK5,Q6ZS86,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GLYCTK,Q8IVS8,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GNE,Q9Y223,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+GUK1,Q16774,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+HK1,P19367,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+HK2,P52789,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+HK3,P52790,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+HKDC1,Q2TB90,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+HYKK,A2RU49,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+IDNK,Q5T6J7,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+IP6K1,Q92551,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+IP6K2,Q9UHH9,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+IP6K3,Q96PC2,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+IPMK,Q8NFU5,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+IPPK,Q9H8X2,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+ITPK1,Q13572,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+ITPKA,P23677,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+ITPKB,P27987,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+ITPKC,Q96DU7,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+KHK,P50053,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+LRGUK,Q96M69,Keyword-annotated entry without established kinase catalytic role,Atypical,Guanylate kinase-like domain without an assigned EC number or demonstrated activity.
+MVK,Q03426,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+NADK,O95544,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+NADK2,Q4G0N4,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+NAGK,Q9UJ70,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+NME1,P15531,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,Nucleoside diphosphate kinase; reported histidine/protein kinase activities; primary nucleotide kinase.
+NME2,P22392,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+NME3,Q13232,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+NME4,O00746,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+NME6,O75414,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+NME7,Q9Y5B8,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,Nucleoside diphosphate kinase family; reported protein kinase activity.
+NMRK1,Q9NWW6,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+NMRK2,Q9NPI5,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+NOL9,Q5SY16,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+PANK1,Q8TE04,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+PANK2,Q9BZ23,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+PANK3,Q9H999,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+PAPSS1,O43252,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+PAPSS2,O95340,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+PCK1,P35558,Carbohydrate or central-metabolism kinase,Atypical,Phosphoenolpyruvate carboxykinase (gluconeogenesis); reported secondary protein-kinase activity.
+PDPK2P,Q6A1A2,Protein kinase outside KinHub roster,AGC,Protein kinase domain; putative PDPK1-related pseudogene product (uncertain existence).
+PDXK,O00764,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+PFKFB1,P16118,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+PFKFB2,O60825,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+PFKFB3,Q16875,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+PFKFB4,Q16877,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+PFKL,P17858,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+PFKM,P08237,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+PFKP,Q01813,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+PGK1,P00558,Carbohydrate or central-metabolism kinase,Atypical,Phosphoglycerate kinase; reported secondary protein-kinase activity; primary role in glycolysis.
+PGK2,P07205,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+PI4K2A,Q9BTU6,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PI4K2B,Q8TCG2,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PI4KA,P42356,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PI4KAP2,A4QPH2,Keyword-annotated entry without established kinase catalytic role,Atypical,Putative PI4KA pseudogene product; uncertain protein existence; no EC number.
+PI4KB,Q9UBF8,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIK3C2A,O00443,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIK3C2B,O00750,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIK3C2G,O75747,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIK3C3,Q8NEB9,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIK3CA,P42336,Lipid kinase,Atypical,PI3K lipid kinase; secondary protein-kinase EC number; primary substrates are phosphoinositides.
+PIK3CB,P42338,Lipid kinase,Atypical,PI3K lipid kinase; secondary protein-kinase EC number; primary substrates are phosphoinositides.
+PIK3CD,O00329,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIK3CG,P48736,Lipid kinase,Atypical,PI3K lipid kinase; secondary protein-kinase EC number; primary substrates are phosphoinositides.
+PIKFYVE,Q9Y2I7,Lipid kinase,Atypical,Phosphoinositide 5-kinase; secondary protein-kinase EC number.
+PIP4K2A,P48426,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIP4K2B,P78356,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIP4K2C,Q8TBX8,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIP5K1A,Q99755,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIP5K1B,O14986,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PIP5K1C,O60331,Lipid kinase,Atypical,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+PKLR,P30613,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+PKM,P14618,Carbohydrate or central-metabolism kinase,Atypical,Pyruvate kinase; reported secondary protein-kinase activities; primary role in glycolysis.
+PMS2P1,A4D2B8,Keyword-annotated entry without established kinase catalytic role,Atypical,Pseudogene product; uncertain protein existence; no EC number.
+PMS2P11,Q13670,Keyword-annotated entry without established kinase catalytic role,Atypical,Pseudogene product; uncertain protein existence; no EC number.
+PMVK,Q15126,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+PNKP,Q96T60,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+PPIP5K1,Q6PFW1,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+PPIP5K2,O43314,Inositol phosphate kinase,Atypical,EC number and reviewed function describe a soluble inositol phosphate substrate.
+PRPS1,P60891,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+PRPS1L1,P21108,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+PRPS2,P11908,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+PSTK,Q8IV42,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+RBKS,Q9H477,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+RFK,Q969G6,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+SEPHS1,P49903,Keyword-annotated entry without established kinase catalytic role,Atypical,Selenophosphate synthetase paralog annotated as lacking established catalytic activity in humans.
+SEPHS2,Q99611,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+SGMS1,Q86VZ5,Keyword-annotated entry without established kinase catalytic role,Atypical,"Sphingomyelin synthase (EC 2.7.8.27, phosphatidylcholine:ceramide cholinephosphotransferase), not a kinase."
+SGMS2,Q8NHU3,Keyword-annotated entry without established kinase catalytic role,Atypical,"Sphingomyelin synthase (EC 2.7.8.27, phosphatidylcholine:ceramide cholinephosphotransferase), not a kinase."
+SHPK,Q9UHJ6,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+SPHK1,Q9NYA1,Lipid kinase,CAMK,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+SPHK2,Q9NRA0,Lipid kinase,CAMK,EC number and reviewed function describe a lipid or phospholipid head-group substrate.
+TK1,P04183,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+TK2,O00142,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+TKFC,Q3LXA3,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.
+TPK1,Q9H3S4,"Cofactor, amino-acid or other small-molecule kinase",Atypical,"EC number and reviewed function describe a cofactor, amino-acid or other small-molecule substrate."
+UCK1,Q9HA47,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+UCK2,Q9BZX2,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+UCKL1,Q9NWZ5,"Nucleotide, nucleoside or nucleic-acid kinase",Atypical,"EC number and reviewed function describe a nucleotide, nucleoside or nucleic-acid substrate."
+XYLB,O75191,Carbohydrate or central-metabolism kinase,Atypical,EC number and reviewed function describe a sugar or central-metabolite substrate.

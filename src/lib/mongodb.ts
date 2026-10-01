@@ -30,6 +30,8 @@ export async function connectToDatabase(): Promise<Mongoose> {
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
+      // MONGODB_DB_NAME overrides the database in the URI path (deployments set both).
+      ...(process.env.MONGODB_DB_NAME ? { dbName: process.env.MONGODB_DB_NAME } : {}),
     });
   }
 

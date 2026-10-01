@@ -315,3 +315,4 @@ async def _legacy_global_ingest_bioactivities() -> int:
 
     logger.info("ChEMBL ingestion complete – %d bioactivity records stored", len(all_activities))
     return len(all_activities)
+

@@ -13,14 +13,24 @@ interface DomainBoundary {
   end: number;
 }
 
+// AlphaFold DB confidence bands for pLDDT (stored in the B-factor column).
+export const PLDDT_BANDS = [
+  { min: 90, color: "#0053D6", label: "Very high (pLDDT > 90)" },
+  { min: 70, color: "#65CBF3", label: "Confident (90 > pLDDT > 70)" },
+  { min: 50, color: "#FFDB13", label: "Low (70 > pLDDT > 50)" },
+  { min: -Infinity, color: "#FF7D45", label: "Very low (pLDDT < 50)" },
+];
+
 interface NGLViewerProps {
   pdbId?: string | null;
   alphafoldId?: string | null;
+  modelUrl?: string | null;
+  colorByPlddt?: boolean;
   domains?: DomainBoundary[];
   className?: string;
 }
 
-export default function NGLViewer({ pdbId, alphafoldId, domains = [], className = "" }: NGLViewerProps) {
+export default function NGLViewer({ pdbId, alphafoldId, modelUrl, colorByPlddt = false, domains = [], className = "" }: NGLViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const stageRef = useRef<any>(null);
@@ -57,6 +67,8 @@ export default function NGLViewer({ pdbId, alphafoldId, domains = [], className 
         let url: string;
         if (pdbId) {
           url = `rcsb://${pdbId}`;
+        } else if (modelUrl) {
+          url = modelUrl;
         } else if (alphafoldId) {
           const resp = await fetch(`https://alphafold.ebi.ac.uk/api/prediction/${alphafoldId}`);
           const data = await resp.json();
@@ -73,7 +85,15 @@ export default function NGLViewer({ pdbId, alphafoldId, domains = [], className 
           return;
         }
 
-        if (domains.length > 0) {
+        if (colorByPlddt) {
+          const scheme = NGL.ColormakerRegistry.addScheme(function (this: InstanceType<typeof NGL.Colormaker>) {
+            this.atomColor = (atom) => {
+              const band = PLDDT_BANDS.find((b) => atom.bfactor > b.min) ?? PLDDT_BANDS[PLDDT_BANDS.length - 1];
+              return Number.parseInt(band.color.slice(1), 16);
+            };
+          }, "plddt");
+          result.addRepresentation("cartoon", { color: scheme });
+        } else if (domains.length > 0) {
           // Base: thin outline for residues not in any domain
           result.addRepresentation("backbone", {
             color: "#1e293b",
@@ -120,7 +140,7 @@ export default function NGLViewer({ pdbId, alphafoldId, domains = [], className 
         stageRef.current = null;
       }
     };
-  }, [pdbId, alphafoldId, domains]);
+  }, [pdbId, alphafoldId, modelUrl, colorByPlddt, domains]);
 
   return (
     <div className={`relative h-full ${className}`}>

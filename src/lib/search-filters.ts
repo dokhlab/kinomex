@@ -5,6 +5,13 @@ function escaped(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+const SOURCE_BINDING_MODES: Record<string, string> = {
+  inhibitor: "inhibitor",
+  allosteric: "allosteric",
+  agonist: "agonist|activator",
+  antagonist: "antagonist",
+};
+
 function intersect(sets: Set<string>[]): string[] {
   if (!sets.length) return [];
   return Array.from(sets[0]).filter((gene) => sets.every((set) => set.has(gene)));
@@ -36,23 +43,14 @@ export async function resolveStructuredGeneSet(
   }
 
   if (filters.bindingTypes.length) {
-    const specific = filters.bindingTypes.filter((type) => type !== "inhibitor");
-    const patterns = specific.map((type) => {
-      if (type === "type_ii") return "type\\s*-?\\s*ii|dfg[- ]out|inactive conformation";
-      if (type === "allosteric") return "allosteric|type\\s*-?\\s*iii";
-      if (type === "atp_competitive") return "atp[- ]competitive|orthosteric|type\\s*-?\\s*i";
-      return escaped(type.replaceAll("_", " "));
-    });
-    const match = patterns.length ? {
-      target_gene_symbol: { $nin: [null, ""] },
-      $or: [
-        { binding_type: { $regex: patterns.join("|"), $options: "i" } },
-        { assay_type: { $regex: patterns.join("|"), $options: "i" } },
-      ],
-    } : { target_gene_symbol: { $nin: [null, ""] } };
-    lookups.push(db.collection("bioactivities").find(match)
-      .project({ target_gene_symbol: 1 }).toArray()
-      .then((docs) => new Set(docs.map((doc) => doc.target_gene_symbol as string).filter(Boolean))));
+    // Binding modes come only from source-supplied ChEMBL mechanism records; a
+    // requested mode without such annotation (e.g. Type II) matches no gene.
+    const patterns = filters.bindingTypes.map((type) => SOURCE_BINDING_MODES[type]).filter(Boolean);
+    lookups.push(patterns.length
+      ? db.collection("ligand_representatives").find({ binding_mode: { $regex: patterns.join("|"), $options: "i" } })
+        .project({ gene_symbol: 1 }).toArray()
+        .then((docs) => new Set(docs.map((doc) => doc.gene_symbol as string).filter(Boolean)))
+      : Promise.resolve(new Set<string>()));
   }
 
   if (!lookups.length) return null;

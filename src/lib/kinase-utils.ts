@@ -1,10 +1,11 @@
 import type { Db } from "mongodb";
 import { escapeRegExp } from "@/lib/api-validation";
 
+// PDIS on the 0-100 scale.
 export function getScoreColor(score: number): string {
-  if (score >= 0.45) return "#34d399";
-  if (score >= 0.25) return "#38bdf8";
-  if (score >= 0.1) return "#f59e0b";
+  if (score >= 45) return "#34d399";
+  if (score >= 25) return "#38bdf8";
+  if (score >= 10) return "#f59e0b";
   return "#f43f5e";
 }
 

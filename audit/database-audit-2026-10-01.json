@@ -1,0 +1,182 @@
+{
+  "database": "kinomex",
+  "generated_at": "2026-10-01T14:04:18+00:00",
+  "collections": {
+    "alphafold_models": 667,
+    "auth_challenges": 0,
+    "bioactivities": 1021668,
+    "catalog_metadata": 2,
+    "compound_identifiers": 346695,
+    "diseases": 256,
+    "etl_checkpoints": 1081,
+    "expression": 36396,
+    "expression_quarantine": 322,
+    "kinases": 678,
+    "ligand_representatives": 717452,
+    "pdis": 678,
+    "pdis_candidate": 534,
+    "pdis_history": 2,
+    "pdis_runs": 2,
+    "pharos_targets": 678,
+    "source_coverage": 3,
+    "structures": 10043,
+    "structures_other": 620,
+    "user_ai_settings": 2,
+    "user_sessions": 0,
+    "users": 0,
+    "variants": 63736
+  },
+  "catalog": {
+    "entries": 678,
+    "core": 522,
+    "extensions": 156,
+    "core_groups": {
+      "AGC": 63,
+      "CMGC": 63,
+      "Other": 81,
+      "CAMK": 74,
+      "TK": 90,
+      "TKL": 43,
+      "STE": 47,
+      "Atypical": 44,
+      "CK1": 12,
+      "RGC": 5
+    },
+    "extension_classes": {
+      "Lipid kinase": 38,
+      "Nucleotide, nucleoside or nucleic-acid kinase": 36,
+      "Carbohydrate or central-metabolism kinase": 38,
+      "Keyword-annotated entry without established kinase catalytic role": 8,
+      "Cofactor, amino-acid or other small-molecule kinase": 20,
+      "Inositol phosphate kinase": 11,
+      "Protein kinase outside KinHub roster": 5
+    },
+    "extensions_with_group": 0
+  },
+  "pdis": {
+    "documents": 678,
+    "formula_versions": {
+      "3.0-weighted-mean": 678
+    },
+    "min": 0.0,
+    "max": 96.36,
+    "median": 33.28,
+    "zero_entries": 5,
+    "entries_ge_50": 71,
+    "totals_reproduced_from_components": 678,
+    "compound_input_max": 25763,
+    "entries_with_compounds": 566
+  },
+  "structures": {
+    "records": 10043,
+    "by_method": {
+      "X-RAY DIFFRACTION": 9688,
+      "ELECTRON MICROSCOPY": 354,
+      "ELECTRON CRYSTALLOGRAPHY": 1
+    },
+    "with_bound_ligands": 8255,
+    "with_emdb": 355,
+    "coverage": {
+      "entries_with_records": 476,
+      "gap": 202,
+      "core_entries_with_records": 384,
+      "orphan_gene_keys": [],
+      "orphan_gene_key_count": 0
+    },
+    "other_entries_not_scored": 620
+  },
+  "alphafold": {
+    "models": 667,
+    "coverage": {
+      "entries_with_records": 667,
+      "gap": 11,
+      "core_entries_with_records": 512,
+      "orphan_gene_keys": [],
+      "orphan_gene_key_count": 0
+    }
+  },
+  "ligands": {
+    "bioactivity_records": 1021668,
+    "catalog_records_by_source": {
+      "chembl": 1019354,
+      "pubchem": 2067
+    },
+    "representative_rows": 717452,
+    "legacy_default_binding_label_rows": 0,
+    "rows_with_binding_mode": 680,
+    "coverage": {
+      "entries_with_records": 566,
+      "gap": 112,
+      "core_entries_with_records": 472,
+      "orphan_gene_keys": [],
+      "orphan_gene_key_count": 0
+    }
+  },
+  "expression": {
+    "gtex_records": 36396,
+    "non_gtex_records_in_views": 0,
+    "quarantined": 322,
+    "quarantined_genes": 161,
+    "coverage": {
+      "entries_with_records": 674,
+      "gap": 4,
+      "core_entries_with_records": 519,
+      "orphan_gene_keys": [],
+      "orphan_gene_key_count": 0
+    }
+  },
+  "variants": {
+    "clinvar_records": 63649,
+    "clinvar_genes": 260,
+    "clinvar_placeholder_not_provided": 0,
+    "clinvar_with_accession": 63649,
+    "clinvar_by_classification": {
+      "Pathogenic": 928,
+      "drug response": 1,
+      "Pathogenic/Likely pathogenic": 614,
+      "Uncertain significance": 54838,
+      "Likely pathogenic; association": 1,
+      "Likely pathogenic/Likely risk allele": 2,
+      "Pathogenic/Likely pathogenic; risk factor": 1,
+      "Uncertain significance/VUS-high": 7,
+      "Uncertain significance; drug response": 1,
+      "not provided": 6,
+      "Likely benign": 115,
+      "Benign": 37,
+      "Uncertain significance/Uncertain risk allele": 22,
+      "Uncertain significance/VUS-mid": 1,
+      "Conflicting classifications of pathogenicity": 6003,
+      "Benign/Likely benign": 75,
+      "VUS-high": 8,
+      "Conflicting classifications of pathogenicity; risk factor": 1,
+      "risk factor": 1,
+      "Pathogenic/Likely pathogenic/Likely risk allele": 1,
+      "Likely pathogenic": 983,
+      "Likely pathogenic, low penetrance": 3
+    },
+    "curated_records": 87,
+    "curated_genes": 36,
+    "curated_gatekeeper_flags": 9,
+    "curated_citations_verified": 0,
+    "kinases_with_gatekeeper": 504
+  },
+  "diseases": {
+    "documents": 256,
+    "coverage": {
+      "entries_with_records": 256,
+      "gap": 422,
+      "core_entries_with_records": 199,
+      "orphan_gene_keys": [],
+      "orphan_gene_key_count": 0
+    }
+  },
+  "pharos": {
+    "tdl": {
+      "Tclin": 69,
+      "Tchem": 387,
+      "Tbio": 200,
+      "Tdark": 20,
+      "null": 2
+    }
+  }
+}

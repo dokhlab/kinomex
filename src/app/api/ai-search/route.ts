@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       ]).toArray().catch(() => []),
     ]);
 
-    const pdisMap = new Map(pdisDocs.filter((p) => Number.isFinite(p.pdis_total)).map((p) => [p.gene_symbol, p.pdis_total / 100]));
+    const pdisMap = new Map(pdisDocs.filter((p) => Number.isFinite(p.pdis_total)).map((p) => [p.gene_symbol, p.pdis_total]));
     const varCountMap = new Map(varCounts.map((v) => [v._id, v.count]));
     const ligandCountMap = new Map(ligandCounts.map((v) => [v._id, v.compounds.filter(Boolean).length]));
     const diseaseMap = new Map(diseaseDocs.map((d) => [d.gene_symbol, (d.diseases || []).map((dis: { disease_id: string }) => dis.disease_id)]));
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     let enriched = uniqueKinases.map((k) => ({
       gene_symbol: k.gene_symbol,
       name: k.full_name || "Unknown",
-      group: k.group || "Atypical",
+      group: k.catalog_membership === "uniprot_extended" ? (k.extension_class || "UniProt extension") : (k.group || "unavailable"),
       subfamily: k.subfamily || "",
       pdis_score: pdisMap.get(k.gene_symbol) ?? null,
       ligand_count: ligandCountMap.get(k.gene_symbol) ?? 0,

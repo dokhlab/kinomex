@@ -18,13 +18,20 @@ def _optional_secret(name: str) -> str:
     return value
 
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
 @dataclass(frozen=True)
 class DatabaseConfig:
     uri: str = field(default_factory=lambda: os.getenv("MONGODB_URI", "mongodb://localhost:27017/kinomex"))
-    db_name: str = "kinomex"
+    db_name: str = field(default_factory=lambda: os.getenv("MONGODB_DB_NAME", "kinomex"))
     max_pool_size: int = 50
     min_pool_size: int = 5
     server_selection_timeout_ms: int = 5_000
@@ -42,6 +49,15 @@ class APIConfig:
     ncbi_eutils_url: str = field(default_factory=lambda: os.getenv("NCBI_EUTILS_URL", "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"))
     pubmed_api_key: str = field(default_factory=lambda: _optional_secret("PUBMED_API_KEY"))
     pubchem_url: str = field(default_factory=lambda: os.getenv("PUBCHEM_API_URL", "https://pubchem.ncbi.nlm.nih.gov/rest/pug"))
+
+
+@dataclass(frozen=True)
+class DataQualityConfig:
+    # Synthetic data is never enabled implicitly. It must be an explicit local/dev choice.
+    allow_dev_seed: bool = field(default_factory=lambda: _env_bool("KINOMEX_ALLOW_DEV_SEED"))
+    allow_synthetic_expression: bool = field(
+        default_factory=lambda: _env_bool("KINOMEX_ALLOW_SYNTHETIC_EXPRESSION")
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -71,6 +87,9 @@ class RateLimitConfig:
     pdis_w_clinical: float = 0.30
     pdis_w_structure: float = 0.15
     pdis_w_compound_diversity: float = 0.15
+    # Retained for the legacy candidate/promote workflow during migration.
+    pdis_w_structure_proxy: float = 0.15
+    pdis_w_fda: float = 0.10
     pdis_clinical_target: int = 100  # normalisation target for clinical trials
 
 
@@ -91,6 +110,7 @@ class LoggingConfig:
 class Settings:
     db: DatabaseConfig = field(default_factory=DatabaseConfig)
     api: APIConfig = field(default_factory=APIConfig)
+    data: DataQualityConfig = field(default_factory=DataQualityConfig)
     rate: RateLimitConfig = field(default_factory=RateLimitConfig)
     log: LoggingConfig = field(default_factory=LoggingConfig)
 

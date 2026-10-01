@@ -1,104 +1,60 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
+import { loadCatalog } from "@/lib/catalog/load";
+import { sourceByKey } from "@/lib/catalog/build";
+import { round2 } from "@/lib/pdis";
 
-type CatalogMetadata = {
-  _id: string;
-  kinhub_domain_rows: number;
-  kinhub_resolved_entries: number;
-  uniprot_extended_entries: number;
-  inactive_historical_entries: number;
-  unresolved_kinhub_accessions: string[];
-  retrieved_at: Date;
-};
+export const dynamic = "force-dynamic";
 
+// Totals derive from the same catalog accounting as /api/catalog/accounting.
 export async function GET() {
   try {
-    const mongoose = await connectToDatabase();
-    const db = mongoose.connection.db!;
+    const { rows, accounting } = await loadCatalog();
+    const records = (key: string) => sourceByKey(accounting, key)?.records ?? null;
+    const scored = rows.filter((row) => row.pdis_default !== null);
+    const averagePDIS = scored.length
+      ? round2(scored.reduce((sum, row) => sum + (row.pdis_default as number), 0) / scored.length)
+      : null;
+    const clinvar = records("clinvar");
+    const curated = records("curated_mutations");
 
-    const [totalKinases, catalogMetadata, groupDist, pdisAgg, totalVariants, totalStructures, totalDiseases, totalBioactivities, topMutated, topDruggable] = await Promise.all([
-      db.collection("kinases").countDocuments(),
-      db.collection<CatalogMetadata>("catalog_metadata")
-        .findOne({ _id: "human-kinase-catalog" }),
-      db.collection("kinases").aggregate([
-        { $group: { _id: "$group", count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-      ]).toArray().catch(() => []),
-      db.collection("pdis").aggregate([
-        { $group: { _id: null, avg: { $avg: "$pdis_total" } } },
-      ]).toArray().catch(() => []),
-      db.collection("variants").countDocuments().catch(() => 0),
-      db.collection("structures").countDocuments({
-        "gene_symbols.0": { $exists: true },
-      }).catch(() => 0),
-      db.collection("diseases").countDocuments().catch(() => 0),
-      db.collection("bioactivities").countDocuments({
-        target_gene_symbol: { $nin: [null, ""] },
-      }).catch(() => 0),
-      db.collection("variants").aggregate([
-        { $group: { _id: "$gene_symbol", count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 10 },
-      ]).toArray().catch(() => []),
-      db.collection("pdis").find().sort({ pdis_total: -1 }).limit(10).toArray().catch(() => []),
-    ]);
-
-    const groupDistribution: Record<string, number> = {
-      AGC: 0, CAMK: 0, CK1: 0, CMGC: 0, STE: 0, TK: 0, TKL: 0,
-      Atypical: 0, RGC: 0, Other: 0,
-    };
-    for (const g of groupDist) {
-      if (g._id && groupDistribution.hasOwnProperty(g._id)) {
-        groupDistribution[g._id] = g.count;
-      }
-    }
-
-    const averagePDIS = Number.isFinite(pdisAgg[0]?.avg) ? pdisAgg[0].avg / 100 : null;
-
-    // Resolve group for top druggable kinases
-    const druggableGenes = topDruggable.map((d) => d.gene_symbol).filter(Boolean);
-    const druggableKinaseDocs = await db.collection("kinases").find({ gene_symbol: { $in: druggableGenes } }).toArray().catch(() => []);
-    const druggableGroupMap = new Map(druggableKinaseDocs.map((k) => [k.gene_symbol, k.group || "Atypical"]));
-
-    const response = {
-      totalKinases,
-      catalogAccounting: catalogMetadata ? {
-        totalEntries: totalKinases,
-        kinhubDomainRows: catalogMetadata.kinhub_domain_rows,
-        kinhubCoreEntries: catalogMetadata.kinhub_resolved_entries,
-        uniprotExtendedEntries: catalogMetadata.uniprot_extended_entries,
-        inactiveHistoricalEntries: catalogMetadata.inactive_historical_entries,
-        unresolvedKinHubAccessions: catalogMetadata.unresolved_kinhub_accessions,
-        reconciled: totalKinases ===
-          catalogMetadata.kinhub_resolved_entries + catalogMetadata.uniprot_extended_entries,
-        retrievedAt: catalogMetadata.retrieved_at,
-      } : null,
-      groupDistribution,
-      averagePDIS: averagePDIS === null ? null : Math.round(averagePDIS * 1000) / 1000,
-      totalLigands: totalBioactivities,
-      totalVariants,
-      totalStructures,
-      totalDiseases,
-      topMutatedKinases: topMutated.map((m) => ({
-        gene_symbol: m._id,
-        name: m._id,
-        mutation_count: m.count,
-        pdis_score: null,
-      })),
-      topDruggableKinases: topDruggable.map((d) => ({
-        gene_symbol: d.gene_symbol,
-        name: d.gene_symbol,
-        pdis_score: d.pdis_total / 100,
-        group: druggableGroupMap.get(d.gene_symbol) || "Atypical",
-      })),
-    };
-
-    return NextResponse.json(response);
+    return NextResponse.json({
+      totalKinases: accounting.total_entries,
+      catalogAccounting: accounting,
+      groupDistribution: accounting.core_group_counts,
+      extensionClassDistribution: accounting.extension_class_counts,
+      pdisScale: "0-100",
+      averagePDIS,
+      totalLigands: records("ligands"),
+      totalLigandPairs: records("compound_pairs"),
+      totalVariants: clinvar === null || curated === null ? null : clinvar + curated,
+      totalClinVarRecords: clinvar,
+      totalCuratedMutations: curated,
+      totalStructures: records("pdb"),
+      totalDiseases: records("uniprot_disease"),
+      topMutatedKinasesBasis: "ClinVar missense records",
+      topMutatedKinases: [...rows]
+        .sort((a, b) => b.clinvar_records - a.clinvar_records || a.gene_symbol.localeCompare(b.gene_symbol))
+        .slice(0, 10)
+        .map((row) => ({
+          gene_symbol: row.gene_symbol,
+          name: row.name,
+          mutation_count: row.clinvar_records,
+          pdis_score: row.pdis_default,
+          display_category: row.display_category,
+        })),
+      topDruggableKinases: [...scored]
+        .sort((a, b) => (a.rank_default ?? Infinity) - (b.rank_default ?? Infinity))
+        .slice(0, 10)
+        .map((row) => ({
+          gene_symbol: row.gene_symbol,
+          name: row.name,
+          pdis_score: row.pdis_default,
+          group: row.display_category,
+          display_category: row.display_category,
+        })),
+    });
   } catch (error) {
     console.error("GET /api/kinases/stats error:", error);
-    return NextResponse.json(
-      { error: "Failed to compute kinome statistics" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to compute kinome statistics" }, { status: 500 });
   }
 }

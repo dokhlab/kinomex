@@ -8,38 +8,10 @@ import { externalClaimsAreCited, extractExternalCitations, verifyExternalCitatio
 import { findMentionedKinases, searchPubMedEvidence } from "@/lib/pubmed";
 import { fetchStringAssociations, stringAssociationUrl, type StringInteraction } from "@/lib/string-network";
 import type { Db } from "mongodb";
-import { currentUser, decryptSecret } from "@/lib/auth";
+import { AiConfigurationError, normalizeLegacyOllamaModel, resolveAiSettings, type EffectiveAiSettings } from "@/lib/ai-config";
+import { currentUser } from "@/lib/auth";
 
-type AiVendor = "openai" | "gemini" | "anthropic" | "nvidia" | "ollama";
-type RequestAiSettings = { vendor: AiVendor; apiKey: string; model: string; baseUrl: string };
-const VENDOR_BASE_URLS: Record<AiVendor, string> = {
-  openai: "https://api.openai.com/v1",
-  gemini: "https://generativelanguage.googleapis.com/v1beta/openai/",
-  anthropic: "https://api.anthropic.com/v1",
-  nvidia: "https://integrate.api.nvidia.com/v1",
-  ollama: "http://localhost:11434/v1",
-};
-
-function parseAiSettings(body: unknown): RequestAiSettings | null {
-  if (!body || typeof body !== "object" || !("aiSettings" in body)) return null;
-  const raw = (body as { aiSettings?: Record<string, unknown> }).aiSettings;
-  const vendor = raw?.vendor;
-  if (typeof vendor !== "string" || !(vendor in VENDOR_BASE_URLS)) return null;
-  const typedVendor = vendor as AiVendor;
-  const apiKey = typeof raw?.apiKey === "string" ? raw.apiKey.trim() : "";
-  const model = typeof raw?.model === "string" ? raw.model.trim().slice(0, 120) : "";
-  if (!model || (typedVendor !== "ollama" && !apiKey)) return null;
-  // Provider endpoints are fixed server-side to prevent user-controlled SSRF.
-  return { vendor: typedVendor, apiKey, model, baseUrl: VENDOR_BASE_URLS[typedVendor] };
-}
-
-function normalizeLegacyOllamaModel(settings: RequestAiSettings): RequestAiSettings {
-  if (settings.vendor !== "ollama") return settings;
-  const legacyModels: Record<string, string> = { qwen3: "qwen3:14b", mistral: "mistral:latest" };
-  return { ...settings, model: legacyModels[settings.model.toLowerCase()] || settings.model };
-}
-
-function providerFailureMessage(error: unknown, settings: RequestAiSettings): string {
+function providerFailureMessage(error: unknown, settings: EffectiveAiSettings): string {
   const details = error instanceof Error ? error.message : String(error);
   if (settings.vendor === "ollama" && /fetch failed|connect|ECONNREFUSED/i.test(details)) {
     return "Ollama is configured, but its local service is not running at localhost:11434. Start Ollama, confirm the selected model is installed, and try again.";
@@ -56,7 +28,7 @@ function providerFailureMessage(error: unknown, settings: RequestAiSettings): st
   return `The configured ${settings.vendor} AI provider could not complete the request. Test the connection in User & AI settings.`;
 }
 
-async function anthropicCompletion(settings: RequestAiSettings, messages: OpenAI.Chat.ChatCompletionMessageParam[]): Promise<string> {
+async function anthropicCompletion(settings: EffectiveAiSettings, messages: OpenAI.Chat.ChatCompletionMessageParam[]): Promise<string> {
   const system = messages.filter((m) => m.role === "system").map((m) => typeof m.content === "string" ? m.content : "").join("\n\n");
   const conversation = messages.filter((m) => m.role === "user" || m.role === "assistant").map((m) => ({ role: m.role, content: typeof m.content === "string" ? m.content : "" }));
   const response = await fetch(`${settings.baseUrl.replace(/\/$/, "")}/messages`, {
@@ -77,9 +49,9 @@ You have access to the current KinomeX database snapshot.
 DATABASE SCHEMA:
 - gene_symbol (string, e.g. "EGFR", "BRAF", "CDK2") — standard HGNC gene symbol
 - full_name (string, e.g. "Epidermal growth factor receptor")
-- group (string: AGC, CAMK, CK1, CMGC, STE, TK, TKL, Atypical)
+- group (string) — the KinHub group (AGC, CAMK, CK1, CMGC, STE, TK, TKL, RGC, Atypical, Other) for a KinHub core entry, or the extension class for a reviewed UniProt extension (KW-0418 without a KinHub row)
 - family (string) — kinase family within the group
-- pdis_score (number or null, 0-1) — Pharmaceutical Development Interest Score; null means no verified score
+- pdis_score (number or null, 0-100) — default-weight Pharmaceutical Development Interest Score; null means the score is unavailable
 - organ_systems_impacted (string[]) — tissues where the kinase is expressed
 - diseases_associated (string[]) — diseases linked to the kinase
 - mutation_count (number) — number of ClinVar missense variants
@@ -96,8 +68,8 @@ KINASE GROUPS:
 - Atypical — atypical kinases (e.g. MTOR, ATM, ATR, CHEK1/2)
 
 PDIS (Pharmaceutical Development Interest Score):
-- Ranges 0-1 and summarizes verified publication, trial, structure, and compound-diversity evidence.
-- Higher values indicate more recorded development activity, not biological importance or a clinical recommendation.
+- Ranges 0-100: the weighted mean of citation, clinical-trial, structure, and compound components (default weights 0.30/0.30/0.15/0.15). Users can change the weights in the Explorer.
+- PDIS summarizes documented development evidence; it does not measure biological importance, efficacy, safety, or clinical priority. Never describe it as a priority or recommendation.
 - Never infer a zero score from a missing PDIS record; report it as unavailable.
 
 Guidelines:
@@ -109,7 +81,7 @@ Guidelines:
 - Do NOT mention internal implementation details.
 - When the user asks for "top" or "high PDIS" or "PDIS above/below X", the RELEVANT KINASES FROM DATABASE section contains the actual data — use it to answer with real scores and rankings.
 - If the context lists kinases, prefer answering from that list rather than making up examples.
-- WEBSITE-GROUNDING RULE: Facts in RELEVANT KINASES FROM DATABASE may be reported as KinomeX data without an external citation. Do not add scientific facts that are absent from that context unless they are supported by a real PubMed-indexed article.
+- SOURCE-LINK RULE: Facts in RELEVANT KINASES FROM DATABASE may be reported as KinomeX data without an external citation. Do not add scientific facts that are absent from that context unless they are supported by a real PubMed-indexed article.
 - SOURCE-AWARE EVIDENCE RULE: Cite the authoritative source that supplied each claim. STRING association claims must include the supplied direct STRING link. UniProt annotations must include the supplied UniProt link. KinomeX records may use their supplied dossier link. Literature-derived claims must include a verified PMID and matching DOI. Do not demand a PMID or DOI for a database record whose primary evidence is STRING, UniProt, ClinVar, GTEx, RCSB PDB, or ChEMBL.
 - COPYRIGHT RULE: PubMed abstracts can be publisher- or author-copyrighted. Paraphrase supplied abstracts in your own concise scientific language. Do not reproduce an abstract, article passage, or substantial verbatim excerpt; provide PMID and DOI links so the user can consult the source.
 - Never invent or approximate a source, identifier, association, or link. If no connected source supplies a claim, say it is unavailable.`;
@@ -128,7 +100,6 @@ function buildSystemPrompt(context: Record<string, unknown>[]): string {
         Array.isArray(k.tissues) && k.tissues.length ? `Tissues:${k.tissues.join(",")}` : "",
         Array.isArray(k.tissues) && k.tissues.length ? "TissueSource:https://gtexportal.org/home/" : "",
         typeof k.ligand_count === "number" ? `Ligands:${k.ligand_count}` : "",
-        Array.isArray(k.binding_types) && k.binding_types.length ? `Binding:${k.binding_types.join(",")}` : "",
         typeof k.ligand_count === "number" && k.ligand_count > 0 ? "LigandSource:https://www.ebi.ac.uk/chembl/" : "",
         Array.isArray(k.curated_functions) && k.curated_functions.length ? `CuratedFunction:${k.curated_functions.join(" ")}` : "",
         k.uniprot_url ? `UniProtSource:${k.uniprot_url}` : "",
@@ -204,7 +175,7 @@ async function fetchKinaseContext(
   if (!kinases?.length && meaningfulTerms.length) {
     const annotatedCatalogue = await db.collection("kinases").find({}, {
       projection: {
-        gene_symbol: 1, full_name: 1, group: 1, family: 1, uniprot_id: 1,
+        gene_symbol: 1, full_name: 1, group: 1, family: 1, uniprot_id: 1, catalog_membership: 1, extension_class: 1,
         source_url: 1, function_annotations: 1, catalytic_activities: 1,
         subunit_annotations: 1, keywords: 1,
       },
@@ -269,11 +240,11 @@ async function fetchKinaseContext(
     ]).toArray().catch(() => []),
     db.collection("bioactivities").aggregate([
       { $match: { target_gene_symbol: { $in: geneSymbols } } },
-      { $group: { _id: "$target_gene_symbol", compounds: { $addToSet: "$compound_id" }, bindingTypes: { $addToSet: "$binding_type" } } },
+      { $group: { _id: "$target_gene_symbol", compounds: { $addToSet: "$compound_id" } } },
     ]).toArray().catch(() => []),
   ]);
 
-  const pdisMap = new Map(pdisDocs.filter((p) => Number.isFinite(p.pdis_total)).map((p) => [p.gene_symbol, p.pdis_total / 100]));
+  const pdisMap = new Map(pdisDocs.filter((p) => Number.isFinite(p.pdis_total)).map((p) => [p.gene_symbol, p.pdis_total]));
   const varCountMap = new Map(varCounts.map((v) => [v._id, v.count]));
   const diseaseMap = new Map(
     diseaseDocs.map((d) => [
@@ -284,20 +255,18 @@ async function fetchKinaseContext(
   const expMap = new Map(expDocs.map((doc) => [doc._id, doc.tissues.filter(Boolean)]));
   const ligandMap = new Map(ligandCounts.map((doc) => [doc._id, {
     count: doc.compounds.filter(Boolean).length,
-    bindingTypes: doc.bindingTypes.filter(Boolean),
   }]));
 
   let context = kinases.map((k) => ({
     gene_symbol: k.gene_symbol,
     full_name: k.full_name,
-    group: k.group,
+    group: k.catalog_membership === "uniprot_extended" ? (k.extension_class || "UniProt extension") : (k.group || "unavailable"),
     family: k.family,
     pdis_score: pdisMap.get(k.gene_symbol) ?? null,
     mutation_count: varCountMap.get(k.gene_symbol) || 0,
     diseases: diseaseMap.get(k.gene_symbol) || [],
     tissues: expMap.get(k.gene_symbol) || [],
     ligand_count: ligandMap.get(k.gene_symbol)?.count || 0,
-    binding_types: ligandMap.get(k.gene_symbol)?.bindingTypes || [],
     curated_functions: Array.isArray(k.function_annotations) ? k.function_annotations : [],
     uniprot_url: k.source_url || (k.uniprot_id ? `https://www.uniprot.org/uniprotkb/${k.uniprot_id}/entry` : null),
   }));
@@ -346,7 +315,7 @@ async function fetchDirectAnnotationFallback(db: Db, query: string): Promise<Rec
     { keywords: { $regex: escapeRegExp(term), $options: "i" } },
   ] })) };
   const records = await db.collection("kinases").find(match, { projection: {
-    gene_symbol: 1, full_name: 1, group: 1, family: 1, uniprot_id: 1,
+    gene_symbol: 1, full_name: 1, group: 1, family: 1, uniprot_id: 1, catalog_membership: 1, extension_class: 1,
     source_url: 1, function_annotations: 1, catalytic_activities: 1,
     subunit_annotations: 1, keywords: 1,
   } }).limit(50).toArray() as Record<string, unknown>[];
@@ -401,17 +370,19 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
     const body: unknown = await request.json();
-    let aiSettings = parseAiSettings(body);
-    if (!aiSettings) {
-      const account = await currentUser();
-      if (account?.aiSettings) aiSettings = {
-        vendor: account.aiSettings.vendor as AiVendor,
-        model: account.aiSettings.model,
-        baseUrl: account.aiSettings.baseUrl,
-        apiKey: decryptSecret(account.aiSettings.encryptedApiKey),
-      };
+    const account = await currentUser();
+    let aiSettings: EffectiveAiSettings;
+    try {
+      aiSettings = normalizeLegacyOllamaModel(resolveAiSettings(account));
+    } catch (error) {
+      if (error instanceof AiConfigurationError) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: error.status,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      throw error;
     }
-    if (aiSettings) aiSettings = normalizeLegacyOllamaModel(aiSettings);
     const messages = validateChatMessages(
       typeof body === "object" && body !== null && "messages" in body
         ? body.messages
@@ -423,15 +394,6 @@ export async function POST(request: NextRequest) {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
-    }
-
-    if (!aiSettings) {
-      return new Response(
-        JSON.stringify({
-          error: "Configure an AI provider and API key in User & AI settings.",
-        }),
-        { status: 501, headers: { "Content-Type": "application/json" } }
-      );
     }
 
     const lastUserMsg = [...messages]

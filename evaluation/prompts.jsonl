@@ -1,0 +1,100 @@
+{"prompt_id": "single_kinase_function-01", "query_type": "single_kinase_function", "prompt": "What is the catalytic function of CSNK1D according to its UniProt record?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-02", "query_type": "single_kinase_function", "prompt": "Summarize the reviewed function of CAMKK2 and cite the source.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-03", "query_type": "single_kinase_function", "prompt": "What substrates does DYRK1A phosphorylate according to KinomeX records?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-04", "query_type": "single_kinase_function", "prompt": "Describe the function of TTBK1 and cite supporting literature.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-05", "query_type": "single_kinase_function", "prompt": "What cellular process does PINK1 regulate?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-06", "query_type": "single_kinase_function", "prompt": "What is the role of MAP3K12 (DLK) in neurons?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-07", "query_type": "single_kinase_function", "prompt": "Which protein complex does MTOR belong to and what does it regulate?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-08", "query_type": "single_kinase_function", "prompt": "What does the UniProt record say about the function of WEE1?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-09", "query_type": "single_kinase_function", "prompt": "Describe the function of STK11 (LKB1) with a literature citation.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-10", "query_type": "single_kinase_function", "prompt": "What is the function of PIK3CA and why is it an extension entry in KinomeX?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-11", "query_type": "single_kinase_function", "prompt": "What does CDK7 do in transcription and the cell cycle?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-12", "query_type": "single_kinase_function", "prompt": "What is the reviewed function of RIPK1?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-13", "query_type": "single_kinase_function", "prompt": "What does the kinase HIPK2 phosphorylate?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-14", "query_type": "single_kinase_function", "prompt": "Describe the function of TBK1 in innate immunity with a citation.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-15", "query_type": "single_kinase_function", "prompt": "What is the function of LRRK2 and which disease is it linked to?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-16", "query_type": "single_kinase_function", "prompt": "What does the UniProt record state about DCLK1?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-17", "query_type": "single_kinase_function", "prompt": "What is the catalytic activity of PRKCG?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-18", "query_type": "single_kinase_function", "prompt": "Describe the function of ULK1 in autophagy.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-19", "query_type": "single_kinase_function", "prompt": "What does the kinase NEK7 regulate?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "single_kinase_function-20", "query_type": "single_kinase_function", "prompt": "What is known about the function of the pseudokinase STRADA?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-01", "query_type": "catalog_filtering", "prompt": "List KinHub core kinases with at most 100 citations, an experimental structure, and at least 100 distinct compounds.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-02", "query_type": "catalog_filtering", "prompt": "Which catalog entries are tissue-enriched in the CNS in GTEx?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-03", "query_type": "catalog_filtering", "prompt": "Which kinases have the highest default-weight PDIS?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-04", "query_type": "catalog_filtering", "prompt": "List TK group kinases with PDIS above 80.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-05", "query_type": "catalog_filtering", "prompt": "Which UniProt extension entries are lipid kinases?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-06", "query_type": "catalog_filtering", "prompt": "How many entries does the KinHub core contain, and how many are UniProt extensions?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-07", "query_type": "catalog_filtering", "prompt": "Which CMGC kinases have no counted clinical trials?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-08", "query_type": "catalog_filtering", "prompt": "List Atypical group kinases in the catalog.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-09", "query_type": "catalog_filtering", "prompt": "Which kinases have PDIS between 40 and 50?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-10", "query_type": "catalog_filtering", "prompt": "Which entries have no experimental structure but have ligand records?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-11", "query_type": "catalog_filtering", "prompt": "List AGC kinases expressed most highly in brain tissues.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-12", "query_type": "catalog_filtering", "prompt": "Which kinases in the CAMK group have a Tdark Pharos label?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-13", "query_type": "catalog_filtering", "prompt": "Which extension entries have no established kinase catalytic role?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-14", "query_type": "catalog_filtering", "prompt": "Which kinases rank in the top 10 when all four PDIS weights are equal?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-15", "query_type": "catalog_filtering", "prompt": "List STE group kinases with more than 1,000 distinct compounds.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-16", "query_type": "catalog_filtering", "prompt": "Which kinases have the most ClinVar missense records?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-17", "query_type": "catalog_filtering", "prompt": "Which inositol phosphate kinases does the catalog contain?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-18", "query_type": "catalog_filtering", "prompt": "List kinases with a PDIS below 10.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-19", "query_type": "catalog_filtering", "prompt": "Which TKL kinases have an AlphaFold DB model but no experimental structure?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "catalog_filtering-20", "query_type": "catalog_filtering", "prompt": "Which KinHub groups have the most entries?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-01", "query_type": "ligand_and_structure", "prompt": "What is the best-resolution experimental structure of EGFR in KinomeX?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-02", "query_type": "ligand_and_structure", "prompt": "How many experimental structures does CSNK1D have and what is the best resolution?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-03", "query_type": "ligand_and_structure", "prompt": "Which compounds show sub-nanomolar Kd against ABL1?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-04", "query_type": "ligand_and_structure", "prompt": "List cryo-EM structures of MTOR with their EMDB accessions.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-05", "query_type": "ligand_and_structure", "prompt": "What ligands are bound in PDB structures of BRAF?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-06", "query_type": "ligand_and_structure", "prompt": "How many distinct compounds does PLK1 have in ChEMBL and PubChem?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-07", "query_type": "ligand_and_structure", "prompt": "Which uncensored IC50 measurements below 10 nM exist for CDK2?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-08", "query_type": "ligand_and_structure", "prompt": "Does CAMKK2 have an AlphaFold DB model, and what is its global pLDDT?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-09", "query_type": "ligand_and_structure", "prompt": "Which kinases have no AlphaFold DB model in KinomeX?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-10", "query_type": "ligand_and_structure", "prompt": "What representative measurement does KinomeX show for imatinib against KIT?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-11", "query_type": "ligand_and_structure", "prompt": "Which structures of ALK carry lorlatinib?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-12", "query_type": "ligand_and_structure", "prompt": "What is the binding mode annotation for osimertinib against EGFR?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-13", "query_type": "ligand_and_structure", "prompt": "How many ligand records does MAPK10 have?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-14", "query_type": "ligand_and_structure", "prompt": "Which PDB entries of JAK2 are above 3.5 \u00c5 resolution?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-15", "query_type": "ligand_and_structure", "prompt": "Which compounds against DAPK3 appear in both ChEMBL and PubChem?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-16", "query_type": "ligand_and_structure", "prompt": "What is the mean resolution of experimental structures of MET?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-17", "query_type": "ligand_and_structure", "prompt": "Which PROTAC compounds are recorded for BTK?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-18", "query_type": "ligand_and_structure", "prompt": "List NMR structures of any kinase in the catalog.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-19", "query_type": "ligand_and_structure", "prompt": "Which ligand record supports the most potent Ki for MAPK14?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "ligand_and_structure-20", "query_type": "ligand_and_structure", "prompt": "What experimental methods cover the structures of PIK3CA?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-01", "query_type": "variant_and_disease", "prompt": "Which ClinVar variants in CAMK2B are classified as pathogenic?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-02", "query_type": "variant_and_disease", "prompt": "What diseases does UniProt associate with CAMK2B?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-03", "query_type": "variant_and_disease", "prompt": "Which EGFR mutations confer resistance to osimertinib?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-04", "query_type": "variant_and_disease", "prompt": "Is ABL1 T315I a gatekeeper mutation?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-05", "query_type": "variant_and_disease", "prompt": "What is the gatekeeper residue of KIT?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-06", "query_type": "variant_and_disease", "prompt": "Which ClinVar records for BRAF have a review status of three stars?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-07", "query_type": "variant_and_disease", "prompt": "What conditions are linked to pathogenic variants in STK11?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-08", "query_type": "variant_and_disease", "prompt": "Which kinases have the most pathogenic ClinVar variants?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-09", "query_type": "variant_and_disease", "prompt": "Which ALK mutations are associated with crizotinib resistance?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-10", "query_type": "variant_and_disease", "prompt": "What diseases does UniProt associate with LRRK2?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-11", "query_type": "variant_and_disease", "prompt": "Which ClinVar variants in RET are pathogenic or likely pathogenic?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-12", "query_type": "variant_and_disease", "prompt": "Is KIT D816V at the gatekeeper position?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-13", "query_type": "variant_and_disease", "prompt": "What disease is linked to variants in CDKL5?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-14", "query_type": "variant_and_disease", "prompt": "Which FGFR3 variants appear in ClinVar with conflicting classifications?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-15", "query_type": "variant_and_disease", "prompt": "What diseases does UniProt list for PIK3CA?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-16", "query_type": "variant_and_disease", "prompt": "Which kinases have literature-curated resistance mutations in KinomeX?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-17", "query_type": "variant_and_disease", "prompt": "What is the ClinVar classification of JAK2 V617F?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-18", "query_type": "variant_and_disease", "prompt": "Which variants of MET affect exon 14 skipping?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-19", "query_type": "variant_and_disease", "prompt": "Which kinases carry UniProt disease annotations for intellectual disability?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "variant_and_disease-20", "query_type": "variant_and_disease", "prompt": "What review status do ClinVar records for ATM mostly have?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-01", "query_type": "literature", "prompt": "What recent literature describes CSNK1D inhibitors in circadian rhythm research?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-02", "query_type": "literature", "prompt": "Cite a publication on DLK (MAP3K12) inhibition in neurodegeneration.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-03", "query_type": "literature", "prompt": "What does the literature report about CAMKK2 in prostate cancer?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-04", "query_type": "literature", "prompt": "Find literature on TTBK1 and tau phosphorylation.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-05", "query_type": "literature", "prompt": "Cite a study on MAPK10 (JNK3) in neuronal apoptosis.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-06", "query_type": "literature", "prompt": "What literature links CSNK2A2 to cancer?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-07", "query_type": "literature", "prompt": "Cite a paper on BRD2 bromodomain inhibitors.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-08", "query_type": "literature", "prompt": "What literature describes DAPK3 in smooth muscle contraction?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-09", "query_type": "literature", "prompt": "Find publications on PRKCG mutations in spinocerebellar ataxia.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-10", "query_type": "literature", "prompt": "Cite a study on FLT3 inhibitors in acute myeloid leukemia.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-11", "query_type": "literature", "prompt": "What does the literature say about DCLK1 as a cancer stem cell marker?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-12", "query_type": "literature", "prompt": "Cite a publication on CDC7 inhibitors in clinical development.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-13", "query_type": "literature", "prompt": "Find literature on MAPK9 (JNK2) in insulin resistance.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-14", "query_type": "literature", "prompt": "What literature describes WNK1 in blood pressure regulation?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-15", "query_type": "literature", "prompt": "Cite a paper on PINK1 and mitophagy.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-16", "query_type": "literature", "prompt": "What publications describe HIPK2 in fibrosis?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-17", "query_type": "literature", "prompt": "Find literature on ULK1 inhibitors.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-18", "query_type": "literature", "prompt": "Cite a study of NEK2 in chromosomal instability.", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-19", "query_type": "literature", "prompt": "What literature reports allosteric inhibitors of AKT1?", "written_at": "2026-09-30T21:09:13Z"}
+{"prompt_id": "literature-20", "query_type": "literature", "prompt": "Cite a review of understudied (dark) kinases.", "written_at": "2026-09-30T21:09:13Z"}

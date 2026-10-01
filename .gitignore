@@ -24,16 +24,12 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*.log
-/data-audit/backups/
-.venv/
 
 # python
 __pycache__/
 *.pyc
 
 # local env files
-.env
 .env*.local
 *~
 
@@ -43,3 +39,6 @@ __pycache__/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/.next-dev/
+/.next-jmb/
+/.next-jmb-build/

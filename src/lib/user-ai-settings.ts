@@ -64,10 +64,6 @@ export function loadProfile(): UserProfile | null {
   try { return JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY) || "null"); } catch { return null; }
 }
 
-export function loadAiSettings(): AiSettings | null {
-  try { return JSON.parse(sessionStorage.getItem(AI_SESSION_KEY) || "null"); } catch { return null; }
-}
-
 export async function hashPassword(password: string): Promise<string> {
   const bytes = new TextEncoder().encode(password);
   const digest = await crypto.subtle.digest("SHA-256", bytes);

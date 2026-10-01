@@ -20,6 +20,7 @@ COLLECTIONS = {
     "expression": "expression",
     "variants": "variants",
     "pdis": "pdis",
+    "pdis_candidate": "pdis_candidate",
     "diseases": "diseases",
 }
 
@@ -33,7 +34,8 @@ async def connect() -> motor.motor_asyncio.AsyncIOMotorDatabase:
     if _db is not None:
         return _db
     cfg = settings.db
-    logger.info("Connecting to MongoDB at %s", cfg.uri)
+    # Never log cfg.uri: deployment URIs may contain database credentials.
+    logger.info("Connecting to MongoDB database '%s'", cfg.db_name)
     _client = motor.motor_asyncio.AsyncIOMotorClient(
         cfg.uri,
         maxPoolSize=cfg.max_pool_size,
@@ -101,10 +103,11 @@ async def ensure_indexes() -> None:
         IndexModel([("pathogenicity", ASCENDING)]),
     ])
 
-    await db[COLLECTIONS["pdis"]].create_indexes([
-        IndexModel([("gene_symbol", ASCENDING)], unique=True),
-        IndexModel([("pdis_total", DESCENDING)]),
-    ])
+    for pdis_collection in (COLLECTIONS["pdis"], COLLECTIONS["pdis_candidate"]):
+        await db[pdis_collection].create_indexes([
+            IndexModel([("gene_symbol", ASCENDING)], unique=True),
+            IndexModel([("pdis_total", DESCENDING)]),
+        ])
 
     logger.info("All indexes ensured")
 
