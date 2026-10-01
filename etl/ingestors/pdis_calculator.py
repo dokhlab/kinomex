@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
+import os
 from datetime import datetime, timezone
 from typing import Any
 
@@ -212,9 +213,12 @@ async def ingest_pdis() -> int:
             "retrieved_at": retrieved_at,
         })
 
-    await db[COLLECTIONS["pdis"]].delete_many({"source": "pdis_calculator"})
+    target_collection = os.getenv("KINOMEX_PDIS_TARGET_COLLECTION", COLLECTIONS["pdis"])
+    if target_collection not in {COLLECTIONS["pdis"], COLLECTIONS["pdis_candidate"]}:
+        raise RuntimeError(f"Unsupported PDIS target collection: {target_collection}")
+    await db[target_collection].delete_many({"source": "pdis_calculator"})
     await batch_upsert(
-        COLLECTIONS["pdis"], records, key_fields=["gene_symbol"], batch_size=500
+        target_collection, records, key_fields=["gene_symbol"], batch_size=500
     )
-    logger.info("Stored %d evidence-only PDIS scores", len(records))
+    logger.info("Stored %d evidence-only PDIS scores in %s", len(records), target_collection)
     return len(records)

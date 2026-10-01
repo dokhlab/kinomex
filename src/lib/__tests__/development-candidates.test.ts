@@ -17,3 +17,4 @@ describe("development candidate attribution", () => {
     expect(candidates[0].status).toContain("terminated");
   });
 });
+

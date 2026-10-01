@@ -51,6 +51,10 @@ interface LigandAssay {
   value_nm: number;
   relation: string;
   target_conformation?: string;
+  source?: string;
+  source_url?: string;
+  assay_count?: number;
+  pubchem_cid?: string | number;
   reference: { pubmed_id: string; doi?: string; title?: string; year?: number };
 }
 

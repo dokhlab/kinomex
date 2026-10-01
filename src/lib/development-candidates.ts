@@ -44,3 +44,4 @@ const CANDIDATES: Record<string, DevelopmentCandidate[]> = {
 export function developmentCandidatesForGene(gene: string): DevelopmentCandidate[] {
   return CANDIDATES[gene.toUpperCase()] ?? [];
 }
+

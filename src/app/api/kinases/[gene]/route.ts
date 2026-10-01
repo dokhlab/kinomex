@@ -12,10 +12,12 @@ const PROFILE_CACHE_HEADERS = {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { gene: string } }
+  { params }: { params: Promise<{ gene: string }> }
 ) {
+  let geneForLog = "unknown";
   try {
-    const { gene } = params;
+    const { gene } = await params;
+    geneForLog = gene;
 
     if (!gene) {
       return NextResponse.json(
@@ -75,8 +77,8 @@ export async function GET(
             { $ifNull: ["$compound_id", { $toString: { $ifNull: ["$pubchem_cid", "unknown"] } }] },
           ] },
         } },
-        // Put the most potent finite measurement first, then retain one row
-        // per source compound while reporting how many assays support it.
+        // Keep the most potent finite measurement per source compound and expose
+        // the number of assay records supporting that representative row.
         { $sort: { _numeric_value: 1, activity_id: 1 } },
         { $group: {
           _id: "$_ligand_key",
@@ -234,7 +236,7 @@ export async function GET(
     });
     return NextResponse.json(kinase, { headers: PROFILE_CACHE_HEADERS });
   } catch (error) {
-    console.error(`GET /api/kinases/${params.gene} error:`, error);
+    console.error(`GET /api/kinases/${geneForLog} error:`, error);
     return NextResponse.json(
       { error: "Failed to fetch kinase profile" },
       { status: 500 }

@@ -108,6 +108,7 @@ query StructureEntries($ids: [String!]!) {
 """
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
 async def _fetch_entry_details(
     session: aiohttp.ClientSession,
     pdb_ids: list[str],
@@ -118,6 +119,7 @@ async def _fetch_entry_details(
         async with session.post(
             "https://data.rcsb.org/graphql",
             json={"query": ENTRY_QUERY, "variables": {"ids": pdb_ids}},
+            timeout=aiohttp.ClientTimeout(total=45),
         ) as resp:
             resp.raise_for_status()
             payload = await resp.json()
@@ -234,7 +236,10 @@ async def ingest_structures() -> int:
                 break
 
             pdb_ids = [r["identifier"] for r in result_list]
-            for detail_offset in range(0, len(pdb_ids), 100):
+            # RCSB occasionally disconnects on large GraphQL responses. Keep
+            # requests small and bounded so transient failures can be retried
+            # without losing the complete refresh transaction.
+            for detail_offset in range(0, len(pdb_ids), 25):
                 details = await _fetch_entry_details(
                     session, pdb_ids[detail_offset : detail_offset + 100], sem
                 )

@@ -186,10 +186,10 @@ function AboutTab() {
       <Section title="Ligand Evidence" icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3h6m-5 0v6l-5 8a2 2 0 001.7 3h10.6a2 2 0 001.7-3l-5-8V3" /></svg>}>
         <Card>
           <p className="text-slate-300 leading-relaxed">
-            The 13 August 2026 audited ligand snapshot contains 1,019,354 valid ChEMBL activity records and 2,085 PubChem records mapped to 566 catalogue genes. The remaining 112 catalogue genes had no mapped record in those connected source snapshots; this means that evidence is unavailable in the current import, not that a ligand does not exist. The live collection has no missing gene symbols, invalid ChEMBL records, orphan catalogue mappings, or duplicate ChEMBL activity identifiers.
+            KinomeX keeps ChEMBL and PubChem records source-bounded. ChEMBL activity rows are mapped to catalogue genes through UniProt-linked targets, retain their source activity identifiers, and are filtered to finite non-negative nM measurements. A dossier displays one representative row per source compound, selecting the most potent measurement while retaining the supporting assay count.
           </p>
-          <p className="text-slate-400 leading-relaxed mt-3">
-            Dossiers separate curated development candidates from quantitative binding assays. Binding assays are consolidated by source compound while retaining the best finite standardized value and the number of supporting assay records. Users can search compounds, filter by nM range, activity type, and assay, resize table columns, and move through results in pages of 100 compounds. Every row links to its ChEMBL or PubChem source.
+          <p className="mt-3 leading-relaxed text-slate-400">
+            Curated development candidates are shown separately from quantitative binding assays and must link to a trial registry or primary publication. The Ligands table supports compound search, nM range filters, binding and assay filters, source-record links, resizable columns, and pagination at 100 compounds per page. Run the ligand audit after each data refresh to distinguish missing source coverage from a claim that no ligand exists.
           </p>
         </Card>
       </Section>

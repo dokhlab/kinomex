@@ -8,38 +8,10 @@ import { externalClaimsAreCited, extractExternalCitations, verifyExternalCitatio
 import { findMentionedKinases, searchPubMedEvidence } from "@/lib/pubmed";
 import { fetchStringAssociations, stringAssociationUrl, type StringInteraction } from "@/lib/string-network";
 import type { Db } from "mongodb";
-import { currentUser, decryptSecret } from "@/lib/auth";
+import { AiConfigurationError, normalizeLegacyOllamaModel, resolveAiSettings, type EffectiveAiSettings } from "@/lib/ai-config";
+import { currentUser } from "@/lib/auth";
 
-type AiVendor = "openai" | "gemini" | "anthropic" | "nvidia" | "ollama";
-type RequestAiSettings = { vendor: AiVendor; apiKey: string; model: string; baseUrl: string };
-const VENDOR_BASE_URLS: Record<AiVendor, string> = {
-  openai: "https://api.openai.com/v1",
-  gemini: "https://generativelanguage.googleapis.com/v1beta/openai/",
-  anthropic: "https://api.anthropic.com/v1",
-  nvidia: "https://integrate.api.nvidia.com/v1",
-  ollama: "http://localhost:11434/v1",
-};
-
-function parseAiSettings(body: unknown): RequestAiSettings | null {
-  if (!body || typeof body !== "object" || !("aiSettings" in body)) return null;
-  const raw = (body as { aiSettings?: Record<string, unknown> }).aiSettings;
-  const vendor = raw?.vendor;
-  if (typeof vendor !== "string" || !(vendor in VENDOR_BASE_URLS)) return null;
-  const typedVendor = vendor as AiVendor;
-  const apiKey = typeof raw?.apiKey === "string" ? raw.apiKey.trim() : "";
-  const model = typeof raw?.model === "string" ? raw.model.trim().slice(0, 120) : "";
-  if (!model || (typedVendor !== "ollama" && !apiKey)) return null;
-  // Provider endpoints are fixed server-side to prevent user-controlled SSRF.
-  return { vendor: typedVendor, apiKey, model, baseUrl: VENDOR_BASE_URLS[typedVendor] };
-}
-
-function normalizeLegacyOllamaModel(settings: RequestAiSettings): RequestAiSettings {
-  if (settings.vendor !== "ollama") return settings;
-  const legacyModels: Record<string, string> = { qwen3: "qwen3:14b", mistral: "mistral:latest" };
-  return { ...settings, model: legacyModels[settings.model.toLowerCase()] || settings.model };
-}
-
-function providerFailureMessage(error: unknown, settings: RequestAiSettings): string {
+function providerFailureMessage(error: unknown, settings: EffectiveAiSettings): string {
   const details = error instanceof Error ? error.message : String(error);
   if (settings.vendor === "ollama" && /fetch failed|connect|ECONNREFUSED/i.test(details)) {
     return "Ollama is configured, but its local service is not running at localhost:11434. Start Ollama, confirm the selected model is installed, and try again.";
@@ -56,7 +28,7 @@ function providerFailureMessage(error: unknown, settings: RequestAiSettings): st
   return `The configured ${settings.vendor} AI provider could not complete the request. Test the connection in User & AI settings.`;
 }
 
-async function anthropicCompletion(settings: RequestAiSettings, messages: OpenAI.Chat.ChatCompletionMessageParam[]): Promise<string> {
+async function anthropicCompletion(settings: EffectiveAiSettings, messages: OpenAI.Chat.ChatCompletionMessageParam[]): Promise<string> {
   const system = messages.filter((m) => m.role === "system").map((m) => typeof m.content === "string" ? m.content : "").join("\n\n");
   const conversation = messages.filter((m) => m.role === "user" || m.role === "assistant").map((m) => ({ role: m.role, content: typeof m.content === "string" ? m.content : "" }));
   const response = await fetch(`${settings.baseUrl.replace(/\/$/, "")}/messages`, {
@@ -401,17 +373,19 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
     const body: unknown = await request.json();
-    let aiSettings = parseAiSettings(body);
-    if (!aiSettings) {
-      const account = await currentUser();
-      if (account?.aiSettings) aiSettings = {
-        vendor: account.aiSettings.vendor as AiVendor,
-        model: account.aiSettings.model,
-        baseUrl: account.aiSettings.baseUrl,
-        apiKey: decryptSecret(account.aiSettings.encryptedApiKey),
-      };
+    const account = await currentUser();
+    let aiSettings: EffectiveAiSettings;
+    try {
+      aiSettings = normalizeLegacyOllamaModel(resolveAiSettings(account));
+    } catch (error) {
+      if (error instanceof AiConfigurationError) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: error.status,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      throw error;
     }
-    if (aiSettings) aiSettings = normalizeLegacyOllamaModel(aiSettings);
     const messages = validateChatMessages(
       typeof body === "object" && body !== null && "messages" in body
         ? body.messages
@@ -423,15 +397,6 @@ export async function POST(request: NextRequest) {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
-    }
-
-    if (!aiSettings) {
-      return new Response(
-        JSON.stringify({
-          error: "Configure an AI provider and API key in User & AI settings.",
-        }),
-        { status: 501, headers: { "Content-Type": "application/json" } }
-      );
     }
 
     const lastUserMsg = [...messages]

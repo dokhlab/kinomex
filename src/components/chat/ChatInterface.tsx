@@ -4,7 +4,6 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CHAT_SESSION_KEY, parseChatSession, saveChatSession, type ChatMessage } from "@/lib/chat-session";
 import KinaseAssistantIcon from "@/components/ui/KinaseAssistantIcon";
-import { loadAiSettings } from "@/lib/user-ai-settings";
 
 const RETRYABLE_EVIDENCE_FAILURES = [
   "No connected KinomeX, STRING, UniProt, or PubMed source returned verifiable evidence",
@@ -202,17 +201,6 @@ export default function ChatInterface() {
         }
         throw new Error(evidence.error || "The deterministic KinomeX evidence search returned no matches.");
       }
-      const aiSettings = loadAiSettings();
-      let accountConfigured = false;
-      if (!aiSettings) {
-        const accountResponse = await fetch("/api/auth/session");
-        if (accountResponse.ok) accountConfigured = Boolean((await accountResponse.json()).user?.aiSettings);
-      }
-      if (!accountConfigured && (!aiSettings || (aiSettings.vendor !== "ollama" && !aiSettings.apiKey))) {
-        setError("Open User & AI settings in the top-right corner and add your AI provider API key.");
-        setLoading(false);
-        return;
-      }
       const res = await fetch(`/api/chat?request=${Date.now()}`, {
         method: "POST",
         cache: "no-store",
@@ -222,7 +210,6 @@ export default function ChatInterface() {
             role: m.role,
             content: m.content,
           })),
-          ...(aiSettings ? { aiSettings } : {}),
         }),
       });
 

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-13T20:35:16.778Z",
-  "database": "mongodb://localhost:27017/kinomex",
+  "generated_at": "2026-08-14T19:08:17.827Z",
+  "database": "mongodb://***@kinomex-db:27017/kinomex?authSource=admin",
   "catalogue_total": 678,
   "genes_with_any_ligand": 566,
   "genes_without_ligands": [
@@ -119,9 +119,9 @@
   ],
   "source_summary": [
     {
-      "records": 2085,
+      "records": 2314,
       "source": "pubchem",
-      "genes": 274,
+      "genes": 302,
       "compounds": 38
     },
     {
@@ -808,11 +808,10 @@
     },
     {
       "gene_symbol": "CDK11B",
-      "records": 139,
-      "compounds": 98,
+      "records": 132,
+      "compounds": 91,
       "sources": [
-        "chembl",
-        "pubchem"
+        "chembl"
       ]
     },
     {
@@ -850,11 +849,10 @@
     },
     {
       "gene_symbol": "CDK16",
-      "records": 416,
-      "compounds": 304,
+      "records": 406,
+      "compounds": 294,
       "sources": [
-        "chembl",
-        "pubchem"
+        "chembl"
       ]
     },
     {
@@ -5350,11 +5348,10 @@
     },
     {
       "gene_symbol": "TSSK1B",
-      "records": 678,
-      "compounds": 612,
+      "records": 677,
+      "compounds": 611,
       "sources": [
-        "chembl",
-        "pubchem"
+        "chembl"
       ]
     },
     {

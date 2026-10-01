@@ -148,11 +148,23 @@ async def ingest_expression() -> int:
     if not records:
         raise RuntimeError("GTEx response contained no valid numeric kinase records")
 
+    # The deployed schema keys expression by the human-readable tissue name.
+    # GTEx can return repeated rows for the same gene/tissue under different
+    # detail IDs, so collapse those rows before the unique-indexed upsert.
+    unique_records: dict[tuple[str, str], dict[str, Any]] = {}
+    for record in records:
+        unique_records.setdefault(
+            (record["gene_symbol"], record["tissue_site"]), record
+        )
+    if len(unique_records) != len(records):
+        logger.info("Collapsed %d duplicate GTEx gene/tissue rows", len(records) - len(unique_records))
+    records = list(unique_records.values())
+
     await db[COLLECTIONS["expression"]].delete_many({"source": "gtex"})
     await batch_upsert(
         COLLECTIONS["expression"],
         records,
-        key_fields=["gene_symbol", "tissue_site_id", "dataset_id"],
+        key_fields=["gene_symbol", "tissue_site"],
         batch_size=1000,
     )
     covered = sorted(by_gene)

@@ -45,3 +45,4 @@ await fs.mkdir("reports", { recursive: true });
 await fs.writeFile("reports/ligand-coverage.json", `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify({ ...report, kinases: `[${perGene.length} rows]` }, null, 2));
 await mongoose.disconnect();
+

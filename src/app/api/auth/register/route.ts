@@ -1,10 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createRecoveryCode, createSession, ensureAuthIndexes, normalizeUsername, passwordDigest, publicUser, recoveryCodeHash, validUsername } from "@/lib/auth";
-export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => null); const name = String(body?.name || "").trim().slice(0, 100); const username = normalizeUsername(String(body?.username || "")); const password = String(body?.password || "");
-  if (!name || !validUsername(username) || password.length < 12) return NextResponse.json({ error: "Provide a name, a valid username, and a password of at least 12 characters." }, { status: 400 });
-  const db = await ensureAuthIndexes(); const { hash, salt } = await passwordDigest(password);
+import { NextResponse } from "next/server";
+import { createSession, currentUser, publicUser } from "@/lib/auth";
+import { createGroupUser, createRecoveryCode, replacePasswordRecoveryCode } from "@/lib/group-auth-db";
+
+function validUsername(value: string) {
+  return /^[a-z0-9][a-z0-9_.-]{2,19}$/.test(value);
+}
+
+export async function POST(request: Request) {
+  const body = await request.json().catch(() => null);
+  const name = String(body?.name || "").trim().slice(0, 100);
+  const username = String(body?.username || "").trim().toLowerCase();
+  const password = String(body?.password || "");
+  if (!name || !validUsername(username) || password.length < 12) {
+    return NextResponse.json(
+      { error: "Provide a name, a valid username, and a password of at least 12 characters." },
+      { status: 400 },
+    );
+  }
+  const user = await createGroupUser({ name, username, password });
+  if (!user) return NextResponse.json({ error: "That username is already registered." }, { status: 409 });
   const recoveryCode = createRecoveryCode();
-  try { const result = await db.collection("users").insertOne({ name, username, usernameNormalized: username, passwordHash: hash, passwordSalt: salt, recoveryCodeHash: recoveryCodeHash(recoveryCode), passkeys: [], createdAt: new Date(), updatedAt: new Date() }); const user = await db.collection("users").findOne({ _id: result.insertedId }); await createSession(result.insertedId); return NextResponse.json({ user: publicUser(user as never), recoveryCode }, { status: 201 }); }
-  catch (error: unknown) { if ((error as { code?: number }).code === 11000) return NextResponse.json({ error: "That username is already registered." }, { status: 409 }); throw error; }
+  await replacePasswordRecoveryCode(user.id, recoveryCode);
+  await createSession(user.id);
+  const account = await currentUser();
+  return NextResponse.json({ user: account ? publicUser(account) : null, recoveryCode }, { status: 201 });
 }
