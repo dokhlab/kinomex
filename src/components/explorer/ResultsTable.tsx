@@ -43,7 +43,7 @@ export default function ResultsTable({ rows, weights, sort, onSort }: ResultsTab
   const w = formatWeightsParam(weights);
   return (
     <div className="overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/40">
-      <table className="w-full min-w-[860px] text-sm">
+      <table className="w-full min-w-[720px] text-sm">
         <thead>
           <tr className="border-b border-white/5 text-left text-[11px] font-medium">
             <th className="px-3 py-3"><SortHeader label="Rank" value="pdis" sort={sort} onSort={onSort} /></th>
@@ -62,9 +62,9 @@ export default function ResultsTable({ rows, weights, sort, onSort }: ResultsTab
                 <Link href={`/kinases/${encodeURIComponent(row.gene_symbol)}${w ? `?w=${w}` : ""}`} className="font-semibold text-white hover:text-kinome-cyan">
                   {row.gene_symbol}
                 </Link>
-                <div className="max-w-[11rem] truncate text-xs text-slate-500" title={row.name}>{row.name}</div>
+                <div className="max-w-[9rem] truncate text-xs text-slate-500" title={row.name}>{row.name}</div>
               </td>
-              <td className="px-3 py-2.5"><GroupBadge group={row.display_category} /></td>
+              <td className="px-3 py-2.5"><GroupBadge group={row.display_category} wrap /></td>
               {COMPONENT_KEYS.map((key) => (
                 <td key={key} className="px-2 py-2.5"><Bar value={row.components?.[key] ?? null} /></td>
               ))}

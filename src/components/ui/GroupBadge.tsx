@@ -16,6 +16,8 @@ interface GroupBadgeProps {
   // A KinHub group for core entries or an extension class for UniProt extensions.
   group: string;
   className?: string;
+  // Lets a long extension label break across lines (after "/" or a space) in tables.
+  wrap?: boolean;
 }
 
 const groupStyles: Record<KinaseGroup, string> = {
@@ -43,18 +45,20 @@ export const EXTENSION_SHORT_LABELS: Record<string, string> = {
 
 const extensionStyle = "bg-orange-400/10 text-orange-300 border border-dashed border-orange-300/40";
 
-export default function GroupBadge({ group, className }: GroupBadgeProps) {
+export default function GroupBadge({ group, className, wrap = false }: GroupBadgeProps) {
   const isGroup = group in groupStyles;
   return (
     <span
       title={isGroup ? `KinHub group ${group}` : `UniProt extension class: ${group}`}
       className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium tracking-wide whitespace-nowrap",
+        wrap
+          ? "inline-block max-w-[8rem] whitespace-normal rounded-2xl px-2.5 py-0.5 text-center text-xs font-medium leading-tight tracking-wide"
+          : "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium tracking-wide whitespace-nowrap",
         isGroup ? groupStyles[group as KinaseGroup] : extensionStyle,
         className
       )}
     >
-      {isGroup ? group : EXTENSION_SHORT_LABELS[group] ?? group}
+      {isGroup ? group : wrap ? (EXTENSION_SHORT_LABELS[group] ?? group).replace("/", "/\u200B") : EXTENSION_SHORT_LABELS[group] ?? group}
     </span>
   );
 }

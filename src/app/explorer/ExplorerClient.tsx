@@ -89,7 +89,7 @@ export default function ExplorerClient() {
           </p>
         </header>
 
-        <div className="flex flex-col gap-6 lg:flex-row">
+        <div className="flex flex-col gap-6 xl:flex-row">
           <div className="min-w-0 flex-1 space-y-5">
             <FiltersPanel filters={state.filters} organs={organs} onChange={setFilters} />
             <WeightsPanel weights={state.weights} onChange={setWeights} />
@@ -127,8 +127,8 @@ export default function ExplorerClient() {
             )}
           </div>
 
-          <aside className="flex-shrink-0 lg:w-56">
-            <div className="sticky top-24 rounded-2xl border border-white/10 bg-slate-900/40 p-5 backdrop-blur-sm">
+          <aside className="flex-shrink-0 xl:w-56">
+            <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-5 backdrop-blur-sm xl:sticky xl:top-24">
               <h2 className="mb-4 text-sm font-semibold text-white">Filtered result</h2>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-400">Catalog entries</span>
@@ -144,8 +144,8 @@ export default function ExplorerClient() {
                       </div>
                     ))}
                   </div>
-                  <div className="mt-3 space-y-1.5 border-t border-white/5 pt-3">
-                    <span className="mb-1 block text-xs text-slate-500">By category</span>
+                  <div className="mt-3 grid grid-cols-1 gap-x-8 gap-y-1.5 border-t border-white/5 pt-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1">
+                    <span className="col-span-full mb-1 block text-xs text-slate-500">By category</span>
                     {categoryOrder.filter((c) => result.categoryBreakdown[c]).map((c) => (
                       <div key={c} className="flex justify-between gap-2 text-xs">
                         <span className="truncate text-slate-400" title={c}>{EXTENSION_SHORT_LABELS[c] ?? c}</span>
