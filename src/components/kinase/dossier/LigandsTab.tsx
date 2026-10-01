@@ -10,6 +10,8 @@ interface Reference {
   journal: string | null;
   year: number | null;
   source_url: string | null;
+  assay_chembl_id?: string | null;
+  assay_aid?: number | null;
 }
 
 interface LigandRow {
@@ -156,7 +158,7 @@ export default function LigandsTab({ kinase }: { kinase: KinaseDetail }) {
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
             Each row shows one representative measurement per source compound: an uncensored Kd or Ki first, then an uncensored IC50 or EC50,
             then any other uncensored activity type, and a censored bound only when nothing else exists. Within a tier the lowest value wins.
-            Expand a row to see every underlying record with its source link.
+            Each row links the assay that reports its measurement; expand a row to see every underlying record with its assay and publication.
           </p>
         </div>
         <div className="grid gap-3 border-b border-white/5 bg-white/[0.015] p-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -179,7 +181,7 @@ export default function LigandsTab({ kinase }: { kinase: KinaseDetail }) {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-sm">
               <thead><tr className="border-b border-white/5 text-left text-[11px] uppercase tracking-wider text-slate-400">
-                <th className="px-4 py-3">Compound</th><th className="px-4 py-3">Activity</th><th className="px-4 py-3">Measurement</th>
+                <th className="px-4 py-3">Compound</th><th className="px-4 py-3">Activity · assay</th><th className="px-4 py-3">Measurement</th>
                 <th className="px-4 py-3">Records</th><th className="px-4 py-3">Binding mode</th><th className="px-4 py-3">Reference</th>
               </tr></thead>
               <tbody className="divide-y divide-white/5">
@@ -193,7 +195,14 @@ export default function LigandsTab({ kinase }: { kinase: KinaseDetail }) {
                           {row.other_source_label && <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[10px] text-amber-300" title={`InChIKey ${row.inchikey}`}>{row.other_source_label}</span>}
                         </div>
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-slate-300">{row.activity_type ?? "unavailable"}</td>
+                      <td className="px-4 py-2.5 text-xs text-slate-300">
+                        {row.activity_type ?? "unavailable"}
+                        {row.reference.source_url && (
+                          <a href={row.reference.source_url} target="_blank" rel="noopener noreferrer" className="block text-[11px] text-kinome-cyan hover:underline" title="Assay that reports this measurement">
+                            {row.reference.assay_chembl_id ?? `PubChem AID ${row.reference.assay_aid ?? 1433}`} ↗
+                          </a>
+                        )}
+                      </td>
                       <td className="px-4 py-2.5 font-mono text-xs text-slate-200">
                         {formatMeasurement(row.relation, row.value_nm)}
                         {row.censored && <span className="ml-1.5 rounded bg-slate-500/20 px-1.5 py-0.5 font-sans text-[10px] text-slate-400">bound</span>}
