@@ -6,14 +6,14 @@ Manuscript JMB-D-26-01062. Snapshot 2026-09-30. This report follows Section 5 of
 
 | Item | Value |
 |---|---|
-| Code | branch `jmb-revision` in `/home/html/sites/kinomex` (worktree `/home/html/sites/kinomex-jmb`); baseline tag `pre-jmb-revision` (commit `2c594cb`) |
-| Deployed commit | **Not deployed.** Production (`https://kinomex.dokhlab.org`) still runs `pre-jmb-revision` on the unmigrated database. The production migration and deployment wait for the maintainer's approval (Section 7, item 1). |
-| Release tag | `v1.1.0-jmb` not created yet (GitHub access required) |
-| Verified environment | Preview server on a full copy of the production database (`kinomex_jmb`, restored from the 2026-09-30 backup and migrated with the release modules) |
-| Release test (Task 1.6) | `scripts/release_check.mjs --render`: **38/38 checks pass** on the preview (`audit/analysis/preview-2026-09-30/release-check-preview.json`) |
+| Code | GitHub `dokhlab/kinomex`, branch `jmb-revision` (built on `main` `d9954fd`); local baseline tag `pre-jmb-revision` |
+| Deployed commit | `65e39c2` (same tree as GitHub `jmb-revision` `54fda70`), deployed 2026-10-01 at 14:05 UTC to `https://kinomex.dokhlab.org` |
+| Release tag | `v1.1.0-jmb` not created yet (requires a GitHub token; the deploy key can push branches only) |
+| Production data | Release modules applied to `kinomex` on 2026-10-01 from the frozen 2026-09-30 cache; the production audit (`audit/database-audit-2026-10-01.json`; accounting in `audit/catalog-accounting-2026-10-01.json`) equals the audit of the verified copy database in every value |
+| Release test (Task 1.6) | `scripts/release_check.mjs --render` against `https://kinomex.dokhlab.org`: **38/38 checks pass** (`audit/release-check-2026-10-01.json`) |
 | Automated tests | Jest 138 passed (+6 database checks that pass with `KINOMEX_DB_TESTS=1`); pytest 89 passed; `next build` succeeds |
-| Analysis re-run (Task 12.2) | The six manuscript scripts run unchanged through `audit/analysis/adapt_schema.py`; 1,696 of 1,704 output values equal `analysis_results_2026-09-30.json`; Section 3 explains the 8 differences |
-| Backups | `storage/kinomex/backups/kinomex-pre-jmb-revision-20260930.archive.gz` (sha256 `a340c927…62cdd`) |
+| Analysis re-run (Task 12.2) | The six manuscript scripts run unchanged through `audit/analysis/adapt_schema.py`; against the live API (`audit/analysis/production-2026-10-01/`): 1,696 of 1,704 values equal `analysis_results_2026-09-30.json`; Section 3.3 explains the 8 differences |
+| Backups | `storage/kinomex/backups/kinomex-pre-jmb-revision-20260930.archive.gz` (sha256 `a340c927…62cdd`); immediately before deployment `kinomex-pre-deploy-20261001T140023.archive.gz` (sha256 `dbfa4282…4a38`) |
 
 ## 2. Ledger check
 
@@ -157,8 +157,8 @@ No τ value changes. The stored τ of all 674 genes derives from the 54 GTEx v10
 
 ## 7. Open issues
 
-1. **Production deployment is pending.** The migrated data and code run on the preview only. Deployment steps, all reading the frozen cache without new queries: back up `kinomex`; run with `MONGODB_DB_NAME=kinomex` the modules `migrate --step all --apply`, `ligands --step all --apply`, `variants --apply`, `structures --apply`, `alphafold --apply`, `pharos --apply`; run `release_audit`; merge `jmb-revision` into `main` and check it out in `/home/html/sites/kinomex`; restart `confs-kinomex-1`; run `scripts/release_check.mjs --base=https://kinomex.dokhlab.org --render`; rerun the analysis scripts against the live API.
-2. **GitHub and Zenodo.** `gh` is not installed and no credentials are configured: the repository description (`gh repo edit dokhlab/kinomex …`), the `v1.1.0-jmb` release, and the Zenodo deposit (code, mongodump archive, audit JSON files, `expected_pdis` table) remain to do; the Data Availability DOI follows the deposit. The README's paper link follows publication.
+1. **Deployment** completed on 2026-10-01 (Section 1). The production container still builds from the live working tree at every start (item 8).
+2. **GitHub and Zenodo.** The code is on GitHub (branch `jmb-revision`, pull request pending). The repository description (`gh repo edit dokhlab/kinomex …`), the `v1.1.0-jmb` release, and the Zenodo deposit (code, mongodump archive, audit JSON files, `expected_pdis` table) require a GitHub token with repository-administration rights and Zenodo access; the Data Availability DOI follows the deposit. The README's paper link follows publication.
 3. **Literature-curated mutation citations are wrong.** 35 of the 37 distinct PMIDs resolve to unrelated articles (for example ABL1 T315I cites PMID 16959637, an avian-influenza study; EGFR C797S cites 25610870, an obesity review); 2 PMIDs (27492416, 28097279) do not exist; 22 rows carry no PMID. KinomeX lists the 87 mutations but withholds these links and shows the citation status instead; no drug appears because no cited article names one. The author supplies correct citations before the manuscript states “each with its PubMed link.”
 4. **Gatekeeper flags.** KLIFS pocket residue 45 keeps the flag on 9 mutations (ABL1 T315I, EGFR T790M, ALK L1196M, FGFR2 V564F, KIT T670I, PDGFRA T674I, RET V804M, RET V804L, FGFR4 V550E) and removes it from 11 (EGFR C797S, ALK G1202R, ALK G1269A, MET D1246N, MET D1228H, FGFR2 N549K, FGFR3 V559M, ERBB2 L755S, ERBB2 T862A, KIT D816V, FGFR4 N535K). The FGFR3 gatekeeper is V555 in the canonical sequence. KLIFS annotates its “GCK” entry with a MAP4K2 pocket; KinomeX leaves GCK without a gatekeeper.
 5. **ClinVar classifications** reflect the ClinVar release of 2026-09-29 (the August 12 snapshot stored no classification); the record set stays at 63,649 on 260 genes. UID 3769991 appears twice, under INSRR and NTRK1, as in ClinVar.

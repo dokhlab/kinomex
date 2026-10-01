@@ -1,0 +1,384 @@
+{
+  "base": "https://kinomex.dokhlab.org",
+  "run_at": "2026-10-01T14:05:30.109Z",
+  "rendered": true,
+  "accounting_snapshot": "2026-09-30",
+  "results": [
+    {
+      "name": "accounting: total = core + extensions",
+      "pass": true,
+      "observed": 678,
+      "expected": 678
+    },
+    {
+      "name": "/: meta description counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "/: no stale count or architecture text",
+      "pass": true,
+      "observed": null,
+      "expected": null
+    },
+    {
+      "name": "/explorer: meta description counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "/explorer: no stale count or architecture text",
+      "pass": true,
+      "observed": null,
+      "expected": null
+    },
+    {
+      "name": "/tree: meta description counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "/tree: no stale count or architecture text",
+      "pass": true,
+      "observed": null,
+      "expected": null
+    },
+    {
+      "name": "/docs: meta description counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "/docs: no stale count or architecture text",
+      "pass": true,
+      "observed": null,
+      "expected": null
+    },
+    {
+      "name": "/tutorial: meta description counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "/tutorial: no stale count or architecture text",
+      "pass": true,
+      "observed": null,
+      "expected": null
+    },
+    {
+      "name": "/search: meta description counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "/search: no stale count or architecture text",
+      "pass": true,
+      "observed": null,
+      "expected": null
+    },
+    {
+      "name": "/kinases/EGFR: meta description counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "/kinases/EGFR: no stale count or architecture text",
+      "pass": true,
+      "observed": null,
+      "expected": null
+    },
+    {
+      "name": "/kinases/PIK3CA: meta description counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "/kinases/PIK3CA: no stale count or architecture text",
+      "pass": true,
+      "observed": null,
+      "expected": null
+    },
+    {
+      "name": "stats.totalKinases",
+      "pass": true,
+      "observed": 678,
+      "expected": 678
+    },
+    {
+      "name": "stats.groupDistribution",
+      "pass": true,
+      "observed": {
+        "AGC": 63,
+        "CAMK": 74,
+        "CK1": 12,
+        "CMGC": 63,
+        "STE": 47,
+        "TK": 90,
+        "TKL": 43,
+        "RGC": 5,
+        "Atypical": 44,
+        "Other": 81
+      },
+      "expected": {
+        "AGC": 63,
+        "CAMK": 74,
+        "CK1": 12,
+        "CMGC": 63,
+        "STE": 47,
+        "TK": 90,
+        "TKL": 43,
+        "RGC": 5,
+        "Atypical": 44,
+        "Other": 81
+      }
+    },
+    {
+      "name": "stats.extensionClassDistribution",
+      "pass": true,
+      "observed": {
+        "Protein kinase outside KinHub roster": 5,
+        "Lipid kinase": 38,
+        "Inositol phosphate kinase": 11,
+        "Nucleotide, nucleoside or nucleic-acid kinase": 36,
+        "Carbohydrate or central-metabolism kinase": 38,
+        "Cofactor, amino-acid or other small-molecule kinase": 20,
+        "Keyword-annotated entry without established kinase catalytic role": 8
+      },
+      "expected": {
+        "Protein kinase outside KinHub roster": 5,
+        "Lipid kinase": 38,
+        "Inositol phosphate kinase": 11,
+        "Nucleotide, nucleoside or nucleic-acid kinase": 36,
+        "Carbohydrate or central-metabolism kinase": 38,
+        "Cofactor, amino-acid or other small-molecule kinase": 20,
+        "Keyword-annotated entry without established kinase catalytic role": 8
+      }
+    },
+    {
+      "name": "stats.totalLigands",
+      "pass": true,
+      "observed": 1021421,
+      "expected": 1021421
+    },
+    {
+      "name": "stats.totalStructures",
+      "pass": true,
+      "observed": 10043,
+      "expected": 10043
+    },
+    {
+      "name": "stats.totalClinVarRecords",
+      "pass": true,
+      "observed": 63649,
+      "expected": 63649
+    },
+    {
+      "name": "stats.pdisScale",
+      "pass": true,
+      "observed": "0-100",
+      "expected": "0-100"
+    },
+    {
+      "name": "stats.topMutatedKinases have PDIS",
+      "pass": true,
+      "observed": true,
+      "expected": true
+    },
+    {
+      "name": "kinases.total",
+      "pass": true,
+      "observed": 678,
+      "expected": 678
+    },
+    {
+      "name": "kinases.partitionBreakdown",
+      "pass": true,
+      "observed": {
+        "kinhub_core": 522,
+        "uniprot_extended": 156
+      },
+      "expected": {
+        "kinhub_core": 522,
+        "uniprot_extended": 156
+      }
+    },
+    {
+      "name": "catalog table rows",
+      "pass": true,
+      "observed": 678,
+      "expected": 678
+    },
+    {
+      "name": "README catalog counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "README snapshot date",
+      "pass": true,
+      "observed": "2026-09-30",
+      "expected": "2026-09-30"
+    },
+    {
+      "name": "README experimental structures",
+      "pass": true,
+      "observed": 10043,
+      "expected": 10043
+    },
+    {
+      "name": "README ligand records",
+      "pass": true,
+      "observed": 1021421,
+      "expected": 1021421
+    },
+    {
+      "name": "README ClinVar records",
+      "pass": true,
+      "observed": 63649,
+      "expected": 63649
+    },
+    {
+      "name": "README GTEx records",
+      "pass": true,
+      "observed": 36396,
+      "expected": 36396
+    },
+    {
+      "name": "home: rendered catalog counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        536,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        536,
+        156
+      ]
+    },
+    {
+      "name": "explorer: rendered sidebar counts",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    },
+    {
+      "name": "tree: rendered counts",
+      "pass": true,
+      "observed": [
+        678,
+        156
+      ],
+      "expected": [
+        678,
+        156
+      ]
+    },
+    {
+      "name": "docs: rendered accounting cards",
+      "pass": true,
+      "observed": [
+        678,
+        522,
+        156
+      ],
+      "expected": [
+        678,
+        522,
+        156
+      ]
+    }
+  ]
+}

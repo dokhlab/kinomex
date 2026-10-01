@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-30T19:53:30+00:00",
-  "database": "kinomex_jmb",
+  "generated_at": "2026-10-01T14:03:16+00:00",
+  "database": "kinomex",
   "pipeline_version": "jmb-2026-09-30",
   "selection_rule": "Representative-row selection for ligand records (Task 5.1), pure logic.\n\nTiers, applied over every record of one (gene, source, compound) pair:\n\n1. uncensored Kd or Ki\n2. uncensored IC50 or EC50\n3. any other uncensored activity type\n4. censored bound (>, >=, >>), any activity type\n\nUncensored relations are =, <, <=, ~ and a missing relation (read as =).\nWithin the lowest tier present, the lowest value wins; ties go to the lower\nactivity_id.",
   "cache": {

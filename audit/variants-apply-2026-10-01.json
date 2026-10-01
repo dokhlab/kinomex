@@ -1,0 +1,292 @@
+{
+ "gatekeepers": {
+  "kinases": 678,
+  "with_gatekeeper": 504,
+  "not_in_klifs": 141,
+  "klifs_but_unmapped": [
+   "ALPK1",
+   "ALPK2",
+   "ALPK3",
+   "BCKDK",
+   "BCR",
+   "BRD2",
+   "BRD3",
+   "BRD4",
+   "BRDT",
+   "CDK11A",
+   "EEF2K",
+   "FASTK",
+   "GCK",
+   "PDK1",
+   "PDK2",
+   "PDK3",
+   "PDK4",
+   "PIP4K2A",
+   "PIP4K2B",
+   "PIP4K2C",
+   "PIP5K1A",
+   "PIP5K1B",
+   "PIP5K1C",
+   "PRKY",
+   "STK40",
+   "TAF1",
+   "TAF1L",
+   "TRIM24",
+   "TRIM28",
+   "TRIM33",
+   "TRPM6",
+   "TRPM7",
+   "WHR1"
+  ],
+  "reference_check": {
+   "ABL1": {
+    "expected": "T315",
+    "mapped": "T315",
+    "agrees": true
+   },
+   "EGFR": {
+    "expected": "T790",
+    "mapped": "T790",
+    "agrees": true
+   },
+   "KIT": {
+    "expected": "T670",
+    "mapped": "T670",
+    "agrees": true
+   },
+   "PDGFRA": {
+    "expected": "T674",
+    "mapped": "T674",
+    "agrees": true
+   },
+   "RET": {
+    "expected": "V804",
+    "mapped": "V804",
+    "agrees": true
+   },
+   "ALK": {
+    "expected": "L1196",
+    "mapped": "L1196",
+    "agrees": true
+   },
+   "FGFR1": {
+    "expected": "V561",
+    "mapped": "V561",
+    "agrees": true
+   },
+   "FGFR2": {
+    "expected": "V564",
+    "mapped": "V564",
+    "agrees": true
+   },
+   "FGFR3": {
+    "expected": "V555",
+    "mapped": "V555",
+    "agrees": true
+   },
+   "FGFR4": {
+    "expected": "V550",
+    "mapped": "V550",
+    "agrees": true
+   },
+   "ERBB2": {
+    "expected": "T798",
+    "mapped": "T798",
+    "agrees": true
+   },
+   "MET": {
+    "expected": "L1157",
+    "mapped": "L1157",
+    "agrees": true
+   },
+   "BTK": {
+    "expected": "T474",
+    "mapped": "T474",
+    "agrees": true
+   },
+   "SRC": {
+    "expected": "T341",
+    "mapped": "T341",
+    "agrees": true
+   },
+   "JAK2": {
+    "expected": "M929",
+    "mapped": "M929",
+    "agrees": true
+   },
+   "FLT3": {
+    "expected": "F691",
+    "mapped": "F691",
+    "agrees": true
+   },
+   "BRAF": {
+    "expected": "T529",
+    "mapped": "T529",
+    "agrees": true
+   }
+  },
+  "approximate_anchor": []
+ },
+ "clinvar": {
+  "records": 63649,
+  "genes": 260,
+  "resolved": 63649,
+  "unresolved": 0,
+  "unresolved_uids": [],
+  "gene_not_in_clinvar_genes": [],
+  "gene_not_in_clinvar_genes_count": 0,
+  "by_germline_classification": {
+   "Uncertain significance": 54838,
+   "Conflicting classifications of pathogenicity": 6003,
+   "Likely pathogenic": 983,
+   "Pathogenic": 928,
+   "Pathogenic/Likely pathogenic": 614,
+   "Likely benign": 115,
+   "Benign/Likely benign": 75,
+   "Benign": 37,
+   "Uncertain significance/Uncertain risk allele": 22,
+   "VUS-high": 8,
+   "Uncertain significance/VUS-high": 7,
+   "not provided": 6,
+   "Likely pathogenic, low penetrance": 3,
+   "Likely pathogenic/Likely risk allele": 2,
+   "Likely pathogenic; association": 1,
+   "Uncertain significance/VUS-mid": 1,
+   "Conflicting classifications of pathogenicity; risk factor": 1,
+   "drug response": 1,
+   "Uncertain significance; drug response": 1,
+   "Pathogenic/Likely pathogenic/Likely risk allele": 1,
+   "Pathogenic/Likely pathogenic; risk factor": 1,
+   "risk factor": 1
+  },
+  "by_review_stars": {
+   "0": 73,
+   "1": 38938,
+   "2": 23862,
+   "3": 776
+  },
+  "clinvar_retrieved_at": "2026-09-30T19:38:44+00:00",
+  "clinvar_lastupdate": "2026/09/29 05:12",
+  "clinvar_dbbuild": "Build260929-0200.1"
+ },
+ "curated": {
+  "records": 87,
+  "genes": 36,
+  "legacy_gatekeeper_flags": 20,
+  "gatekeeper_kept": [
+   "ABL1 T315I",
+   "EGFR T790M",
+   "ALK L1196M",
+   "FGFR2 V564F",
+   "KIT T670I",
+   "PDGFRA T674I",
+   "RET V804M",
+   "RET V804L",
+   "FGFR4 V550E"
+  ],
+  "gatekeeper_removed": [
+   "EGFR C797S (EGFR gatekeeper T790 (KLIFS pocket residue 45))",
+   "ALK G1202R (ALK gatekeeper L1196 (KLIFS pocket residue 45))",
+   "ALK G1269A (ALK gatekeeper L1196 (KLIFS pocket residue 45))",
+   "MET D1246N (MET gatekeeper L1157 (KLIFS pocket residue 45))",
+   "MET D1228H (MET gatekeeper L1157 (KLIFS pocket residue 45))",
+   "FGFR2 N549K (FGFR2 gatekeeper V564 (KLIFS pocket residue 45))",
+   "FGFR3 V559M (FGFR3 gatekeeper V555 (KLIFS pocket residue 45))",
+   "ERBB2 L755S (ERBB2 gatekeeper T798 (KLIFS pocket residue 45))",
+   "ERBB2 T862A (ERBB2 gatekeeper T798 (KLIFS pocket residue 45))",
+   "KIT D816V (KIT gatekeeper T670 (KLIFS pocket residue 45))",
+   "FGFR4 N535K (FGFR4 gatekeeper V550 (KLIFS pocket residue 45))"
+  ],
+  "gatekeeper_added": [],
+  "effect_type": {
+   "resistance": 31,
+   "other": 56
+  },
+  "with_affected_drugs": 0,
+  "with_diseases": [
+   "ABL1 T315I: ['CML']",
+   "ALK G1202R: ['NSCLC']",
+   "MET D1246N: ['NSCLC']",
+   "PDGFRA T674I: ['DFSP']"
+  ],
+  "drug_not_named_in_publication": [
+   "ABL1 T315I: ['Imatinib'] (PMID 16959637)",
+   "ABL1 E255K: ['Imatinib'] (PMID 17023468)",
+   "ABL1 Y253H: ['Imatinib'] (PMID 17023468)",
+   "EGFR T790M: ['Osimertinib'] (PMID 24383709)",
+   "EGFR C797S: ['Third-gen TKI'] (PMID 25610870)",
+   "ALK G1202R: ['Lorlatinib'] (PMID 28211429)",
+   "ALK L1196M: ['Crizotinib'] (PMID 22675496)",
+   "ALK C1156Y: ['Crizotinib'] (PMID 23011138)",
+   "ALK G1269A: ['Alectinib'] (PMID 25249531)",
+   "ALK I1171T: ['Ceritinib'] (PMID 28097279, no publication record)",
+   "MET D1246N: ['Crizotinib'] (PMID 22526780)",
+   "MET D1246H: ['MET inhibitor'] (PMID 22526780)",
+   "MET D1228H: ['Savolitinib'] (PMID 30569965)",
+   "MET F1200I: ['Type II inhibitor'] (PMID 22526780)",
+   "FGFR2 V564F: ['Erdafitinib'] (PMID 30974189)",
+   "FGFR2 N549K: ['Erdafitinib'] (PMID 30974189)",
+   "FGFR3 V559M: ['Erdafitinib'] (PMID 30974189)",
+   "ERBB2 L755S: ['Lapatinib'] (PMID 21676740)",
+   "ERBB2 T862A: ['Neratinib'] (PMID 22422664)",
+   "KIT D816V: ['Imatinib'] (PMID 12810708)",
+   "KIT T670I: ['Imatinib'] (PMID 12714891)",
+   "FLT3 D835Y: ['Midostaurin'] (PMID 15070744)",
+   "FLT3 D835H: ['Midostaurin'] (PMID 15070744)",
+   "FLT3 ITD: ['Gilteritinib'] (PMID 27492416, no publication record)",
+   "PDGFRA T674I: ['Imatinib'] (PMID 15677390)",
+   "RET V804M: ['Vandetanib'] (PMID 23401066)",
+   "RET V804L: ['Cabozantinib'] (PMID 23401066)",
+   "RET G918R: ['Type II inhibitor'] (PMID 23401066)",
+   "JAK3 A572V: ['Ruxolitinib'] (PMID 22584630)",
+   "MTOR S2215Y: ['Sirolimus'] (PMID 20639490)",
+   "FGFR4 V550E: ['Ponatinib'] (PMID none, no publication record)",
+   "FGFR4 N535K: ['Erdafitinib'] (PMID none, no publication record)"
+  ],
+  "citations_naming_gene_or_mutation": [],
+  "citations_not_naming_gene_or_mutation": 65,
+  "missing_pubmed_id": 22,
+  "pmids_not_in_cache": [
+   "27492416",
+   "28097279"
+  ],
+  "curated_gatekeepers": {
+   "ABL1": "T315",
+   "AKT1": "M227",
+   "AKT2": "M229",
+   "ALK": "L1196",
+   "ATM": "L2767",
+   "BRAF": "T529",
+   "CDK4": "F93",
+   "CDK6": "F98",
+   "CHEK2": "L301",
+   "DMPK": "M148",
+   "EGFR": "T790",
+   "EPHA2": "T692",
+   "EPHB4": "T693",
+   "ERBB2": "T798",
+   "FGFR1": "V561",
+   "FGFR2": "V564",
+   "FGFR3": "V555",
+   "FGFR4": "V550",
+   "FLT3": "F691",
+   "INSR": "M1103",
+   "IRAK1": "Y288",
+   "JAK2": "M929",
+   "JAK3": "M902",
+   "KIT": "T670",
+   "LRRK2": "M1947",
+   "MAP2K1": "M143",
+   "MAP2K2": "M147",
+   "MAPK1": "Q105",
+   "MAPK3": "Q122",
+   "MET": "L1157",
+   "MTOR": "I2237",
+   "MUSK": "F655",
+   "PDGFRA": "T674",
+   "PIK3CA": "I848",
+   "RAF1": "T421",
+   "RET": "V804"
+  }
+ }
+}

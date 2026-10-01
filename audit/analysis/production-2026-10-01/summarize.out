@@ -1,0 +1,27 @@
+678
+['alphafold', 'catalog_membership', 'classification', 'clinvar_variants', 'curated_mutations', 'development_candidates', 'diseases_associated', 'display_category', 'domains', 'ec_number', 'expression', 'extension_banner', 'extension_class', 'extension_class_basis', 'gatekeeper', 'gene_symbol', 'group', 'key_references', 'keywords', 'ligand_assays', 'ligand_summary', 'mutations', 'name', 'organ_systems_impacted', 'organism', 'other_structures', 'partition', 'pdis_score', 'pdis_structure_input_count', 'pharos', 'protein_sequence', 'seq_length', 'structures', 'subfamily', 'swiss_prot_annotation', 'tissue_expressions', 'uniprot_id', 'uniprot_record_status']
+Counter({'3.0-weighted-mean': 678})
+Counter({'kinhub_core': 522, 'uniprot_extended': 156}) Counter({'active': 677, 'inactive': 1})
+sum lig rows 717452 genes with lig 566
+struct in dossier 10165 max 615 pdb raw sum 10278 genes pdb>0 476
+mut sum 63736 genes 264
+expr sum 36396 genes 674
+dis genes 256
+dev cand genes 2 4
+ncomp dist [(0, 407), (6, 32), (5, 30), (4, 27), (7, 24), (3, 23), (8, 19), (9, 19), (2, 16), (11, 14), (10, 13), (12, 13), (1, 9), (15, 4), (20, 4), (18, 3), (19, 3), (16, 3), (21, 3), (22, 3), (14, 3), (17, 2), (23, 2), (13, 2)]
+EGFR 95.74 100 100 83.52 94.62 33585 432 371 17 14911
+KIT 94.34 88.79 100 89.79 83.92 10439 125 61 22 5033
+ALK 90.19 85.99 100 90.96 80.3 7802 105 74 11 3482
+BRAF 87.41 83.96 100 81.1 87.62 6310 106 100 10 7328
+MET 86.99 87.36 100 90.82 86.64 8998 307 122 5 6632
+KDR 86.02 71.47 100 87.99 94.22 1716 107 51 14 14324
+ERBB2 84.25 81.21 100 81.85 81.89 4740 212 46 6 4094
+FLT1 82.97 71.41 90 82.37 77.27 1705 90 9 18 2561
+ABL1 82.91 75.45 79 91.32 83.28 2599 79 76 21 4713
+BTK 82.73 78.79 100 95.2 93.68 3682 228 167 3 13554
+BCR 78.39 89.59 100 91.14 69.67 11343 213 3 0 1183
+MTOR 78.3 94.48 100 80.84 89.96 18902 877 49 0 9292
+RET 72.91 77.25 52 84.7 84.65 3137 52 26 19 5419
+CDK4 71.43 82.68 100 63.25 82.62 5523 132 11 0 4410
+FLT3 70.67 78.18 50 67.65 86.62 3454 50 7 23 6617
+pdis None 0 min 0.0
