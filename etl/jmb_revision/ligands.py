@@ -11,6 +11,7 @@ Steps (``--step``):
 - provenance:      adds document_chembl_id, pubmed_id and doi to ChEMBL bioactivities
 - identifiers:     rebuilds ``compound_identifiers`` (standard InChIKeys)
 - representatives: rebuilds ``ligand_representatives`` and writes the audit JSON
+- display:         adds the in-range ``display`` measurement to each representative row
 
 The apply step reads only the cache, never the network. Every step is idempotent.
 """
@@ -25,7 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from pymongo import ASCENDING, InsertOne, MongoClient, UpdateMany
+from pymongo import ASCENDING, InsertOne, MongoClient, UpdateMany, UpdateOne
 
 from ..config import settings
 from . import ligands_fetch as fetch
@@ -419,10 +420,71 @@ def step_representatives(db, apply: bool) -> dict[str, Any]:
     return report
 
 
+def _gene_pairs(db, catalog: list[str]):
+    """(gene, compound_key, records) for every pair, streamed gene by gene."""
+    cursor = db.bioactivities.find(
+        {"target_gene_symbol": {"$in": catalog}}, PROJECTION, batch_size=10000,
+    ).sort("target_gene_symbol", ASCENDING)
+    gene, pairs = None, defaultdict(list)
+    for rec in cursor:
+        if rec["target_gene_symbol"] != gene:
+            yield from ((gene, key, recs) for key, recs in pairs.items())
+            gene, pairs = rec["target_gene_symbol"], defaultdict(list)
+        pairs[sel.compound_key(rec["source"], rec.get("compound_id"), rec.get("pubchem_cid"))].append(rec)
+    yield from ((gene, key, recs) for key, recs in pairs.items())
+
+
+def display_doc(records: list[dict[str, Any]], assay_doc, documents) -> dict[str, Any] | None:
+    summary = sel.display_summary(records)
+    if summary is None:
+        return None
+    rec = summary.pop("record")
+    return {**summary, "representative": _representative(rec, assay_doc, documents)}
+
+
+def step_display(db, apply: bool) -> dict[str, Any]:
+    """Representative re-selected inside the reporting range (0 < value <= 10,000 nM).
+
+    The frozen representative fields are left unchanged; the dossier reads ``display``.
+    """
+    assay_doc, documents = load_provenance()
+    catalog = sorted(db.kinases.distinct("gene_symbol"))
+    counts: Counter = Counter()
+    ops: list[UpdateOne] = []
+    modified = 0
+    for gene, key, recs in _gene_pairs(db, catalog):
+        doc = display_doc(recs, assay_doc, documents)
+        counts["pairs"] += 1
+        counts["records"] += len(recs)
+        if doc is None:
+            counts["pairs_without_display"] += 1
+            counts["pairs_only_zero_or_missing"] += all((sel.numeric_value(r.get("standard_value")) or 0) <= 0 for r in recs)
+        else:
+            counts["pairs_with_display"] += 1
+            counts["records_in_range"] += doc["in_range_count"]
+            rep = sel.summarize_pair(recs)["record"]
+            counts["display_differs_from_representative"] += rep is not None and not sel.in_display_range(rep)
+        ops.append(UpdateOne({"gene_symbol": gene, "compound_key": key}, {"$set": {"display": doc}}))
+        if apply and len(ops) >= 5000:
+            modified += db.ligand_representatives.bulk_write(ops, ordered=False).modified_count
+            ops = []
+    if apply:
+        if ops:
+            modified += db.ligand_representatives.bulk_write(ops, ordered=False).modified_count
+        db.ligand_representatives.create_index(
+            [("gene_symbol", ASCENDING), ("display.tier", ASCENDING), ("display.value_nm", ASCENDING)],
+            name="gene_display_tier_value")
+        counts["modified"] = modified
+        counts["rows_missing_display_field"] = db.ligand_representatives.count_documents({"display": {"$exists": False}})
+    counts["display_max_nm"] = sel.DISPLAY_MAX_NM
+    return dict(counts)
+
+
 STEPS = {
     "provenance": step_provenance,
     "identifiers": step_identifiers,
     "representatives": step_representatives,
+    "display": step_display,
 }
 
 

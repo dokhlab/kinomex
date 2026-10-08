@@ -94,6 +94,9 @@ export interface LigandSummary {
   representative_rows: number;
   records: number;
   rows_in_both_sources: number;
+  /** Compounds with a measurement inside the 0–10,000 nM reporting range. */
+  reported_rows?: number;
+  hidden_rows?: number;
   by_source: Record<string, { rows: number; records: number }>;
 }
 

@@ -1,4 +1,5 @@
 import type { Db } from "mongodb";
+import { actionOf, displayRangeFilter, inDisplayRange, measureOf, PLOTTED_RELATIONS, ACTIONS, MEASURES } from "./ligand-display";
 
 type Doc = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -17,13 +18,48 @@ export interface LigandQuery {
   sort: "value" | "name" | "records";
 }
 
+/** Query parameters shared by the ligand list and plot endpoints; null when invalid. */
+export function parseLigandQuery(s: URLSearchParams): LigandQuery | null {
+  const q: LigandQuery = {
+    page: Number(s.get("page") ?? 1),
+    size: Number(s.get("size") ?? LIGAND_PAGE_SIZE),
+    search: (s.get("search") ?? "").trim() || undefined,
+    activityType: s.get("activity_type") || undefined,
+    source: s.get("source") || undefined,
+    uncensoredOnly: s.get("uncensored") === "1",
+    maxNm: s.get("max_nm") ? Number(s.get("max_nm")) : null,
+    sort: (s.get("sort") as LigandQuery["sort"]) || "value",
+  };
+  if (!Number.isInteger(q.page) || q.page < 1 || !Number.isInteger(q.size) || q.size < 1 || q.size > 500
+    || (q.search && q.search.length > 100) || (q.maxNm !== null && !Number.isFinite(q.maxNm))
+    || !["value", "name", "records"].includes(q.sort) || (q.source && !["chembl", "pubchem"].includes(q.source))) {
+    return null;
+  }
+  return q;
+}
+
 async function hasRepresentatives(db: Db): Promise<boolean> {
   return (await db.listCollections({ name: "ligand_representatives" }, { nameOnly: true }).toArray()).length > 0;
 }
 
+// True once the ETL `display` step has written the in-range measurement; until
+// then the frozen representative is shown when it lies inside the range.
+let displayStepSeen = false;
+async function displayPrefix(db: Db): Promise<string> {
+  if (!displayStepSeen) {
+    displayStepSeen = (await db.collection("ligand_representatives").findOne({ display: { $exists: true } }, { projection: { _id: 1 } })) !== null;
+  }
+  return displayStepSeen ? "display." : "";
+}
+
+function reportedFilter(prefix: string): Doc {
+  return prefix ? { display: { $ne: null } } : displayRangeFilter();
+}
+
 export async function ligandSummary(db: Db, gene: string) {
   if (!(await hasRepresentatives(db))) return null;
-  const [bySource, byType] = await Promise.all([
+  const prefix = await displayPrefix(db);
+  const [bySource, byType, reported] = await Promise.all([
     db.collection("ligand_representatives").aggregate([
       { $match: { gene_symbol: gene } },
       { $group: { _id: "$source", rows: { $sum: 1 }, records: { $sum: "$assay_count" }, both: { $sum: { $cond: ["$also_in_other_source", 1, 0] } } } },
@@ -32,12 +68,15 @@ export async function ligandSummary(db: Db, gene: string) {
       { $match: { gene_symbol: gene } },
       { $group: { _id: { type: "$activity_type", censored: "$censored" }, n: { $sum: 1 } } },
     ]).toArray(),
+    db.collection("ligand_representatives").countDocuments({ gene_symbol: gene, ...reportedFilter(prefix) }),
   ]);
   const sum = (key: "rows" | "records" | "both") => bySource.reduce((s, r) => s + (r[key] ?? 0), 0);
   return {
     representative_rows: sum("rows"),
     records: sum("records"),
     rows_in_both_sources: sum("both"),
+    reported_rows: reported,
+    hidden_rows: sum("rows") - reported,
     by_source: Object.fromEntries(bySource.map((r) => [r._id, { rows: r.rows, records: r.records }])),
     by_activity_type: byType.reduce((acc: Record<string, { uncensored: number; censored: number }>, r) => {
       const entry = (acc[r._id.type ?? "unavailable"] ??= { uncensored: 0, censored: 0 });
@@ -51,27 +90,34 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function ligandFilter(gene: string, q: LigandQuery): Doc {
-  const filter: Doc = { gene_symbol: gene };
+export function ligandFilter(gene: string, q: LigandQuery, prefix = "display."): Doc {
+  const filter: Doc = { gene_symbol: gene, ...reportedFilter(prefix) };
   if (q.search) {
     const re = { $regex: escapeRegExp(q.search), $options: "i" };
     filter.$or = [{ compound_name: re }, { compound_id: re }, { compound_key: re }, { inchikey: re }];
   }
-  if (q.activityType) filter.activity_type = q.activityType;
+  if (q.activityType) filter[`${prefix}activity_type`] = q.activityType;
   if (q.source) filter.source = q.source;
-  if (q.uncensoredOnly) filter.censored = false;
-  if (q.maxNm != null) filter.value_nm = { $lte: q.maxNm };
+  if (q.uncensoredOnly) filter[`${prefix}censored`] = false;
+  if (q.maxNm != null) filter[`${prefix}value_nm`] = { ...(prefix ? {} : filter.value_nm), $lte: q.maxNm };
   return filter;
 }
 
-const SORTS: Record<LigandQuery["sort"], Doc> = {
-  value: { tier: 1, value_nm: 1, compound_key: 1 },
-  name: { compound_name: 1, compound_key: 1 },
-  records: { assay_count: -1, compound_key: 1 },
-};
+function sortFor(sort: LigandQuery["sort"], prefix: string): Doc {
+  if (sort === "name") return { compound_name: 1, compound_key: 1 };
+  if (sort === "records") return { assay_count: -1, compound_key: 1 };
+  return { [`${prefix}tier`]: 1, [`${prefix}value_nm`]: 1, compound_key: 1 };
+}
+
+// The measurement a row reports: the in-range `display` sub-document, or the
+// frozen representative before the display step has run.
+function measurementOf(doc: Doc): Doc {
+  return doc.display !== undefined ? (doc.display ?? {}) : doc;
+}
 
 export function serializeRepresentative(doc: Doc) {
-  const rep = doc.representative ?? {};
+  const m = measurementOf(doc);
+  const rep = m.representative ?? {};
   return {
     compound_key: doc.compound_key,
     source: doc.source,
@@ -82,12 +128,14 @@ export function serializeRepresentative(doc: Doc) {
     inchikey: doc.inchikey ?? null,
     also_in_other_source: doc.also_in_other_source === true,
     other_source_label: doc.also_in_other_source ? (doc.source === "chembl" ? "Also in PubChem" : "Also in ChEMBL") : null,
-    activity_type: doc.activity_type ?? null,
-    relation: doc.relation ?? "=",
-    value_nm: typeof doc.value_nm === "number" ? doc.value_nm : null,
-    censored: doc.censored === true,
-    tier: doc.tier ?? null,
+    activity_type: m.activity_type ?? null,
+    relation: m.relation ?? "=",
+    value_nm: typeof m.value_nm === "number" ? m.value_nm : null,
+    censored: m.censored === true,
+    tier: m.tier ?? null,
     assay_count: doc.assay_count ?? 1,
+    in_range_count: m.in_range_count ?? null,
+    action: actionOf(m.activity_type, doc.binding_mode),
     binding_mode: doc.binding_mode || NOT_ANNOTATED,
     binding_mode_source: doc.binding_mode_source ?? null,
     reference: {
@@ -105,11 +153,12 @@ export function serializeRepresentative(doc: Doc) {
 
 export async function ligandPage(db: Db, gene: string, q: LigandQuery) {
   if (!(await hasRepresentatives(db))) return null;
-  const filter = ligandFilter(gene, q);
+  const prefix = await displayPrefix(db);
+  const filter = ligandFilter(gene, q, prefix);
   const [total, docs, types] = await Promise.all([
     db.collection("ligand_representatives").countDocuments(filter),
-    db.collection("ligand_representatives").find(filter).sort(SORTS[q.sort]).skip((q.page - 1) * q.size).limit(q.size).toArray(),
-    db.collection("ligand_representatives").distinct("activity_type", { gene_symbol: gene }),
+    db.collection("ligand_representatives").find(filter).sort(sortFor(q.sort, prefix)).skip((q.page - 1) * q.size).limit(q.size).toArray(),
+    db.collection("ligand_representatives").distinct(`${prefix}activity_type`, { gene_symbol: gene, ...reportedFilter(prefix) }),
   ]);
   return {
     total,
@@ -119,6 +168,30 @@ export async function ligandPage(db: Db, gene: string, q: LigandQuery) {
     activity_types: (types as string[]).filter(Boolean).sort(),
     rows: docs.map(serializeRepresentative),
   };
+}
+
+// Every plotted point (a reported point value) for the current filters, as
+// compact columns: measure and action are indexes into MEASURES and ACTIONS.
+export async function ligandPlot(db: Db, gene: string, q: LigandQuery) {
+  if (!(await hasRepresentatives(db))) return null;
+  const prefix = await displayPrefix(db);
+  const filter = ligandFilter(gene, q, prefix);
+  const docs = await db.collection("ligand_representatives")
+    .find(filter, { projection: { _id: 0, compound_key: 1, compound_id: 1, pubchem_cid: 1, compound_name: 1, binding_mode: 1, "display.activity_type": 1, "display.relation": 1, "display.value_nm": 1, activity_type: 1, relation: 1, value_nm: 1 } })
+    .toArray();
+  const columns = { key: [] as string[], name: [] as string[], measure: [] as number[], action: [] as number[], value_nm: [] as number[], activity_type: [] as string[] };
+  let bounds = 0;
+  for (const doc of docs) {
+    const m = measurementOf(doc);
+    if (!PLOTTED_RELATIONS.includes(m.relation ?? "=") || !inDisplayRange(m.relation, m.value_nm)) { bounds += 1; continue; }
+    columns.key.push(doc.compound_key);
+    columns.name.push(doc.compound_name || doc.compound_id || `PubChem CID ${doc.pubchem_cid}`);
+    columns.measure.push(MEASURES.indexOf(measureOf(m.activity_type)));
+    columns.action.push(ACTIONS.indexOf(actionOf(m.activity_type, doc.binding_mode)));
+    columns.value_nm.push(m.value_nm);
+    columns.activity_type.push(m.activity_type ?? "");
+  }
+  return { total: docs.length, plotted: columns.key.length, bounds, measures: MEASURES, actions: ACTIONS, ...columns };
 }
 
 function toNm(value: unknown): number | null {
@@ -134,8 +207,7 @@ export async function ligandRecords(db: Db, gene: string, compoundKey: string) {
   if (source === "chembl") match.compound_id = id;
   else match.pubchem_cid = Number(id);
   const docs = await db.collection("bioactivities").find(match).limit(5000).toArray();
-  return docs
-    .map((b) => ({
+  const all = docs.map((b) => ({
       activity_id: b.activity_id ?? null,
       activity_type: b.assay_type ?? null,
       relation: b.standard_relation ?? "=",
@@ -153,6 +225,9 @@ export async function ligandRecords(db: Db, gene: string, compoundKey: string) {
       source_url: source === "chembl"
         ? (b.assay_chembl_id ? `https://www.ebi.ac.uk/chembl/explore/assay/${b.assay_chembl_id}` : null)
         : `https://pubchem.ncbi.nlm.nih.gov/bioassay/${b.assay_aid ?? 1433}`,
-    }))
+    }));
+  const records = all
+    .filter((r) => inDisplayRange(r.relation, r.value_nm))
     .sort((a, b) => (a.value_nm ?? Infinity) - (b.value_nm ?? Infinity));
+  return { records, hidden: all.length - records.length };
 }

@@ -124,3 +124,24 @@ def test_binding_mode_requires_mechanism_record():
     assert hit["binding_mode_source"]["label"] == "ChEMBL mechanism"
     miss = _binding_mode({"CHEMBL203"}, "CHEMBL1", mech)
     assert miss == {"binding_mode": None, "binding_mode_source": None, "mechanism_of_action": None}
+
+
+@pytest.mark.parametrize("relation,value,expected", [
+    ("=", "0.0", False), ("=", "0", False), ("=", None, False), ("=", "-3", False),
+    ("=", "0.5", True), ("=", "10000", True), ("=", "10000.1", False), ("<", "20000", False),
+    (">", "1000", True), (">", "10000", False), (">=", "10000", False), ("~", "9999", True),
+])
+def test_display_range(relation, value, expected):
+    assert sel.in_display_range(rec(1, "IC50", relation, value)) is expected
+
+
+def test_display_reselects_inside_range():
+    recs = [rec(1, "KD", "=", "25000"), rec(2, "IC50", "=", "40"), rec(3, "IC50", "=", "0.0")]
+    assert sel.select_representative(recs)["activity_id"] == 1
+    shown = sel.display_summary(recs)
+    assert shown["record"]["activity_id"] == 2
+    assert (shown["activity_type"], shown["value_nm"], shown["tier"], shown["in_range_count"]) == ("IC50", 40.0, 2, 1)
+
+
+def test_display_is_none_without_in_range_record():
+    assert sel.display_summary([rec(1, "IC50", "=", "0.0"), rec(2, "KD", ">", "10000")]) is None

@@ -2,6 +2,8 @@
 
 import { Fragment, useEffect, useState } from "react";
 import type { KinaseDetail } from "./types";
+import LigandPotencyPlot, { type LigandPlotData } from "./LigandPotencyPlot";
+import { RANGE_RULE } from "@/lib/dossier/ligand-display";
 
 interface Reference {
   document_chembl_id: string | null;
@@ -78,16 +80,18 @@ function RefLinks({ r }: { r: Reference | LigandRecord }) {
 
 function Records({ gene, row }: { gene: string; row: LigandRow }) {
   const [records, setRecords] = useState<LigandRecord[] | null>(null);
+  const [hidden, setHidden] = useState(0);
   const [error, setError] = useState("");
   useEffect(() => {
     fetch(`/api/kinases/${encodeURIComponent(gene)}/ligands/records?compound_key=${encodeURIComponent(row.compound_key)}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Records unavailable"))))
-      .then((body) => setRecords(body.records))
+      .then((body) => { setRecords(body.records); setHidden(body.hidden ?? 0); })
       .catch((e) => setError(e.message));
   }, [gene, row.compound_key]);
   if (error) return <p className="px-4 py-3 text-xs text-rose-400">{error}</p>;
   if (!records) return <p className="px-4 py-3 text-xs text-slate-500">Loading records…</p>;
   return (
+    <>
     <table className="w-full text-xs">
       <thead><tr className="text-left text-[10px] uppercase tracking-wider text-slate-500">
         <th className="px-4 py-1.5">Activity</th><th className="px-4 py-1.5">Measurement</th><th className="px-4 py-1.5">Assay</th><th className="px-4 py-1.5">Reference</th>
@@ -103,6 +107,8 @@ function Records({ gene, row }: { gene: string; row: LigandRow }) {
         ))}
       </tbody>
     </table>
+    {hidden > 0 && <p className="px-4 pb-2 text-[11px] text-slate-500">{hidden} record{hidden === 1 ? "" : "s"} at 0 nM or above 10,000 nM not shown.</p>}
+    </>
   );
 }
 
@@ -116,6 +122,7 @@ export default function LigandsTab({ kinase }: { kinase: KinaseDetail }) {
   const [source, setSource] = useState("");
   const [uncensored, setUncensored] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
+  const [plot, setPlot] = useState<LigandPlotData | null>(null);
 
   useEffect(() => setPage(1), [search, activityType, source, uncensored]);
   useEffect(() => {
@@ -131,6 +138,21 @@ export default function LigandsTab({ kinase }: { kinase: KinaseDetail }) {
       .catch((e) => { if (e.name !== "AbortError") setError(e.message); });
     return () => controller.abort();
   }, [gene, page, search, activityType, source, uncensored]);
+
+  // The plot follows the table filters, not its page.
+  useEffect(() => {
+    const p = new URLSearchParams();
+    if (search) p.set("search", search);
+    if (activityType) p.set("activity_type", activityType);
+    if (source) p.set("source", source);
+    const controller = new AbortController();
+    setPlot(null);
+    fetch(`/api/kinases/${encodeURIComponent(gene)}/ligands/plot?${p}`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Plot unavailable"))))
+      .then(setPlot)
+      .catch(() => {});
+    return () => controller.abort();
+  }, [gene, search, activityType, source]);
 
   const summary = kinase.ligand_summary;
   const candidates = kinase.development_candidates ?? [];
@@ -150,15 +172,25 @@ export default function LigandsTab({ kinase }: { kinase: KinaseDetail }) {
         </div>
       )}
 
+      {plot ? (
+        <LigandPotencyPlot data={plot} onSelect={(i) => { setSearch(plot.key[i].split(":")[1]); setOpen(plot.key[i]); }} />
+      ) : summary && summary.representative_rows > 0 ? (
+        <div className="glass-card p-6 text-sm text-slate-500">Loading potency plot…</div>
+      ) : null}
+
       <div className="glass-card overflow-hidden">
         <div className="border-b border-white/5 p-4">
           <h3 className="text-sm font-semibold text-white">
-            Compound–kinase pairs {summary ? `(${summary.representative_rows.toLocaleString("en-US")} compounds, ${summary.records.toLocaleString("en-US")} records)` : ""}
+            Compound–kinase pairs {summary ? `(${(summary.reported_rows ?? summary.representative_rows).toLocaleString("en-US")} compounds reported, ${summary.records.toLocaleString("en-US")} records)` : ""}
           </h3>
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
             Each row shows one representative measurement per source compound: an uncensored Kd or Ki first, then an uncensored IC50 or EC50,
             then any other uncensored activity type, and a censored bound only when nothing else exists. Within a tier the lowest value wins.
             Each row links the assay that reports its measurement; expand a row to see every underlying record with its assay and publication.
+          </p>
+          <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+            {RANGE_RULE}
+            {summary?.hidden_rows ? ` ${summary.hidden_rows.toLocaleString("en-US")} of ${summary.representative_rows.toLocaleString("en-US")} compounds have no measurement in that range and are not listed.` : ""}
           </p>
         </div>
         <div className="grid gap-3 border-b border-white/5 bg-white/[0.015] p-4 sm:grid-cols-2 lg:grid-cols-5">
