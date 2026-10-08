@@ -166,3 +166,11 @@ No τ value changes. The stored τ of all 674 genes derives from the 54 GTEx v10
 7. **PDIS structure inputs** of genes with gene-name matches (for example PDK1, STK3) include structures of other proteins; ground rule 2 keeps these inputs, and the dossier states the difference.
 8. **Deployment fragility.** `confs-kinomex-1` runs `npm run build` from the live working tree at every start. A host reboot during this update started a build of unfinished code; restoring the baseline stopped it. Building from a tagged release, or keeping development in the separate worktree, prevents a repeat.
 9. `npm run lint` fails on the ESLint 9 configuration format (pre-existing; `tsc --noEmit` passes).
+
+## Addendum, 2026-10-08: ligand reporting range and potency plot
+
+- New ETL step `python -m etl.jmb_revision.ligands --step display --apply` writes a `display` measurement on every `ligand_representatives` row: the representative re-selected (same tier rules) from the records with 0 < value ≤ 10,000 nM, excluding lower bounds at 10,000 nM or above; `null` when no record is in range. The frozen representative fields, the audit counts above and the PDIS compound counts are unchanged.
+- Run on a copy of the 2026-10-06 database: 717,452 pairs; 548,042 with an in-range measurement, 169,410 without (hidden in the dossier); 246 pairs whose representative was out of range but which have an in-range record now show that record (e.g. ABL1 / CHEMBL553695: IC50 72,000 nM → 5,000 nM).
+- 518 representative rows read 0 nM (ChEMBL `standard_value` "0.0"; 454 of them PFKFB3). None of these compounds has a non-zero record for the same kinase, so they drop out.
+- 24 in-range values are below 0.1 pM (e.g. CDK12 Kd 0.00005 nM), likely unit errors in the deposited records; they are kept, and the plot draws them at its 0.1 pM edge.
+- The dossier Ligands tab adds a potency plot (shape = measure, colour = action), whose colours were checked for colour-vision deficiency against the card surface.

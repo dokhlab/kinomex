@@ -13,8 +13,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
   try {
     const db = (await connectToDatabase()).connection.db!;
-    const records = await ligandRecords(db, gene, key);
-    return NextResponse.json({ compound_key: key, records: records ?? [] });
+    const result = await ligandRecords(db, gene, key);
+    return NextResponse.json({ compound_key: key, records: result?.records ?? [], hidden: result?.hidden ?? 0 });
   } catch (error) {
     console.error(`GET /api/kinases/${gene}/ligands/records error:`, error);
     return NextResponse.json({ error: "Failed to fetch ligand records" }, { status: 500 });

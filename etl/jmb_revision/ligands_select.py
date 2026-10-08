@@ -112,6 +112,19 @@ def select_old_rule(records: Iterable[Mapping[str, Any]]) -> Mapping[str, Any]:
     return min(records, key=old_rule_key)
 
 
+# Reporting range for the dossier (display only; the representative rows above
+# stay unchanged). A value of 0 nM is not a measurement, and a value above
+# 10,000 nM, or a lower bound at 10,000 nM or above, reports no activity.
+DISPLAY_MAX_NM = 10000.0
+
+
+def in_display_range(record: Mapping[str, Any]) -> bool:
+    value = numeric_value(record.get("standard_value"))
+    if value is None or value <= 0 or value > DISPLAY_MAX_NM:
+        return False
+    return not (is_censored(record.get("standard_relation")) and value >= DISPLAY_MAX_NM)
+
+
 def summarize_pair(records: list[Mapping[str, Any]]) -> dict[str, Any]:
     """Representative measurement and counts for one pair."""
     rep = select_representative(records)
@@ -129,6 +142,19 @@ def summarize_pair(records: list[Mapping[str, Any]]) -> dict[str, Any]:
         "assay_count": len(records),
         "uncensored_count": uncensored,
         "activity_type_counts": dict(sorted(type_counts.items())),
+    }
+
+
+def display_summary(records: list[Mapping[str, Any]]) -> dict[str, Any] | None:
+    """The representative re-selected from the records inside the reporting range."""
+    in_range = [r for r in records if in_display_range(r)]
+    if not in_range:
+        return None
+    summary = summarize_pair(in_range)
+    return {
+        "record": summary["record"],
+        **{k: summary[k] for k in ("activity_type", "relation", "relation_original", "value_nm", "censored", "tier")},
+        "in_range_count": len(in_range),
     }
 
 

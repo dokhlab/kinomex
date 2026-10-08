@@ -44,7 +44,7 @@ efficacy, safety, or clinical priority.
 | `GET /api/kinases?weights=a,b,c,d&sort=pdis&partition=kinhub_core` | Filtered, weighted, ranked entries (`pdis_default`, `pdis_weighted`, `rank_weighted`) |
 | `GET /api/kinases/{gene}` | Dossier, including `pdis_score.components`, `raw_values`, `default_weights`, `formula_version` |
 | `GET /api/kinases/{gene}/structures?page=` | Scored experimental structures, 25 per page |
-| `GET /api/kinases/{gene}/ligands?uncensored=1` | Representative ligand rows; `/ligands/records?compound_key=` lists the underlying records |
+| `GET /api/kinases/{gene}/ligands?uncensored=1` | Ligand rows inside the 0–10,000 nM reporting range; `/ligands/records?compound_key=` lists the underlying records; `/ligands/plot` returns the potency-plot points |
 
 ## Development
 

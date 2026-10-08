@@ -96,7 +96,7 @@ function KinaseDetailPage() {
   const tabCounts: Record<string, number> = {
     structure: kinase.structures.total,
     expression: kinase.tissue_expressions.length,
-    chemical: kinase.ligand_summary?.representative_rows ?? 0,
+    chemical: kinase.ligand_summary?.reported_rows ?? kinase.ligand_summary?.representative_rows ?? 0,
     mutations: kinase.clinvar_variants.length + kinase.curated_mutations.length,
     diseases: kinase.diseases_associated.length,
     references: kinase.key_references.length,
