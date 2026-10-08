@@ -21,10 +21,10 @@ interface LigandRow {
   source: "chembl" | "pubchem";
   compound_id: string | null;
   pubchem_cid: number | null;
+  pubchem_cids: number[];
   ligand_name: string;
   compound_url: string | null;
   inchikey: string | null;
-  other_source_label: string | null;
   activity_type: string | null;
   relation: string;
   value_nm: number | null;
@@ -37,6 +37,7 @@ interface LigandRow {
 }
 
 interface LigandRecord {
+  source: "chembl" | "pubchem";
   activity_id: number | null;
   activity_type: string | null;
   relation: string;
@@ -98,7 +99,7 @@ function Records({ gene, row }: { gene: string; row: LigandRow }) {
       </tr></thead>
       <tbody className="divide-y divide-white/5">
         {records.map((r, i) => (
-          <tr key={`${r.activity_id ?? i}`}>
+          <tr key={`${r.source}-${r.activity_id ?? i}`}>
             <td className="px-4 py-1.5 text-slate-300">{r.activity_type ?? "unavailable"}</td>
             <td className="px-4 py-1.5 font-mono text-slate-200">{formatMeasurement(r.relation, r.value_nm)}{r.relation_original === null ? <span className="ml-1 text-slate-500" title="The source record carries no relation qualifier">(unqualified)</span> : null}</td>
             <td className="px-4 py-1.5">{r.source_url ? <a href={r.source_url} target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">{r.assay_chembl_id ?? `PubChem AID ${r.assay_aid}`} ↗</a> : "unavailable"}</td>
@@ -223,8 +224,10 @@ export default function LigandsTab({ kinase }: { kinase: KinaseDetail }) {
                       <td className="px-4 py-2.5">
                         <div className="font-medium text-slate-200">{row.ligand_name}</div>
                         <div className="flex flex-wrap items-center gap-2 text-xs">
-                          {row.compound_url ? <a href={row.compound_url} target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">{row.compound_id ?? `PubChem CID ${row.pubchem_cid}`} ↗</a> : <span className="text-slate-500">{row.compound_key}</span>}
-                          {row.other_source_label && <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[10px] text-amber-300" title={`InChIKey ${row.inchikey}`}>{row.other_source_label}</span>}
+                          {row.compound_id && <a href={`https://www.ebi.ac.uk/chembl/explore/compound/${row.compound_id}`} target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">{row.compound_id} ↗</a>}
+                          {(row.pubchem_cids ?? []).map((cid) => (
+                            <a key={cid} href={`https://pubchem.ncbi.nlm.nih.gov/compound/${cid}`} target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline" title={row.compound_id ? `Same standard InChIKey ${row.inchikey}` : undefined}>PubChem CID {cid} ↗</a>
+                          ))}
                         </div>
                       </td>
                       <td className="px-4 py-2.5 text-xs text-slate-300">
@@ -273,7 +276,7 @@ export default function LigandsTab({ kinase }: { kinase: KinaseDetail }) {
           Sources: <a href="https://www.ebi.ac.uk/chembl/" target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">ChEMBL</a> (CC BY-SA 3.0) and{" "}
           <a href="https://pubchem.ncbi.nlm.nih.gov/bioassay/1433" target="_blank" rel="noopener noreferrer" className="text-kinome-cyan hover:underline">PubChem AID 1433</a>.
           A binding mode appears only when a ChEMBL mechanism record supplies it; other rows read &quot;Not annotated.&quot;
-          The badge marks a compound whose standard InChIKey occurs in both sources for this kinase.
+          A compound found in both sources (same standard InChIKey) is listed once with its ChEMBL ID and PubChem CID; its measurement is chosen from the records of both.
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ from __future__ import annotations
 import pytest
 
 from etl.jmb_revision import ligands_select as sel
-from etl.jmb_revision.ligands import _binding_mode, old_rule_check
+from etl.jmb_revision.ligands import _binding_mode, merge_plan, old_rule_check
 
 
 def rec(activity_id, assay_type, relation, value, **extra):
@@ -145,3 +145,14 @@ def test_display_reselects_inside_range():
 
 def test_display_is_none_without_in_range_record():
     assert sel.display_summary([rec(1, "IC50", "=", "0.0"), rec(2, "KD", ">", "10000")]) is None
+
+
+def test_merge_plan_folds_pubchem_into_lowest_chembl_key():
+    rows = [
+        {"gene_symbol": "EGFR", "compound_key": "pubchem:5291", "source": "pubchem",
+         "other_source_compound_keys": ["chembl:CHEMBL939", "chembl:CHEMBL1"]},
+        {"gene_symbol": "EGFR", "compound_key": "pubchem:7", "source": "pubchem", "other_source_compound_keys": []},
+        {"gene_symbol": "EGFR", "compound_key": "chembl:CHEMBL939", "source": "chembl",
+         "other_source_compound_keys": ["pubchem:5291"]},
+    ]
+    assert merge_plan(rows) == {("EGFR", "pubchem:5291"): "chembl:CHEMBL1"}

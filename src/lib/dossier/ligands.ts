@@ -52,6 +52,9 @@ async function displayPrefix(db: Db): Promise<string> {
   return displayStepSeen ? "display." : "";
 }
 
+// PubChem rows folded into the ChEMBL row with the same standard InChIKey.
+const NOT_MERGED = { merged_into: { $exists: false } };
+
 function reportedFilter(prefix: string): Doc {
   return prefix ? { display: { $ne: null } } : displayRangeFilter();
 }
@@ -59,7 +62,7 @@ function reportedFilter(prefix: string): Doc {
 export async function ligandSummary(db: Db, gene: string) {
   if (!(await hasRepresentatives(db))) return null;
   const prefix = await displayPrefix(db);
-  const [bySource, byType, reported] = await Promise.all([
+  const [bySource, byType, reported, compounds, merged] = await Promise.all([
     db.collection("ligand_representatives").aggregate([
       { $match: { gene_symbol: gene } },
       { $group: { _id: "$source", rows: { $sum: 1 }, records: { $sum: "$assay_count" }, both: { $sum: { $cond: ["$also_in_other_source", 1, 0] } } } },
@@ -69,14 +72,16 @@ export async function ligandSummary(db: Db, gene: string) {
       { $group: { _id: { type: "$activity_type", censored: "$censored" }, n: { $sum: 1 } } },
     ]).toArray(),
     db.collection("ligand_representatives").countDocuments({ gene_symbol: gene, ...reportedFilter(prefix) }),
+    db.collection("ligand_representatives").countDocuments({ gene_symbol: gene, ...NOT_MERGED }),
+    db.collection("ligand_representatives").countDocuments({ gene_symbol: gene, merged_from: { $exists: true } }),
   ]);
   const sum = (key: "rows" | "records" | "both") => bySource.reduce((s, r) => s + (r[key] ?? 0), 0);
   return {
-    representative_rows: sum("rows"),
+    representative_rows: compounds,
     records: sum("records"),
-    rows_in_both_sources: sum("both"),
+    rows_in_both_sources: prefix ? merged : sum("both"),
     reported_rows: reported,
-    hidden_rows: sum("rows") - reported,
+    hidden_rows: compounds - reported,
     by_source: Object.fromEntries(bySource.map((r) => [r._id, { rows: r.rows, records: r.records }])),
     by_activity_type: byType.reduce((acc: Record<string, { uncensored: number; censored: number }>, r) => {
       const entry = (acc[r._id.type ?? "unavailable"] ??= { uncensored: 0, censored: 0 });
@@ -94,10 +99,10 @@ export function ligandFilter(gene: string, q: LigandQuery, prefix = "display."):
   const filter: Doc = { gene_symbol: gene, ...reportedFilter(prefix) };
   if (q.search) {
     const re = { $regex: escapeRegExp(q.search), $options: "i" };
-    filter.$or = [{ compound_name: re }, { compound_id: re }, { compound_key: re }, { inchikey: re }];
+    filter.$or = [{ compound_name: re }, { compound_id: re }, { compound_key: re }, { merged_from: re }, { inchikey: re }];
   }
   if (q.activityType) filter[`${prefix}activity_type`] = q.activityType;
-  if (q.source) filter.source = q.source;
+  if (q.source) filter[prefix ? "sources" : "source"] = q.source;
   if (q.uncensoredOnly) filter[`${prefix}censored`] = false;
   if (q.maxNm != null) filter[`${prefix}value_nm`] = { ...(prefix ? {} : filter.value_nm), $lte: q.maxNm };
   return filter;
@@ -118,22 +123,24 @@ function measurementOf(doc: Doc): Doc {
 export function serializeRepresentative(doc: Doc) {
   const m = measurementOf(doc);
   const rep = m.representative ?? {};
+  const pubchemCids: number[] = doc.source === "pubchem" ? [doc.pubchem_cid] : (doc.merged_pubchem_cids ?? []);
   return {
     compound_key: doc.compound_key,
     source: doc.source,
+    sources: doc.sources ?? [doc.source],
     compound_id: doc.compound_id ?? null,
     pubchem_cid: doc.pubchem_cid ?? null,
+    pubchem_cids: pubchemCids,
     ligand_name: doc.compound_name || doc.compound_id || (doc.pubchem_cid ? `PubChem CID ${doc.pubchem_cid}` : "Name unavailable"),
     compound_url: doc.compound_url ?? null,
     inchikey: doc.inchikey ?? null,
     also_in_other_source: doc.also_in_other_source === true,
-    other_source_label: doc.also_in_other_source ? (doc.source === "chembl" ? "Also in PubChem" : "Also in ChEMBL") : null,
     activity_type: m.activity_type ?? null,
     relation: m.relation ?? "=",
     value_nm: typeof m.value_nm === "number" ? m.value_nm : null,
     censored: m.censored === true,
     tier: m.tier ?? null,
-    assay_count: doc.assay_count ?? 1,
+    assay_count: m.record_count ?? doc.assay_count ?? 1,
     in_range_count: m.in_range_count ?? null,
     action: actionOf(m.activity_type, doc.binding_mode),
     binding_mode: doc.binding_mode || NOT_ANNOTATED,
@@ -199,15 +206,23 @@ function toNm(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-// Every underlying record of one compound-kinase pair, with its source link.
-export async function ligandRecords(db: Db, gene: string, compoundKey: string) {
+function keyMatch(compoundKey: string): Doc | null {
   const [source, id] = compoundKey.split(":", 2) as [string, string | undefined];
   if (!id || !["chembl", "pubchem"].includes(source)) return null;
-  const match: Doc = { target_gene_symbol: gene, source };
-  if (source === "chembl") match.compound_id = id;
-  else match.pubchem_cid = Number(id);
-  const docs = await db.collection("bioactivities").find(match).limit(5000).toArray();
+  return source === "chembl" ? { source, compound_id: id } : { source, pubchem_cid: Number(id) };
+}
+
+// Every underlying record of one compound-kinase pair, including the PubChem
+// records merged into a ChEMBL row, with its source link.
+export async function ligandRecords(db: Db, gene: string, compoundKey: string) {
+  const own = keyMatch(compoundKey);
+  if (!own) return null;
+  const row = await db.collection("ligand_representatives").findOne(
+    { gene_symbol: gene, compound_key: compoundKey }, { projection: { merged_from: 1 } });
+  const matches = [own, ...((row?.merged_from ?? []) as string[]).map(keyMatch).filter((m): m is Doc => m !== null)];
+  const docs = await db.collection("bioactivities").find({ target_gene_symbol: gene, $or: matches }).limit(5000).toArray();
   const all = docs.map((b) => ({
+      source: b.source as string,
       activity_id: b.activity_id ?? null,
       activity_type: b.assay_type ?? null,
       relation: b.standard_relation ?? "=",
@@ -222,7 +237,7 @@ export async function ligandRecords(db: Db, gene: string, compoundKey: string) {
       doi: b.doi || null,
       journal: b.document_journal || null,
       year: b.document_year ?? null,
-      source_url: source === "chembl"
+      source_url: b.source === "chembl"
         ? (b.assay_chembl_id ? `https://www.ebi.ac.uk/chembl/explore/assay/${b.assay_chembl_id}` : null)
         : `https://pubchem.ncbi.nlm.nih.gov/bioassay/${b.assay_aid ?? 1433}`,
     }));

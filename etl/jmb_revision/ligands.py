@@ -11,7 +11,8 @@ Steps (``--step``):
 - provenance:      adds document_chembl_id, pubmed_id and doi to ChEMBL bioactivities
 - identifiers:     rebuilds ``compound_identifiers`` (standard InChIKeys)
 - representatives: rebuilds ``ligand_representatives`` and writes the audit JSON
-- display:         adds the in-range ``display`` measurement to each representative row
+- display:         adds the in-range ``display`` measurement to each representative row and
+                   merges PubChem rows into the ChEMBL row with the same standard InChIKey
 
 The apply step reads only the cache, never the network. Every step is idempotent.
 """
@@ -421,17 +422,32 @@ def step_representatives(db, apply: bool) -> dict[str, Any]:
 
 
 def _gene_pairs(db, catalog: list[str]):
-    """(gene, compound_key, records) for every pair, streamed gene by gene."""
+    """(gene, {compound_key: records}) for every gene, streamed gene by gene."""
     cursor = db.bioactivities.find(
         {"target_gene_symbol": {"$in": catalog}}, PROJECTION, batch_size=10000,
     ).sort("target_gene_symbol", ASCENDING)
     gene, pairs = None, defaultdict(list)
     for rec in cursor:
         if rec["target_gene_symbol"] != gene:
-            yield from ((gene, key, recs) for key, recs in pairs.items())
+            if pairs:
+                yield gene, pairs
             gene, pairs = rec["target_gene_symbol"], defaultdict(list)
         pairs[sel.compound_key(rec["source"], rec.get("compound_id"), rec.get("pubchem_cid"))].append(rec)
-    yield from ((gene, key, recs) for key, recs in pairs.items())
+    if pairs:
+        yield gene, pairs
+
+
+def merge_plan(rows) -> dict[tuple[str, str], str]:
+    """(gene, PubChem key) -> the ChEMBL key it merges into.
+
+    A PubChem compound whose standard InChIKey matches a ChEMBL compound for the
+    same kinase is the same ligand; it folds into the lowest such ChEMBL key.
+    """
+    return {
+        (row["gene_symbol"], row["compound_key"]): min(row["other_source_compound_keys"])
+        for row in rows
+        if row["source"] == "pubchem" and row.get("other_source_compound_keys")
+    }
 
 
 def display_doc(records: list[dict[str, Any]], assay_doc, documents) -> dict[str, Any] | None:
@@ -439,32 +455,65 @@ def display_doc(records: list[dict[str, Any]], assay_doc, documents) -> dict[str
     if summary is None:
         return None
     rec = summary.pop("record")
-    return {**summary, "representative": _representative(rec, assay_doc, documents)}
+    return {**summary, "record_count": len(records), "representative": _representative(rec, assay_doc, documents)}
+
+
+MERGE_FIELDS = ("merged_into", "merged_from", "merged_pubchem_cids")
 
 
 def step_display(db, apply: bool) -> dict[str, Any]:
-    """Representative re-selected inside the reporting range (0 < value <= 10,000 nM).
+    """Representative re-selected inside the reporting range (0 < value <= 10,000 nM),
+    with cross-source duplicates (same standard InChIKey) merged into the ChEMBL row.
 
-    The frozen representative fields are left unchanged; the dossier reads ``display``.
+    The frozen representative fields are left unchanged; the dossier reads ``display``,
+    ``sources`` and the ``merged_*`` fields.
     """
     assay_doc, documents = load_provenance()
     catalog = sorted(db.kinases.distinct("gene_symbol"))
+    plan = merge_plan(db.ligand_representatives.find(
+        {"source": "pubchem", "also_in_other_source": True},
+        {"_id": 0, "gene_symbol": 1, "compound_key": 1, "source": 1, "other_source_compound_keys": 1}))
     counts: Counter = Counter()
     ops: list[UpdateOne] = []
     modified = 0
-    for gene, key, recs in _gene_pairs(db, catalog):
-        doc = display_doc(recs, assay_doc, documents)
-        counts["pairs"] += 1
-        counts["records"] += len(recs)
-        if doc is None:
-            counts["pairs_without_display"] += 1
-            counts["pairs_only_zero_or_missing"] += all((sel.numeric_value(r.get("standard_value")) or 0) <= 0 for r in recs)
-        else:
-            counts["pairs_with_display"] += 1
-            counts["records_in_range"] += doc["in_range_count"]
-            rep = sel.summarize_pair(recs)["record"]
-            counts["display_differs_from_representative"] += rep is not None and not sel.in_display_range(rep)
-        ops.append(UpdateOne({"gene_symbol": gene, "compound_key": key}, {"$set": {"display": doc}}))
+
+    def update(gene: str, key: str, fields: dict[str, Any]) -> None:
+        unset = {f: "" for f in MERGE_FIELDS if f not in fields}
+        ops.append(UpdateOne({"gene_symbol": gene, "compound_key": key},
+                             {"$set": fields, **({"$unset": unset} if unset else {})}))
+
+    for gene, pairs in _gene_pairs(db, catalog):
+        absorbed: dict[str, list[str]] = defaultdict(list)
+        for key in pairs:
+            target = plan.get((gene, key))
+            if target in pairs:
+                absorbed[target].append(key)
+        for key, recs in pairs.items():
+            counts["pairs"] += 1
+            counts["records"] += len(recs)
+            target = plan.get((gene, key))
+            if target in pairs:
+                counts["pubchem_rows_merged"] += 1
+                update(gene, key, {"display": None, "sources": ["pubchem"], "merged_into": target})
+                continue
+            extra = sorted(absorbed.get(key, []))
+            combined = recs + [r for k in extra for r in pairs[k]]
+            doc = display_doc(combined, assay_doc, documents)
+            fields: dict[str, Any] = {"display": doc, "sources": sorted({r["source"] for r in combined})}
+            if extra:
+                counts["chembl_rows_with_pubchem"] += 1
+                fields["merged_from"] = extra
+                fields["merged_pubchem_cids"] = [int(k.split(":", 1)[1]) for k in extra]
+            if doc is None:
+                counts["pairs_without_display"] += 1
+                counts["pairs_only_zero_or_missing"] += all(
+                    (sel.numeric_value(r.get("standard_value")) or 0) <= 0 for r in combined)
+            else:
+                counts["pairs_with_display"] += 1
+                counts["records_in_range"] += doc["in_range_count"]
+                rep = sel.summarize_pair(combined)["record"]
+                counts["display_differs_from_representative"] += rep is not None and not sel.in_display_range(rep)
+            update(gene, key, fields)
         if apply and len(ops) >= 5000:
             modified += db.ligand_representatives.bulk_write(ops, ordered=False).modified_count
             ops = []
